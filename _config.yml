@@ -65,6 +65,14 @@ pagination_dir: page
 ## Themes: http://hexo.io/themes/
 theme: TKL
 
+# Archives
+## 2: Enable pagination
+## 1: Disable pagination
+## 0: Fully Disable
+archive: 1
+category: 1
+tag: 1
+
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
