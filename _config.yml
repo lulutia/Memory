@@ -12,8 +12,8 @@ timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://lulutia.github.io/Memory/
-root: /Memory/
+url: http://memory.lulutia.com
+root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
@@ -47,6 +47,14 @@ highlight:
 default_category: uncategorized
 category_map:
 tag_map:
+
+# Server #本地服务参数
+## Hexo uses Connect as a server
+## You can customize the logger format as defined in
+## http://www.senchalabs.org/connect/logger.html
+port: 4000
+logger: true
+logger_format:
 
 # Date / Time format
 ## Hexo uses Moment.js to parse and display date
