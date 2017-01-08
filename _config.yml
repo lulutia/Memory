@@ -4,7 +4,7 @@
 
 # Site
 title: lulutia
-subtitle:
+subtitle: 有趣 是对一个人的至高评价
 description: Keep going
 author: lulutia
 language:
@@ -95,3 +95,22 @@ deploy:
   type: git
   repository: https://github.com/lulutia/Memory.git
   branch: gh-pages
+
+jsonContent:
+    meta: false
+    pages: false
+    posts:
+      title: true
+      date: true
+      path: true
+      text: true
+      raw: false
+      content: false
+      slug: false
+      updated: false
+      comments: false
+      link: false
+      permalink: false
+      excerpt: false
+      categories: false
+      tags: true

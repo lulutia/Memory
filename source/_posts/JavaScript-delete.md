@@ -1,8 +1,10 @@
 title: JavaScript中的delete一探
 categories: technology
+date: 2015-10-20 12:36
+comments: true
 tags: [前端,计算机]
 ---
-##JavaScript中的delete
+
 * 核心内容借鉴自下面的[网址](http://perfectionkills.com/understanding-delete/)
 * delete一般用法：
     * 删除对象的属性 

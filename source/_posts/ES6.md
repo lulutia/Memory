@@ -1,8 +1,10 @@
 title: ES6 learning
-categories: technology 
+categories: technology
+date: 2015-10-11 22:38
+comments: true
 tags: [前端,计算机]
 ---
-##Environment Prepare
+Environment Prepare
 * Bable
     * node --harmony
     * node --v8-options | grep harmony
@@ -44,7 +46,7 @@ tags: [前端,计算机]
     * traceur --script es6.js --out es5.js  --experimental
 
 
-##Some commands
+Some commands
 * let 
     * 块级作用域
     * 不存在变量提升
@@ -59,7 +61,7 @@ tags: [前端,计算机]
 * ES6规定，var命令和function命令声明的全局变量，属于全局对象的属性；let命令、const命令、class命令声明的全局变量，不属于全局对象的属性。
 
    
-##跨模块常量：
+跨模块常量：
 ~~~
     export XXX
     -----
@@ -69,7 +71,7 @@ tags: [前端,计算机]
 ~~~
     
     
-##变量的解构赋值
+变量的解构赋值
 * 如果解构不成功，变量的值就等于undefined
 * 解构赋值允许指定默认值
 * 如果等号的右边不是数组（或者严格地说，不是可遍历的结构，参见《Iterator》一章），那么将会报错,解构不仅可以用于数组，还可以用于对象
@@ -80,5 +82,5 @@ tags: [前端,计算机]
     * 不能将整个模式，或嵌套模式中的一层，放在圆括号之中
 * 可以使用圆括号的情况只有一种：赋值语句的非模式部分，可以使用圆括号
 
-##Iterator
+Iterator
 * Waiting

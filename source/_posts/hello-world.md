@@ -1,12 +1,14 @@
 title: 留档：GitHub＋hexo＋godaddy
+date: 2015-09-11 19:22
+comments: true
 categories: technology 
 tags: [环境搭建,计算机]
 ---
-##环境准备部分
+环境准备部分
 * 安装Node，去[node官网](https://nodejs.org/)根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成在里面了。
 * 安装git，我用的是git的客户端[SourceTree](https://www.sourcetreeapp.com/)，选择很多，怎样顺手怎样来。
 
-##github部分
+github部分
 [**github**](https://github.com/)是一个开源代码库以及版本控制系统。
 
 * 申请一个GitHub的账号，路径点击上面链接。
@@ -17,7 +19,7 @@ tags: [环境搭建,计算机]
 * 添加SSH公匙到Account settings －》SSH Keys －》Add SSH Key(其实如果不用SSH连接是可以省略这一步的)，具体过程[点击我](https://help.github.com/articles/generating-ssh-keys/)。将的很详细，跟着走就可以了。
 * 将此仓库克隆到本地(此处需要建立没有历史纪录和操作记录的新分支，所以最好新克隆)，然后创建gh-pages的分支并且将里面的内容都删除，此处不要提交修改。具体过程[点击我](https://help.github.com/articles/creating-project-pages-manually/)。
 
-##hexo部分
+hexo部分
 [**hexo**](https://hexo.io/zh-cn/)是一个快速，简洁高效的博客框架。
 
 * 在命令行里输入`npm install hexo-cli -g`进行安装。这里可能会出现几个问题。
@@ -94,18 +96,18 @@ tags: [环境搭建,计算机]
 		npm install hexo-deployer-git --save
 	~~~
 	
-##主题安装
+主题安装
 [**主题寻找地址**](https://github.com/hexojs/hexo/wiki/Themes)
 安装方法也很简单，具体的每个主题下有，大概就是将他们克隆到本地的themes文件夹下，然后修改hexo的配置里的theme为希望的主题。
 
-##域名部署
+域名部署
 * 我是之前在godaddy上买过一个域名。
 * [Godaddy注册商域名修改DNS地址](https://support.dnspod.cn/Kb/showarticle/tsid/42)。
 * 在DNSPod添加域名后进入控制台添加纪录，这边已经有两条记录了，此时再添加两条，一条是A纪录的host为@指向github的ip，这里是固定的192.30.252.153。另外一条CNAME纪录的host为www指向你的主页<username>.github.io(当然这里也可以通过dig命令获取具体的ip值)，同理，如果是项目主页可以添加二级目录指向<username>.github.io。
 * 在具体的项目下添加一个文件CNAME。里面写上你希望对应的域名，然后提交。接着生成部署hexo就行。
 * [更加详细内容参照](https://help.github.com/articles/about-custom-domains-for-github-pages-sites/)。
 
-##另外一些参考资料
+另外一些参考资料
 * [资料一](http://ibruce.info/2013/11/22/hexo-your-blog/)
 * [资料二](https://medium.com/@LovettLovett/github-pages-godaddy-f0318c2f25a)
 

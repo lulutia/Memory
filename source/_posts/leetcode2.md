@@ -1,9 +1,11 @@
 title: leetcode-JavaScript实现part2
-categories: Algorithm 
+categories: Algorithm
+date: 2015-10-12 18:09
+comments: true
 tags: [前端,计算机,算法]
 ---
 其他见part1
-##Merge Two Sorted Lists
+Merge Two Sorted Lists
 * https://leetcode.com/problems/merge-two-sorted-lists/
 * Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.
     
@@ -67,7 +69,7 @@ var mergeTwoLists = function(l1, l2) {
 
 ~~~
 
-##Remove Duplicates from Sorted Array
+Remove Duplicates from Sorted Array
 * https://leetcode.com/problems/remove-duplicates-from-sorted-array/
 * Given a sorted array, remove the duplicates in place such that each element appear only once and return the new length.
     * Do not allocate extra space for another array, you must do this in place with constant memory.
@@ -98,7 +100,7 @@ var removeDuplicates = function(nums) {
 };
 ~~~
 
-##Remove Element
+Remove Element
 * https://leetcode.com/problems/remove-element/
 * Given an array and a value, remove all instances of that value in place and return the new length.The order of elements can be changed. It doesn't matter what you leave beyond the new length.
 
@@ -124,7 +126,7 @@ var removeElement = function(nums, val) {
 };
 ~~~
 
-##Implement strStr()
+Implement strStr()
 * https://leetcode.com/problems/implement-strstr/
 * mplement strStr().Returns the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.
 
@@ -146,7 +148,7 @@ var strStr = function(haystack, needle) {
 };
 ~~~
 
-##Valid Sudoku
+Valid Sudoku
 * https://leetcode.com/problems/valid-sudoku/
 * Determine if a Sudoku is valid, according to: [Sudoku Puzzles - The Rules](http://sudoku.com.au/TheRules.aspx).The Sudoku board could be partially filled, where empty cells are filled with the character '.'.
 * Note:A valid Sudoku board (partially filled) is not necessarily solvable. Only the filled cells need to be validated.
@@ -190,7 +192,7 @@ var isValidSudoku = function(board) {
 };
 ~~~
 
-##Length of Last Word
+Length of Last Word
 * https://leetcode.com/problems/length-of-last-word/
 * Given a string s consists of upper/lower-case alphabets and empty space characters ' ', return the length of last word in the string.If the last word does not exist, return 0.
     * Note: A word is defined as a character sequence consists of non-space characters only.
@@ -220,7 +222,7 @@ var lengthOfLastWord = function(s) {
 };
 ~~~
 
-##Plus One
+Plus One
 * https://leetcode.com/problems/plus-one/
 * Given a non-negative number represented as an array of digits, plus one to the number.The digits are stored such that the most significant digit is at the head of the list.
 
@@ -251,7 +253,7 @@ var plusOne = function(digits) {
 };
 ~~~
 
-##Climbing Stairs
+Climbing Stairs
 * https://leetcode.com/problems/climbing-stairs/
 * You are climbing a stair case. It takes n steps to reach to the top.Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
 * 测试可知，其实是一个斐波拉契数列n为1，2，3，4，5时，结果为1，2，3，5，8.
@@ -279,7 +281,7 @@ var climbStairs = function(n) {
 };
 ~~~
 
-##Remove Duplicates from Sorted List
+Remove Duplicates from Sorted List
 * https://leetcode.com/problems/remove-duplicates-from-sorted-list/
 * Given a sorted linked list, delete all duplicates such that each element appear only once.
     * For example,
@@ -321,7 +323,7 @@ var deleteDuplicates = function(head) {
 };
 ~~~
 
-##Merge Sorted Array
+Merge Sorted Array
 * https://leetcode.com/problems/merge-sorted-array/
 * Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
     * Note:You may assume that nums1 has enough space (size that is greater or equal to m + n) to hold additional elements from nums2. The number of elements initialized in nums1 and nums2 are m and n respectively.

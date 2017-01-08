@@ -1,9 +1,11 @@
 title: leetcode-JavaScript实现
 categories: Algorithm 
+date: 2015-10-11 18:22
+comments: true
 tags: [前端,计算机,算法]
 ---
 找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。
-##Add Two Numbers
+Add Two Numbers
 * https://leetcode.com/problems/add-two-numbers/
 * You are given two linked lists representing two non-negative numbers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
     * Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
@@ -58,7 +60,7 @@ var addTwoNumbers = function(l1, l2) {
 
 ~~~
 
-##Longest Substring Without Repeating Characters：
+Longest Substring Without Repeating Characters：
 
 * https://leetcode.com/problems/longest-substring-without-repeating-characters/
 * Given a string, find the length of the longest substring without repeating characters. For example, the longest substring without repeating letters for "abcabcbb" is "abc", which the length is 3. For "bbbbb" the longest substring is "b", with the length of 1.
@@ -89,7 +91,7 @@ var lengthOfLongestSubstring = function(s) {
 };
 ~~~
 
-##ZigZag Conversion
+ZigZag Conversion
 * https://leetcode.com/problems/zigzag-conversion/
 * 简单的说就是从左边开始不停画Z字型路线，然后从上部读取字母拼成输出。
 * 后来网上找了下，[这个孩子](http://fisherlei.blogspot.com/2013/01/leetcode-zigzag-conversion.html)的分析思路和我的基本一样。
@@ -120,7 +122,7 @@ var convert = function(s, numRows) {
 };
 ~~~
 
-##Reverse Integer
+Reverse Integer
 * https://leetcode.com/problems/reverse-integer/
 * Reverse digits of an integer.
     * Example1: x = 123, return 321
@@ -151,7 +153,7 @@ var reverse = function(x) {
 };
 ~~~
 
-##String to Integer (atoi)
+String to Integer (atoi)
 * https://leetcode.com/problems/string-to-integer-atoi/
 * Implement atoi to convert a string to an integer.
     * Hint: Carefully consider all possible input cases. If you want a challenge, please do not see below and ask yourself what are the possible input cases.
@@ -196,7 +198,7 @@ var myAtoi = function(str) {
 };
 ~~~
 
-##Palindrome Number
+Palindrome Number
 * https://leetcode.com/problems/palindrome-number/
 * Determine whether an integer is a palindrome. Do this without extra space.
 
@@ -231,7 +233,7 @@ var isPalindrome = function(x) {
 };
 ~~~
 
-##Roman to Integer
+Roman to Integer
 * https://leetcode.com/problems/roman-to-integer/
 * Given a roman numeral, convert it to an integer.Input is guaranteed to be within the range from 1 to 3999.
 * 题目没写具体的罗马数规律，查了一下，如下：[罗马数规律](http://blog.csdn.net/wzy_1988/article/details/17057929)
@@ -284,7 +286,7 @@ var romanToInt = function(s) {
 };
 ~~~
 
-##Longest Common Prefix
+Longest Common Prefix
 * https://leetcode.com/problems/longest-common-prefix/
 * Write a function to find the longest common prefix string amongst an array of strings.
 

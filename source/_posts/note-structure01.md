@@ -1,8 +1,10 @@
-title: (数据结构与算法JavaScript描述)读书笔记－前端自留
-categories: technology 
+title: (数据结构与算法JavaScript描述)读书笔记
+categories: technology
+date: 2015-10-13 16:06
+comments: true
 tags: [前端,计算机,算法]
 ---
-##数组
+数组
 * 判断是否数组：Array.isArray(sth);
 * []创建数组的效率比Array构造函数高;
 * 浅复制 VS 深复制；
@@ -34,7 +36,7 @@ function matrix(numrows,numcols,initial){
 }
 ~~~
 
-##列表
+列表
 * 如果数据结构非常复杂。列表的作用就没有那么大了。
 * 如果数据储存的顺序不重要，也不必对数据进行查找，那么列表就很好。
 
@@ -139,7 +141,7 @@ for(names.front();names.currPos()<names.length();names.next()){
 }
 ~~~
 
-##栈
+栈
 ~~~
 function Stack(){
     this.dataStore = [];

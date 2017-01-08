@@ -1,12 +1,14 @@
 title: 留档：Node学习脚印一
-categories: technology 
+categories: technology
+date: 2015-10-11 18:21
+comments: true 
 tags: [前端,计算机]
 ---
-##资料准备部分
+资料准备部分
 * [Node入门](http://www.nodebeginner.org/index-zh-cn.html)
 * 深入浅出Node.js
 
-##Node入门部分
+Node入门部分
 目标：
 
 * 用户通过浏览器使用此应用。
@@ -132,5 +134,5 @@ requestHandlers.show = function(res, postData){
 module.exports = requestHandlers;
 ~~~
 
-##注意点
+注意点
 * 阻塞和非阻塞的问题

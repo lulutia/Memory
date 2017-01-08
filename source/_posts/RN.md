@@ -1,9 +1,11 @@
 title: React Native入个小门
 categories: technology 
+date: 2016-05-27 22:36
+comments: true
 tags: [前端,计算机]
 ---
-##React Native入个小门
-###React Native是个啥?
+
+React Native是个啥?
 * 创造者:FaceBook
 * 时间:React.js Conf 2015 上发布，9月推出Android版本
 * 使用范围:用于开发iOS和Android原生应用
@@ -16,7 +18,7 @@ tags: [前端,计算机]
  * ECMAScript 6 vs ECMAScript 5
  * React Native View vs DOM
 
-###如何玩React Native?
+如何玩React Native?
 * 按照React Native官方文档搭建环境，如下有[英文版](http://facebook.github.io/react-native/docs/getting-started.html)，[中文版](http://reactnative.cn/docs/0.26/getting-started.html)。模拟器推荐使用[Genymotion](https://www.genymotion.com/)。IDE推荐使用[WebStorm](https://www.jetbrains.com/webstorm/),其注册码[在此](http://us.idea.lanyus.com/)。整个上述过程中可能遇见的问题如下:
      * $ANDROID_NDK 和 $ANDROID_HOME 没有正确设置: 
         * 解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存在。

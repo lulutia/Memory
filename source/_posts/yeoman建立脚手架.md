@@ -1,8 +1,10 @@
 title: yeoman建立脚手架
 categories: technology 
+date: 2015-11-03 22:10
+comments: true
 tags: [前端,计算机]
 ---
-##yeoman建立脚手架
+
 * 首先你要先安装yeoman，`npm install -g yo bower grunt-cli gulp`。
 * generator是一个Node.js的模块。
 * 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。
@@ -85,11 +87,12 @@ this.prompt({
 * 在generator-name/文件夹下运行`npm link`可以使generator在本地可用。
 
     
-##意料之外的问题
+意料之外的问题
 * yeoman安装的时候表示node和npm的版本都落后了，然后npm这个命令就无法用了……简直了＝＝然后想用brew安装下，结果忘记brew没更新，各种更新无效。
 * 直接用`curl -L https://www.npmjs.com/install.sh | sh`加上sudo也有问题，还是报权限错误。
 * 决定可以用bower，但强迫症患者觉得这样不完美。可以直接重新下node，但觉得代价太大。
 * 用了比较粗暴的方法，去npm 的github上下载了sh，然后`sudo sh /Users/muriel/Downloads/install.sh`来安装。完了顺便把brew更新下,把没升级的软件升级了`brew update;brew upgrade;brew cleanup`。
 * 然后又出来一个问题，`npm install`按照package.json来安装但是目录结构有问题，原来npm的3开始决定采用扁平化处理，所以之前的代码为了适应这个改变必须要做一些改变。
 
-##[具体代码](https://github.com/lulutia/generator-lulutia-react)
+
+[具体代码](https://github.com/lulutia/generator-lulutia-react)
