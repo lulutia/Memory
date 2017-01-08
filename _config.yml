@@ -71,7 +71,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: http://hexo.io/plugins/
 ## Themes: http://hexo.io/themes/
-theme: TKL
+theme: yilia
 
 # Archives
 ## 2: Enable pagination
@@ -81,6 +81,14 @@ archive: 1
 category: 1
 tag: 1
 
+marked:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
