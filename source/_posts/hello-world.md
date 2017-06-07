@@ -1,7 +1,7 @@
 title: 留档：GitHub＋hexo＋godaddy
+categories: technology 
 date: 2015-09-11 19:22
 comments: true
-categories: technology 
 tags: [环境搭建,计算机]
 ---
 环境准备部分

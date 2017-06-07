@@ -3,13 +3,13 @@ categories: technology
 comments: true
 tags: [前端,计算机]
 ---
-###背景介绍
+背景介绍
 * WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]
 * 具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。
 * OpenGL2.0开始支持的可编程着色器方法被OpenGL ES2.0继承，成为了WebGL1.0标准的核心部分。而着色器方法或称为着色器，是使用一种类似C的编程语言实现精美的视觉效果。而编写着色器的语言称为着色器语言，WebGL使用OpenGL ES着色器语言，亦即GLSLES。
 * WebGL规范的建立由Khronos(也负责OpenGL规范的更新和标准化)建立的WebGL工作小组负责。2011年发布了WebGL规范的第一个版本。[WebGL2.0](https://www.khronos.org/registry/webgl/specs/latest/2.0/)处于[Editor's Draft](http://stackoverflow.com/questions/6692762/what-is-the-difference-between-a-w3c-working-draft-and-an-editors-draft)状态，它主要提供与OpenGL3.0新特性的对应，现阶段它并不与WebGL1.0完全向下兼容。
 
-### 基本概念
+基本概念
   WebGL主要是用于渲染2D、3D矢量图形。在进入它的使用细节之前，我们先分析下它到底做了件什么事以及其执行的顺序。
   如果你有过一点三模建模方面的经验的话，你就会知道，所有的三维模型都是由点，线，三角形构成的。譬如下面这只超级出名的bunny兔子。模型的精细程度与其面片的数量直接相关，当面片数量足够多时，人类的视觉是无法分辨三角形的。
   同理，如果我们打开WebGL的绘图API，我们就会发现，它处理的也是点，线，三角形。那么它是如何由这些最基础的东西构建出整个世界的呢。其实，它主要执行了三方面的操作：
@@ -45,7 +45,7 @@ tags: [前端,计算机]
  下面图示为整体流程:
  
  ![整体流程](http://okzzg7ifm.bkt.clouddn.com/01.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
-###GLSE中的数据类型
+GLSE中的数据类型
 * 基本类型
 	* float: 表示浮点数
 	* int： 整型 
@@ -84,7 +84,7 @@ tags: [前端,计算机]
 * 预处理指令
 	预处理指令用来在真正编译之前对代码进行预处理，都以#开始
 
-###核心思想
+核心思想
 * [获取WebGL上下文](http://lulutia.com/webgldemo/01/)：
 ![获取上下文](http://okzzg7ifm.bkt.clouddn.com/02.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
 
@@ -183,7 +183,7 @@ tags: [前端,计算机]
 	![纹理代码处理](http://okzzg7ifm.bkt.clouddn.com/10.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
 	
 	
-### 具体API
+具体API
 **注：文中demo根据WebGL编程指南demo改编而来**
 
 1. [gl.createShader(type)](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createShader): 创建由type指定的着色器对象，type的值分别为gl.VERTEX_SHADER表示顶点着色器 gl.FRAGMENT_SHADER表示片元着色器
