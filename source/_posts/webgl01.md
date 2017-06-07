@@ -20,16 +20,15 @@ tags: [前端,计算机]
   	* 顶点坐标会写入缓冲中等待使用
   * 进行图元装配：即将顶点根据primitive(原始的连接关系）还原成网格结构
   	* 在WebGL中，为了使用者对顶点的位置有足够的控制权，提供了一个顶点着色器的东西。它是用上面提到的opengl es编写的，然后以字符串的形式嵌入在js文件中的，在程序开始运行前就已经设置好了
+  	* 顶点着色器中主要对点的特性进行处理，比如进行坐标的转换等，然后由GPU执行图元装配。此处是以单个点为单位执行的操作，有多少个点，这段程序就会执行多少次
 
-	```js
-	var VSHADER_SOURCE = 
-	'void main() {\n' +
-	'gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n' + //设置坐标，必须
-	'gl_PointSize = 10.0;\n' + // 设置尺寸，非必需，默认1.0
-	'}\n';
-	```
-	
-	* 顶点着色器中主要对点的特性进行处理，比如进行坐标的转换等，然后由GPU执行图元装配。此处是以单个点为单位执行的操作，有多少个点，这段程序就会执行多少次
+		```js
+		var VSHADER_SOURCE = 
+		'void main() {\n' +
+		'gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n' + //设置坐标，必须
+		'gl_PointSize = 10.0;\n' + // 设置尺寸，非必需，默认1.0
+		'}\n';
+		```
   * 进行光栅化：将图转化为一个个栅格组成的图象
   	* 上面一部生成了模型的网格形态，但是要呈现实际的模型还需要“着色”，这部分WebGL也为我们提供了片元着色器来进行控制。
   	* 片元着色器主要进行材质，颜色的处理等，它会进行逐片元处理过程，片元这边可大概理解为像素(图像的单元)
@@ -122,7 +121,7 @@ GLSE中的数据类型
 * [WebGL可绘制的基本图形](http://lulutia.com/webgldemo/08/)，主要运用于API 14，[对比例子点我](http://lulutia.com/webgldemo/09/)
 	WebGL可以绘制gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN 七种，它们的绘制顺序如下：
 	
-	![基本图形](http://okzzg7ifm.bkt.clouddn.com/06.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
+	![基本图形](http://okzzg7ifm.bkt.clouddn.com/06.png?imageView2/2/w/900/h/500/q/75%7Cwatermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10%7Cimageslim)
 	
 * 移动、旋转、缩放
 	* 对于[平移](http://lulutia.com/webgldemo/10/)而言，就是对顶点的每个分量加上其在对应轴上平移的距离, 因此就是在顶点着色器中对原有的position加上移动的position即可
@@ -147,15 +146,13 @@ GLSE中的数据类型
 	'gl_Position.w = 1.0;\n' +
 	'}\n';
 	```
-	* 当情况复杂起来后，需要进行[矩阵变换](http://lulutia.com/webgldemo/12/)，比如根据上面可以得到平移矩阵，旋转矩阵和缩放矩阵如下：之后将它与坐标相乘即可得到变换后的坐标
-	
-	```js
-	gl_Position = u_xformMatrix * a_Position ;
-	```
-	
-	![矩阵](http://okzzg7ifm.bkt.clouddn.com/07.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
-	
-	* 因为[矩阵计算比较复杂](http://lulutia.com/webgldemo/13/)，一般情况下都使用封装好的矩阵操作库进行计算
+	* 当情况复杂起来后，需要进行[矩阵变换](http://lulutia.com/webgldemo/12/)，比如根据上面可以得到平移矩阵，旋转矩阵和缩放矩阵如下：之后将它与坐标相乘即可得到变换后的坐标,因为[矩阵计算比较复杂](http://lulutia.com/webgldemo/13/)，一般情况下都使用封装好的矩阵操作库进行计算
+		
+		![矩阵](http://okzzg7ifm.bkt.clouddn.com/07.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
+
+		```js
+		gl_Position = u_xformMatrix * a_Position ;
+		```
 
 * [动画](http://lulutia.com/webgldemo/14/)
 	* 根据不同时间确定不同的状态
