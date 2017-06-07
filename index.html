@@ -196,12 +196,11 @@
 <li><p>进行图元装配：即将顶点根据primitive(原始的连接关系）还原成网格结构</p>
 <ul>
 <li>在WebGL中，为了使用者对顶点的位置有足够的控制权，提供了一个顶点着色器的东西。它是用上面提到的opengl es编写的，然后以字符串的形式嵌入在js文件中的，在程序开始运行前就已经设置好了</li>
-</ul>
+<li><p>顶点着色器中主要对点的特性进行处理，比如进行坐标的转换等，然后由GPU执行图元装配。此处是以单个点为单位执行的操作，有多少个点，这段程序就会执行多少次</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> VSHADER_SOURCE = </div><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n'</span> + <span class="comment">//设置坐标，必须</span></div><div class="line"><span class="string">'gl_PointSize = 10.0;\n'</span> + <span class="comment">// 设置尺寸，非必需，默认1.0</span></div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
 </li>
 </ul>
-<pre><code>* 顶点着色器中主要对点的特性进行处理，比如进行坐标的转换等，然后由GPU执行图元装配。此处是以单个点为单位执行的操作，有多少个点，这段程序就会执行多少次
-</code></pre><ul>
+</li>
 <li><p>进行光栅化：将图转化为一个个栅格组成的图象</p>
 <ul>
 <li>上面一部生成了模型的网格形态，但是要呈现实际的模型还需要“着色”，这部分WebGL也为我们提供了片元着色器来进行控制。</li>
@@ -275,7 +274,7 @@
 <p>  <img src="http://okzzg7ifm.bkt.clouddn.com/05.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="缓冲区对象"></p>
 </li>
 <li><p><a href="http://lulutia.com/webgldemo/08/" target="_blank" rel="external">WebGL可绘制的基本图形</a>，主要运用于API 14，<a href="http://lulutia.com/webgldemo/09/" target="_blank" rel="external">对比例子点我</a><br>  WebGL可以绘制gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN 七种，它们的绘制顺序如下：</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/06.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="基本图形"></p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/06.png?imageView2/2/w/900/h/500/q/75%7Cwatermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10%7Cimageslim" alt="基本图形"></p>
 </li>
 <li><p>移动、旋转、缩放</p>
 <ul>
@@ -286,17 +285,14 @@
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">newX = oldX * cosβ - oldY * sinβ</div><div class="line">newY = oldX * sinβ + oldY * cosβ</div><div class="line">newZ = oldZ</div></pre></td></tr></table></figure>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_Position.x = a_Position.x * u_CosB - a_Position.y * u_SinB;\n'</span> + <span class="comment">//设置坐标，必须</span></div><div class="line"><span class="string">'gl_Position.y = a_Position.x * u_SinB + a_Position.y * u_CosB;\n'</span> +</div><div class="line"><span class="string">'gl_Position.z = a_Position.z;\n'</span> + </div><div class="line"><span class="string">'gl_Position.w = 1.0;\n'</span> +</div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
 </li>
-<li><p>当情况复杂起来后，需要进行<a href="http://lulutia.com/webgldemo/12/" target="_blank" rel="external">矩阵变换</a>，比如根据上面可以得到平移矩阵，旋转矩阵和缩放矩阵如下：之后将它与坐标相乘即可得到变换后的坐标</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gl_Position = u_xformMatrix * a_Position ;</div></pre></td></tr></table></figure>
+<li><p>当情况复杂起来后，需要进行<a href="http://lulutia.com/webgldemo/12/" target="_blank" rel="external">矩阵变换</a>，比如根据上面可以得到平移矩阵，旋转矩阵和缩放矩阵如下：之后将它与坐标相乘即可得到变换后的坐标,因为<a href="http://lulutia.com/webgldemo/13/" target="_blank" rel="external">矩阵计算比较复杂</a>，一般情况下都使用封装好的矩阵操作库进行计算</p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/07.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="矩阵"></p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gl_Position = u_xformMatrix * a_Position ;</div></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
-</ul>
-<pre><code>![矩阵](http://okzzg7ifm.bkt.clouddn.com/07.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
-
-* 因为[矩阵计算比较复杂](http://lulutia.com/webgldemo/13/)，一般情况下都使用封装好的矩阵操作库进行计算
-</code></pre><ul>
-<li><a href="http://lulutia.com/webgldemo/14/" target="_blank" rel="external">动画</a><ul>
+<li><p><a href="http://lulutia.com/webgldemo/14/" target="_blank" rel="external">动画</a></p>
+<ul>
 <li>根据不同时间确定不同的状态</li>
 <li>在每次绘制前，清除上次绘制的内容，并绘制相应状态下的图形</li>
 <li>调用requestAnimationFrame(fn)进行持续绘制</li>
