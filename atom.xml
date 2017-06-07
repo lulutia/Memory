@@ -1,0 +1,1415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>lulutia</title>
+  <subtitle>有趣 是对一个人的至高评价</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://memory.lulutia.com/"/>
+  <updated>2017-06-07T02:51:33.000Z</updated>
+  <id>http://memory.lulutia.com/</id>
+  
+  <author>
+    <name>lulutia</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>WEBGL系列之二维操作</title>
+    <link href="http://memory.lulutia.com/2017/06/07/webgl01/"/>
+    <id>http://memory.lulutia.com/2017/06/07/webgl01/</id>
+    <published>2017-06-07T02:45:01.000Z</published>
+    <updated>2017-06-07T02:51:33.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>###背景介绍</p>
+<ul>
+<li>WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]</li>
+<li>具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。</li>
+<li>OpenGL2.0开始支持的可编程着色器方法被OpenGL ES2.0继承，成为了WebGL1.0标准的核心部分。而着色器方法或称为着色器，是使用一种类似C的编程语言实现精美的视觉效果。而编写着色器的语言称为着色器语言，WebGL使用OpenGL ES着色器语言，亦即GLSLES。</li>
+<li>WebGL规范的建立由Khronos(也负责OpenGL规范的更新和标准化)建立的WebGL工作小组负责。2011年发布了WebGL规范的第一个版本。<a href="https://www.khronos.org/registry/webgl/specs/latest/2.0/" target="_blank" rel="external">WebGL2.0</a>处于<a href="http://stackoverflow.com/questions/6692762/what-is-the-difference-between-a-w3c-working-draft-and-an-editors-draft" target="_blank" rel="external">Editor’s Draft</a>状态，它主要提供与OpenGL3.0新特性的对应，现阶段它并不与WebGL1.0完全向下兼容。</li>
+</ul>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>  WebGL主要是用于渲染2D、3D矢量图形。在进入它的使用细节之前，我们先分析下它到底做了件什么事以及其执行的顺序。<br>  如果你有过一点三模建模方面的经验的话，你就会知道，所有的三维模型都是由点，线，三角形构成的。譬如下面这只超级出名的bunny兔子。模型的精细程度与其面片的数量直接相关，当面片数量足够多时，人类的视觉是无法分辨三角形的。<br>  同理，如果我们打开WebGL的绘图API，我们就会发现，它处理的也是点，线，三角形。那么它是如何由这些最基础的东西构建出整个世界的呢。其实，它主要执行了三方面的操作：</p>
+<ul>
+<li>获取顶点坐标<ul>
+<li>简单图形，可以显示定义</li>
+<li>复杂图形，一般会在三维软件导出模型时一同导出</li>
+<li>顶点坐标会写入缓冲中等待使用</li>
+</ul>
+</li>
+<li><p>进行图元装配：即将顶点根据primitive(原始的连接关系）还原成网格结构</p>
+<ul>
+<li>在WebGL中，为了使用者对顶点的位置有足够的控制权，提供了一个顶点着色器的东西。它是用上面提到的opengl es编写的，然后以字符串的形式嵌入在js文件中的，在程序开始运行前就已经设置好了</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> VSHADER_SOURCE = </div><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n'</span> + <span class="comment">//设置坐标，必须</span></div><div class="line"><span class="string">'gl_PointSize = 10.0;\n'</span> + <span class="comment">// 设置尺寸，非必需，默认1.0</span></div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<pre><code>* 顶点着色器中主要对点的特性进行处理，比如进行坐标的转换等，然后由GPU执行图元装配。此处是以单个点为单位执行的操作，有多少个点，这段程序就会执行多少次
+</code></pre><ul>
+<li><p>进行光栅化：将图转化为一个个栅格组成的图象</p>
+<ul>
+<li>上面一部生成了模型的网格形态，但是要呈现实际的模型还需要“着色”，这部分WebGL也为我们提供了片元着色器来进行控制。</li>
+<li><p>片元着色器主要进行材质，颜色的处理等，它会进行逐片元处理过程，片元这边可大概理解为像素(图像的单元)</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"> 	<span class="keyword">var</span> FSHADER_SOURCE = </div><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n'</span> + <span class="comment">// 设置颜色</span></div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p> 下面图示为整体流程:</p>
+<p> <img src="http://okzzg7ifm.bkt.clouddn.com/01.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="整体流程"></p>
+<p>###GLSE中的数据类型</p>
+<ul>
+<li>基本类型<ul>
+<li>float: 表示浮点数</li>
+<li>int： 整型 </li>
+<li>bool： 布尔类型</li>
+<li>齐次坐标: (x, y, z, w) 等价于三维坐标 (x/w, y/w, z/w)，w必需大于等于0，齐次坐标的存在，使得用矩阵乘法来描述顶点变换称为可能，三维图形系统在计算过程中，通常使用齐次坐标来表示顶点的三维坐标，这样能够提高处理三维数据的效率</li>
+</ul>
+</li>
+<li>矢量和矩阵<ul>
+<li>vec4: 表示由四个浮点数组成的矢量，类似有 vec2,vec3,ivec2,ivec3,ivec4,bvec2,bvec3,bvec4</li>
+<li>mat2: 表示2<em>2的浮点数元素的矩阵，类似有 mat3,mat4, 注意<em>*列主序</em></em></li>
+</ul>
+</li>
+<li>结构体<br>  使用struct，将已存在的类型聚合到一起，就可以定义为结构体</li>
+<li>数组<br>  只支持一维数组，而且数组对象不支持pop()和push()等操作</li>
+<li>取样器(纹理)：必须通过该类型变量访问纹理，两种基本的取样器类型如下<ul>
+<li>sampler2D</li>
+<li>samplerCube</li>
+<li>注意：取样器变量只能是uniform变量，或者需要访问纹理的函数</li>
+</ul>
+</li>
+<li>函数</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">返回类型函数名(type0, arg0, type1, arg1, ...typen, argn) &#123;</div><div class="line">	函数计算</div><div class="line">	<span class="keyword">return</span> 返回值</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>存储限定字<ul>
+<li>const: 不可变</li>
+<li>attribute: 只能出现在顶点着色器中，只能被声明为全局变量，被用来表示逐点的信息</li>
+<li>uniform：可以用在顶点和片元着色器中，必须是全局变量，uniform变量是只读的，它可以是数组和结构体之外的任意类型，它包含了“一致”[即非逐顶点／片元的]的数据</li>
+<li>varying: 必须全局，从顶点着色器向片元着色器传输数据，在两个着色器中必须同名同类型</li>
+</ul>
+</li>
+<li>精度限定字<ul>
+<li>highp: 高精度</li>
+<li>mediump: 中精度</li>
+<li>lowp: 低精度</li>
+<li>可以使用关键字precision来声明着色器的默认精度，这行代码必须在顶点着色器或片元着色器的顶部，格式为<strong>precision 精度限定字 类型名称</strong></li>
+<li>注意：片元着色器中的float类型没有默认精度，需要手动指定，否则会出现编译错误</li>
+</ul>
+</li>
+<li>预处理指令<br>  预处理指令用来在真正编译之前对代码进行预处理，都以#开始</li>
+</ul>
+<p>###核心思想</p>
+<ul>
+<li><p><a href="http://lulutia.com/webgldemo/01/" target="_blank" rel="external">获取WebGL上下文</a>：<br><img src="http://okzzg7ifm.bkt.clouddn.com/02.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="获取上下文"></p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">'example'</span>);</div><div class="line"><span class="keyword">var</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</div><div class="line">ctx.fillStyle = <span class="string">'rgba(0, 0, 255, 1.0)'</span>;</div></pre></td></tr></table></figure>
+</li>
+<li><p><a href="http://lulutia.com/webgldemo/03/" target="_blank" rel="external">初始化着色器</a>：<br>  详细见具体API 1-13部分，具体流程如下:</p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/03.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="初始化着色器"></p>
+</li>
+<li><p><a href="http://lulutia.com/webgldemo/02/" target="_blank" rel="external">设置canvas背景色并清除canvas</a>：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 设定背景色，一旦指定了背景色后，背景色就会常驻WebGL系统，在下一次再调用这个函数前不会改变</span></div><div class="line">gl.clearColor(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>); <span class="comment">//见API 15</span></div><div class="line"></div><div class="line"><span class="comment">// 用背景色清空canvas绘图区域，此方法继承自OpenGL，基于多基本缓冲区模型清空绘图区域，实际上是在清空颜色缓冲区，类似的还有 gl.DEPTH_BUFFER_BIT,gl.STENCIL_BUFFER_BIT</span></div><div class="line">gl.clear(gl.COLOR_BUFFER_BIT); <span class="comment">// 见API16</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>右手坐标系是WebGL默认的坐标系统</p>
+</li>
+<li><p><a href="http://lulutia.com/webgldemo/04/" target="_blank" rel="external">JS与着色器之间传输数据(以attribute举例)</a><br>  详细见具体API 17-20部分，具体流程如下: <a href="http://lulutia.com/webgldemo/05/" target="_blank" rel="external">动态传输例子点我</a>, <a href="http://lulutia.com/webgldemo/06/" target="_blank" rel="external">点我</a></p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/04.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="js vs 着色器"></p>
+</li>
+<li><p><a href="http://lulutia.com/webgldemo/07/" target="_blank" rel="external">缓冲区对象</a><br>  WebGL提供了<strong>缓冲区对象</strong>，它可以一次性的向着色器传入多个顶点的数据。使用缓冲区对象向顶点着色器传入多个顶点数据的步骤如下:<br>  详细见具体API 21-25部分，注意<strong>可以创建多个缓冲区对象</strong></p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/05.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="缓冲区对象"></p>
+</li>
+<li><p><a href="http://lulutia.com/webgldemo/08/" target="_blank" rel="external">WebGL可绘制的基本图形</a>，主要运用于API 14，<a href="http://lulutia.com/webgldemo/09/" target="_blank" rel="external">对比例子点我</a><br>  WebGL可以绘制gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN 七种，它们的绘制顺序如下：</p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/06.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="基本图形"></p>
+</li>
+<li><p>移动、旋转、缩放</p>
+<ul>
+<li><p>对于<a href="http://lulutia.com/webgldemo/10/" target="_blank" rel="external">平移</a>而言，就是对顶点的每个分量加上其在对应轴上平移的距离, 因此就是在顶点着色器中对原有的position加上移动的position即可</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">newX = oldX + moveX;</div><div class="line">newY = oldY + moveY;</div><div class="line">newZ = oldZ + moveZ;</div></pre></td></tr></table></figure>
+</li>
+<li><p>对于<a href="http://lulutia.com/webgldemo/11/" target="_blank" rel="external">旋转</a>而言，有公式如下[绕Z轴旋转]，因此将顶点着色器中的坐标换为下面的计算即可：<strong>注意JS内置的Math.cos()和Math.sin()接受的是弧度制，而并非角度</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">newX = oldX * cosβ - oldY * sinβ</div><div class="line">newY = oldX * sinβ + oldY * cosβ</div><div class="line">newZ = oldZ</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_Position.x = a_Position.x * u_CosB - a_Position.y * u_SinB;\n'</span> + <span class="comment">//设置坐标，必须</span></div><div class="line"><span class="string">'gl_Position.y = a_Position.x * u_SinB + a_Position.y * u_CosB;\n'</span> +</div><div class="line"><span class="string">'gl_Position.z = a_Position.z;\n'</span> + </div><div class="line"><span class="string">'gl_Position.w = 1.0;\n'</span> +</div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
+</li>
+<li><p>当情况复杂起来后，需要进行<a href="http://lulutia.com/webgldemo/12/" target="_blank" rel="external">矩阵变换</a>，比如根据上面可以得到平移矩阵，旋转矩阵和缩放矩阵如下：之后将它与坐标相乘即可得到变换后的坐标</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gl_Position = u_xformMatrix * a_Position ;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code>![矩阵](http://okzzg7ifm.bkt.clouddn.com/07.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim)
+
+* 因为[矩阵计算比较复杂](http://lulutia.com/webgldemo/13/)，一般情况下都使用封装好的矩阵操作库进行计算
+</code></pre><ul>
+<li><a href="http://lulutia.com/webgldemo/14/" target="_blank" rel="external">动画</a><ul>
+<li>根据不同时间确定不同的状态</li>
+<li>在每次绘制前，清除上次绘制的内容，并绘制相应状态下的图形</li>
+<li>调用requestAnimationFrame(fn)进行持续绘制</li>
+</ul>
+</li>
+<li><p>颜色<br>之前的所有例子我们都是直接设定了颜色值并传入片元着色器，其颜色值是统一的不变的，但是实际中，我们可能会对不同的点着色不同，因此顶点着色器与片元着色器之间应该有某种联系</p>
+<ul>
+<li>实际在顶点着色器与片元着色器中主要执行了两个步骤：<ul>
+<li>图形装配过程：将孤立的顶点坐标装配成几何图形</li>
+<li><a href="http://lulutia.com/webgldemo/15/" target="_blank" rel="external">光栅化</a>过程：将装配好的几何图形转化为片元</li>
+</ul>
+</li>
+<li>光栅化过程中生成的片元都是带有坐标信息的，调用片元着色器时这些坐标信息也随着片元传了进来，可以通过片元着色器中的内置变量来访问片元的坐标</li>
+<li>在WebGL中，<strong>如果顶点着色器与片元着色器中有类型和命名都相同的varying变量，那么顶点着色器赋给该变量的值就会自动被传入片元着色器</strong>，但是，片元着色器中的v_Color变量和顶点着色器中的v_Color实际并不是一回事，顶点着色器中的v_Color变量在传入片元着色器之前经过了内插过程，所以称为varying</li>
+<li><p><a href="http://lulutia.com/webgldemo/16/" target="_blank" rel="external">整个颜色的处理过程如下</a>：</p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/08.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="颜色处理"></p>
+</li>
+</ul>
+</li>
+<li><p><a href="http://lulutia.com/webgldemo/17/" target="_blank" rel="external">纹理</a><br>  真实世界中的颜色变化是相当细粒度的，我们如果全部通过自己定义来做则会陷入无休止的工作中，因此在三维图形学中，纹理映射就成为了一项关键技术。所谓纹理映射，就是将一张图像映射到一个几何图形的表面上去，它根据纹理图像，为之前光栅化后的每个片元涂上合适的颜色，其中组成纹理图像的像素称为纹素，其具体流程如下：</p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/09.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="纹理处理"></p>
+<ul>
+<li>在执行纹理映射的过程中，会涉及到纹理坐标，WebGL系统中的纹理坐标是二维的，使用st坐标系统。其坐标值与图像自身的尺寸无关，左下角的坐标为(0.0, 0.0), 右下角为(1.0, 0.0), 右上角为(1.0, 1.0), 左上角为(0.0, 1.0)。纹理映射需要顶点着色器和片元着色器的配合，首先在顶点着色器中为每个顶点指定纹理坐标，然后在片元着色器中根据每个片元的纹理坐标从纹理图像中抽取纹理像素颜色。</li>
+<li><p>详细流程见API 27-32，具体代码处理流程如下：在GLSE中运用texture2D(sample2D, sampler, vec2, coord): 来从sample指定的纹理上获取coord指定的纹理坐标处的像素颜色, <a href="http://lulutia.com/webgldemo/18/" target="_blank" rel="external">修改纹理坐标和映射方式点我</a>, <a href="http://lulutia.com/webgldemo/19/" target="_blank" rel="external">多重纹理点我</a></p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/10.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="纹理代码处理"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="具体API"><a href="#具体API" class="headerlink" title="具体API"></a>具体API</h3><p><strong>注：文中demo根据WebGL编程指南demo改编而来</strong></p>
+<ol>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createShader" target="_blank" rel="external">gl.createShader(type)</a>: 创建由type指定的着色器对象，type的值分别为gl.VERTEX_SHADER表示顶点着色器 gl.FRAGMENT_SHADER表示片元着色器</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/shaderSource" target="_blank" rel="external">gl.shaderSource(shader, source)</a>: 将source指定的字符串形式的代码传入shader指定着色器，如果之前已经向shader传入过代码了，旧的代码将会被替换掉</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/compileShader" target="_blank" rel="external">gl.compileShader(shader)</a>: 编译shader指定的着色器中的源代码</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderParameter" target="_blank" rel="external">gl.getShaderParameter(shader, pname)</a>: 获取shader指定的着色器中，pname指定的参数信息pname: 指定待获取参数的类型，可以是gl.SHADER_TYPE gl.DELETE_STATUS或者gl.COMPILE_STATUS，根据pname的不同，返回不同的值</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderInfoLog" target="_blank" rel="external">gl.getShaderInfoLog(shader)</a>: 获取shader指定的着色器的信息日志</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/deleteShader" target="_blank" rel="external">gl.deleteShader(shader)</a>: 如果不需要这个着色器，可以用gl.deleteShader()函数来删除着色器，注意，如果着色器对象还在使用，那么deleteShader()并不会立刻删除着色器而是要等到程序对象不再使用该着色器后，才将其删除</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createProgram" target="_blank" rel="external">gl.createProgram()</a>: 创建程序对象</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/attachShader" target="_blank" rel="external">gl.attachShader(program, shader)</a>: 将shader指定的着色器对象分配给program指定的程序对象，着色器在附给程序对象前，并不一定要为其指定代码或进行编译(也就是说，把空的着色器附给程序对象也是可以的)</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/linkProgram" target="_blank" rel="external">gl.linkProgram(program)</a>: 连接program指定的程序对象中的着色器进行这一步的目的是确保：<ul>
+<li>顶点着色器和片元着色器的varying变量同名同类型，且一一对应</li>
+<li>顶点着色器对每个varying变量赋了值</li>
+<li>顶点着色器和片元着色器中的同名uniform变量也是同类型的</li>
+<li>着色器中的attribute变量，uniform变量和varying变量的个数没有超过着色器的上限</li>
+</ul>
+</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramParameter" target="_blank" rel="external">gl.getProgramParameter(program, pname)</a>: 获取pname指定的程序对象中pname指定的参数信息。返回值随着pname的不同而不同pname：gl.DELETE_STATUS gl.LINK_STATUS gl.VALIDATE_STATUS gl.ATTACHED_SHADERS gl.ACTIVE_ATTRIBUTES gl.ACTIVE_UNIFORMS, 根据pname的不同，返回值不同, 程序对象即使连接成功了，也有可能运行失败，比如没有为取样器分配纹理单元。这些错误是在运行阶段而不是连接阶段产生的</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramInfoLog" target="_blank" rel="external">gl.getProgramInfoLog(program)</a>: 获取program指定的程序对象的信息日志</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/deleteProgram" target="_blank" rel="external">gl.deleteProgram(program)</a>: 删除程序对象</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/useProgram" target="_blank" rel="external">gl.useProgram(program)</a>: 告知WebGL系统绘制时使用program指定的程序对象</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays" target="_blank" rel="external">gl.drawArrays(mode, first, count)</a>: 按照mode参数指定的方式绘制图形(gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN), first: 指定从哪个顶点开始绘制 整型, count: 指定绘制多少个点 整型</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clearColor" target="_blank" rel="external">gl.clearColor(red, green, blue, alpha)</a>: 确定当清除颜色buffer时使用的颜色</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clear" target="_blank" rel="external">gl.clear(mask)</a>: 指定被清除的buffer，可能的值gl.COLOR_BUFFER_BIT，gl.DEPTH_BUFFER_BIT，gl.STENCIL_BUFFER_BIT </li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getAttribLocation" target="_blank" rel="external">gl.getAttribLocation(program, name)</a>: 获取由name参数指定的attribute变量的存储地址, program: 指定包含顶点着色器和片元着色器的着色器程序对象, name: 指定想要获取其存储地址的attribute变量的名称</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttrib" target="_blank" rel="external">gl.vertexAttrib3f(location, v0, v1, v2)</a>: 将数据(v0, v1, v2)传给由location参数指定的attribute变量, gl.vertexAttribXf是一系列同族函数，其中X可以为1，2，3，4，无论哪一个，第四个值都为1.0，其他未填位填充0.0, gl.vertexAttribXv是其矢量版本，接受类型化数组, gl.vertexAttrib 基础函数名 x 参数个数 v参数类型 还能够有gl.vertexAttrib[123]f这种用法</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getUniformLocation" target="_blank" rel="external">gl.getUniformLocation(program, name)</a>: 与API17类似</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/uniform" target="_blank" rel="external">gl.uniform[1234][fi]<a href="">v</a></a>: 与API18类似 </li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createBuffer" target="_blank" rel="external">gl.createBuffer()</a>: 创建缓冲区对象, 这一步的结果是WebGL系统中多了一个新创建出来的缓冲区对象</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindBuffer" target="_blank" rel="external">gl.bindBuffer(target, buffer)</a>: 允许使用buffer表示的缓冲区对象并将其绑定到target表示的目标上，target: gl.ARRAY_BUFFER 表示缓冲区对象中包含了顶点的数据，gl.ELEMENT_ARRAY_BUFFER表示缓冲区对象中包含了顶点的索引值，buffer: 指定之前由gl.createBuffer()返回的待绑定的缓冲区对象将缓冲区对象绑定到目标。这个目标表示缓冲区对象的用途, 我们不能直接向缓冲区写入数据，而只能向目标写入数据，所以要向缓冲区写入数据，必须先绑定。</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData" target="_blank" rel="external">gl.bufferData(target, ArrayBufferView srcData, usage)</a>: 这个API在WebGL1.0和2.0上有所不同，具体见规范。总的来说是开辟存储空间，向绑定在target上的缓冲区对象写入数据data</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer" target="_blank" rel="external">gl.vertexAttribPointer(index, size, type, normalized, stride, offset)</a>: 将绑定到target的缓冲区对象分配给由location指定的attribute变量, size: 指定缓冲区中每个顶点的分量个数(1-4), type: 指定数据格式 [gl.UNSIGNED_BYTE, gl.SHORT, gl.UNSIGNED_SHORT, gl.INT, gl.UNSIGNED_INT, gl.FLOAT], normalized: 传入true, false表明是否将非浮点数的数据归一化到[0, 1]或[-1, 1]区间, stride: 指定相邻两个顶点间的字节数，默认0, offset: 指定缓冲区对象中的偏移量(以字节为单位)</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/enableVertexAttribArray" target="_blank" rel="external">gl.enableVertexAttribArray(index)</a>: 开启index指定的attribute变量，链接变量与分配给它的缓冲区对象，使顶点着色器能够访问缓冲区内的数据</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/uniformMatrix" target="_blank" rel="external">gl.uniformMatrix[234]x[234]fv(location, transpose, array…)</a>: 将array表示的n*n矩阵分配给由location指定的uniform变量，transpose在WebGL中必须指定为false</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createTexture" target="_blank" rel="external">gl.createTexture()</a>: 创建纹理对象以存储纹理图像</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/pixelStorei" target="_blank" rel="external">gl.pixelStorei(pname, param)</a>: 使用pname和param指定的方式处理加载得到的图片, pname:gl.UNPACK_FLIP_Y_WEBGL: 对图像进行Y轴反转，默认为false; gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL: 将图像RGB颜色值的每一个分量乘以A，默认为false, param: 指定非0(true)或0(false)，必须为整数。使用原因：WebGL纹理坐标系统中t轴的方向和PNG,BMP,JPG等格式图片的坐标系统的Y轴方向是相反的，所以要对纹理图像进行Y轴反转</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/activeTexture" target="_blank" rel="external">gl.activeTexture(texture)</a>: 激活texture指定的纹理单元</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindTexture" target="_blank" rel="external">gl.bindTexture(target, texture)</a>: 开启texture指定的纹理对象，并将其绑定到target上, 如果已经激活了某个纹理单元，则纹理对象也会绑定到这个纹理单元上; target: gl.TEXTURE_2D  gl.TEXTURE_CUBE_MAP;<br>在WebGL中，没法直接操作纹理对象，必须通过将纹理对象绑定到纹理单元上，然后通过操作纹理单元来操作纹理对象</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter" target="_blank" rel="external">gl.texParameter<a href="target, pname, param">fi</a></a>: 将param的值赋给绑定到目标的纹理对象的pname参数上, 具体参数见规定，通常可以不用调用，使用默认值就可以了</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D" target="_blank" rel="external">gl.texImage2D(target, level, internalformat, format, type, image)</a>: 将image指定的图像分配给绑定到目标上的纹理对象</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;###背景介绍&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]&lt;/li&gt;
+&lt;li&gt;具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>2017你好～</title>
+    <link href="http://memory.lulutia.com/2017/01/08/2017HELLO/"/>
+    <id>http://memory.lulutia.com/2017/01/08/2017HELLO/</id>
+    <published>2017-01-08T12:51:32.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/assets/img/2017.jpg" alt=""></p>
+<p>又一年匆匆走过，这一年说长不长说短不短，但的的确确发生了好多好多事情。先来篇流水帐总结。</p>
+<p>被老爹说了n久的驾照终于到手了，并且拿到的第二天就被老爹像拎兔子一样拎出去开了70多公里。</p>
+<p>和老爸因为一件现在显而易见已经完全想不起来的事情起了争执，一气之下把齐腰长发剪成了个短的不能再短的发型，完美开启了假小子模式。</p>
+<p>回学校后顺利结束了答辩，在等资料处理的漫长的一个月里拉着大鸟去日本走了一遭。在这只有零星早樱的季节吃了超级好吃的美食，看了超级棒的风景，遇见了超级有爱的人，也算满足了小时候的心愿。意大利和日本这两个我在小学毕业写在同学录 最想去的国家 一栏的国家都GET。</p>
+<p>之后被老哥约着去菲律宾潜水，计划之外的拿到了初级潜水执照，看到了不一样的风景却依然没有学会游泳，泪目。</p>
+<p>4月，繁忙的一个月。拽着啊呜和麦子在陌生的帝都陪我找房子，感受就是贵贵贵……尘埃落定后去广州见了下快五年没见的小燕子～虽然这么久没见平时也没啥联系，但原来的感觉在见面的那刻还是回来了。之后作死的和啊呜去了柬埔寨，三天暴走，看过了千年的文明，也晒的跟块煤炭一样了……</p>
+<p>终于的终于还是入职了，然后就入了RN大坑，痛并快乐着的痛快啊。同事都特别好，毕竟年纪差的不多，玩到一块儿没障碍。去了没看见草的草原，漂了比想象中短的水道，爬了只能看见雾霾的山，为了烤鱼来回三四个小时 ｜ 果然吃货技能点的太高。</p>
+<p>有些时候会觉得自己好挫，但貌似这个事情急也没用，只能一步一个脚印来。</p>
+<p>七月和麦子看了仙剑一的舞台剧，感觉已经记不起上次看舞台剧是多久了，总之其现在的先进程度还是远远超过了我的预期的（也许是我期待值真心太低了</p>
+<p>本来约好和科儿的中秋青岛游因为啊呜的突然到来而取消了，不过来了场说走就走的旅行去了趟兰卡威……人生中第二次进警察局，同时深深的体会到自驾的重要性……</p>
+<p>国庆先去上海见了科儿，接着和两只萌萌的室友一起从杭州去了趟越南，对于给小费的事情咱都完美的坚持了我们的底线，棒棒的，120个赞。这趟旅游重要的不是去哪里而是和谁去～</p>
+<p>16年的最后，集结了浩浩荡荡十多号人一起去东北跨年！零点时刻，我们五只吃着毛肚喝着酒或饮料，就这样毫无防备的被拖入了2017。</p>
+<p>你好啊，2017。</p>
+<p>PS：自己挖的一大堆坑还是希望能在2017填一填哈，啥日语啊，啥乌克丽丽啊，啥天文观测啊，啥无人机啊 （好吧，发现缺钱是硬伤，好好工作好好赚钱，好好和我爱的人和爱我的人一起过好每一天～</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;img src=&quot;/assets/img/2017.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;p&gt;又一年匆匆走过，这一年说长不长说短不短，但的的确确发生了好多好多事情。先来篇流水帐总结。&lt;/p&gt;
+&lt;p&gt;被老爹说了n久的驾照终于到手了，并且拿到的第二天就被老爹像拎兔子一样拎出去开
+    
+    </summary>
+    
+      <category term="self" scheme="http://memory.lulutia.com/categories/self/"/>
+    
+    
+      <category term="总结" scheme="http://memory.lulutia.com/tags/%E6%80%BB%E7%BB%93/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>React Native入个小门</title>
+    <link href="http://memory.lulutia.com/2016/05/27/RN/"/>
+    <id>http://memory.lulutia.com/2016/05/27/RN/</id>
+    <published>2016-05-27T14:36:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>React Native是个啥?</p>
+<ul>
+<li>创造者:FaceBook</li>
+<li>时间:React.js Conf 2015 上发布，9月推出Android版本</li>
+<li>使用范围:用于开发iOS和Android原生应用</li>
+<li>基本特点:<ul>
+<li>用React.js抽象操作系统的原生UI组件，继而代替DOM元素来渲染。–&gt;Learn once, write anywhere</li>
+<li>在后台React Native运行在主线程之外，而在另一个专门的后台线程里运行JavaScript引擎，两个线程之间通过异步消息协议来通信。–&gt;具备流畅和反应灵敏的优势</li>
+</ul>
+</li>
+<li>对应技术栈<ul>
+<li>JSX vs HTML</li>
+<li>CSS-layout vs css</li>
+<li>ECMAScript 6 vs ECMAScript 5</li>
+<li>React Native View vs DOM</li>
+</ul>
+</li>
+</ul>
+<p>如何玩React Native?</p>
+<ul>
+<li>按照React Native官方文档搭建环境，如下有<a href="http://facebook.github.io/react-native/docs/getting-started.html" target="_blank" rel="external">英文版</a>，<a href="http://reactnative.cn/docs/0.26/getting-started.html" target="_blank" rel="external">中文版</a>。模拟器推荐使用<a href="https://www.genymotion.com/" target="_blank" rel="external">Genymotion</a>。IDE推荐使用<a href="https://www.jetbrains.com/webstorm/" target="_blank" rel="external">WebStorm</a>,其注册码<a href="http://us.idea.lanyus.com/" target="_blank" rel="external">在此</a>。整个上述过程中可能遇见的问题如下:<ul>
+<li>$ANDROID_NDK 和 $ANDROID_HOME 没有正确设置: <ul>
+<li>解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存在。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>运行官方案例(即在虚拟机上查看RN各个组件的实际效果)，方法如此<a href="https://github.com/facebook/react-native/tree/master/Examples/UIExplorer" target="_blank" rel="external">链接</a>,可能遇见的问题如下:<ul>
+<li><code>What went wrong: Execution failed for task &#39;:ReactAndroid:buildReactNdkLib&#39;.</code>  <ul>
+<li><a href="http://stackoverflow.com/questions/36209774/unable-to-run-react-native-uiexplorer-example-project" target="_blank" rel="external">解决办法</a></li>
+</ul>
+</li>
+<li>安卓新项目起不来<ul>
+<li>注意下是不是老项目的shell还在运行，需要重新编译链接一次。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><a href="https://github.com/fbsamples/f8app" target="_blank" rel="external">运行F8 App方法</a>,其开发指南<a href="http://f8-app.liaohuqiu.net/" target="_blank" rel="external">在此</a>。可能遇见的问题如下:</p>
+<ul>
+<li>pod install无反应问题。<ul>
+<li><a href="http://www.cnblogs.com/yiqiedejuanlian/p/3698788.html" target="_blank" rel="external">解决办法</a>,关于CocoaPods使用方法及各种问题强烈推荐下面<a href="http://www.jianshu.com/p/969dcb9907cf" target="_blank" rel="external">这篇文章</a></li>
+</ul>
+</li>
+<li><code>Could not find com.google.android.gms:play-services-gcm:8.3.0.</code><ul>
+<li><a href="https://github.com/fbsamples/f8app/issues/16" target="_blank" rel="external">解决办法</a></li>
+</ul>
+</li>
+<li><figure class="highlight subunit"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">    $ adb reverse tcp:8081 tcp:8081</div><div class="line"><span class="keyword">error: </span>closed  </div><div class="line"><span class="keyword">error: </span>closed</div></pre></td></tr></table></figure>
+<ul>
+<li>原因：对于 Android 5.0 及以上的设备，可以直接运行；对于其以下的版本，按照官方文档，需要按 menu 键或者摇晃手机，在开发菜单中设置一下 dev server 的 IP 地址。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>接下来就可以欢快的自己写代码了。写的途中还会遇见各种坑，就具体情况具体分析吧。总结下：<ul>
+<li>确保相关工具和Android SDK都是最新版本。</li>
+<li>确保网络畅通，特别是翻好墙。（此处应有微笑</li>
+<li>注意看官方文档及其issue。</li>
+</ul>
+</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;React Native是个啥?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;创造者:FaceBook&lt;/li&gt;
+&lt;li&gt;时间:React.js Conf 2015 上发布，9月推出Android版本&lt;/li&gt;
+&lt;li&gt;使用范围:用于开发iOS和Android原生应用&lt;/li&gt;
+&lt;li&gt;基本
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>yeoman建立脚手架</title>
+    <link href="http://memory.lulutia.com/2015/11/03/yeoman%E5%BB%BA%E7%AB%8B%E8%84%9A%E6%89%8B%E6%9E%B6/"/>
+    <id>http://memory.lulutia.com/2015/11/03/yeoman建立脚手架/</id>
+    <published>2015-11-03T14:10:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>首先你要先安装yeoman，<code>npm install -g yo bower grunt-cli gulp</code>。</li>
+<li>generator是一个Node.js的模块。</li>
+<li>建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。</li>
+<li><p><code>npm init</code>来建立一个package.json。</p>
+  <figure class="highlight stata"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">    &#123;</div><div class="line">  <span class="string">"name"</span>: <span class="string">"generator-lulutia-react"</span>,<span class="comment">//必须generator开头</span></div><div class="line">  <span class="string">"version"</span>: <span class="string">"0.0.1"</span>,</div><div class="line">  <span class="string">"description"</span>: <span class="string">"the bone to build a app"</span>,</div><div class="line">  <span class="string">"files"</span>: [</div><div class="line">    <span class="string">"app"</span>,</div><div class="line">    <span class="string">"router"</span></div><div class="line">  ],<span class="comment">//必须是你的generator用到的文件构成的数组</span></div><div class="line">  <span class="string">"main"</span>: <span class="string">"index.js"</span>,</div><div class="line">  <span class="string">"scripts"</span>: &#123;</div><div class="line">    <span class="string">"test"</span>: <span class="string">"echo \"</span><span class="keyword">Error</span>: <span class="keyword">no</span> <span class="keyword">test</span> specified\<span class="string">" &amp;&amp; exit 1"</span></div><div class="line">  &#125;,</div><div class="line">  <span class="string">"keywords"</span>: [</div><div class="line">    <span class="string">"yeoman-generator"</span><span class="comment">//必须有这条</span></div><div class="line">  ],</div><div class="line">  <span class="string">"author"</span>: <span class="string">"lulutia"</span>,</div><div class="line">  <span class="string">"license"</span>: <span class="string">"MIT"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>npm install yeoman-generator --save</code>//yeoman的依赖必须是最新的</p>
+</li>
+<li>默认执行<code>yo name</code>时执行的是app内的内容，<code>yo name:subcommand</code>执行的是其他文件夹里的内容。</li>
+<li>yeoman提供两种组织方式来，其一是:<code>./</code>,其二是:<code>generators/</code>，注意第二种方式的package.json内的files要相应修改。</li>
+<li><p>根据提供的基本结构来写自己的脚手架内容</p>
+  <figure class="highlight qml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> generators = <span class="built_in">require</span>(<span class="string">'yeoman-generator'</span>);</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = yeoman.generators.Base.extend(</div><div class="line">&#123;</div><div class="line"><span class="comment">// The name `constructor` is important here</span></div><div class="line"><span class="attribute">constructor</span>: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line"><span class="comment">// Calling the super constructor is important so our generator is correctly set up</span></div><div class="line">generators.Base.apply(<span class="keyword">this</span>, <span class="built_in">arguments</span>);</div><div class="line"></div><div class="line"><span class="comment">// Next, add your custom code</span></div><div class="line"><span class="keyword">this</span>.option(<span class="string">'coffee'</span>); <span class="comment">// This method adds support for a `--coffee` flag</span></div><div class="line">&#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>我这里用了几个库，Prompts:主要掌管generator与用户的交互</p>
+  <figure class="highlight actionscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">module.exports = yeoman.generators.Base.extend(&#123;</div><div class="line">prompting: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>&#123;</div><div class="line"><span class="keyword">var</span> done = <span class="keyword">this</span>.async();</div><div class="line"><span class="keyword">this</span>.prompt(&#123;</div><div class="line">  type    : <span class="string">'input'</span>,</div><div class="line">  name    : <span class="string">'name'</span>,</div><div class="line">  message : <span class="string">'Your project name'</span>,</div><div class="line">  <span class="keyword">default</span> : <span class="keyword">this</span>.appname <span class="comment">// Default to current folder name</span></div><div class="line">&#125;, <span class="function"><span class="keyword">function</span> <span class="params">(answers)</span> </span>&#123;</div><div class="line">  <span class="keyword">this</span>.log(answers.name);</div><div class="line">  done();</div><div class="line">&#125;.bind(<span class="keyword">this</span>));</div><div class="line">&#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+</li>
+<li><p>writing里面用mkdirp建立基本骨架。在app内部建立templates文件夹，通过里面的文件的拷贝建立结构。</p>
+  <figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mkdirp(<span class="string">"assets/style"</span>);</div><div class="line">mkdirp(<span class="string">"build"</span>);</div><div class="line">   </div><div class="line">  <span class="keyword">this</span>.fs.copy(</div><div class="line">          <span class="keyword">this</span>.templatePath(<span class="string">'coffeelint.json'</span>),</div><div class="line">          <span class="keyword">this</span>.destinationPath(<span class="string">'coffeelint.json'</span>)</div><div class="line">        );</div></pre></td></tr></table></figure>
+</li>
+<li><p><code>generator.installDependencies()</code>安装依赖.</p>
+</li>
+<li>在generator-name/文件夹下运行<code>npm link</code>可以使generator在本地可用。</li>
+</ul>
+<p>意料之外的问题</p>
+<ul>
+<li>yeoman安装的时候表示node和npm的版本都落后了，然后npm这个命令就无法用了……简直了＝＝然后想用brew安装下，结果忘记brew没更新，各种更新无效。</li>
+<li>直接用<code>curl -L https://www.npmjs.com/install.sh | sh</code>加上sudo也有问题，还是报权限错误。</li>
+<li>决定可以用bower，但强迫症患者觉得这样不完美。可以直接重新下node，但觉得代价太大。</li>
+<li>用了比较粗暴的方法，去npm 的github上下载了sh，然后<code>sudo sh /Users/muriel/Downloads/install.sh</code>来安装。完了顺便把brew更新下,把没升级的软件升级了<code>brew update;brew upgrade;brew cleanup</code>。</li>
+<li>然后又出来一个问题，<code>npm install</code>按照package.json来安装但是目录结构有问题，原来npm的3开始决定采用扁平化处理，所以之前的代码为了适应这个改变必须要做一些改变。</li>
+</ul>
+<p><a href="https://github.com/lulutia/generator-lulutia-react" target="_blank" rel="external">具体代码</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;首先你要先安装yeoman，&lt;code&gt;npm install -g yo bower grunt-cli gulp&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;generator是一个Node.js的模块。&lt;/li&gt;
+&lt;li&gt;建立一个写generator的文件，必须命名
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ES6 learning 五</title>
+    <link href="http://memory.lulutia.com/2015/11/02/ES6-5/"/>
+    <id>http://memory.lulutia.com/2015/11/02/ES6-5/</id>
+    <published>2015-11-02T13:36:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>异步操作和Async函数</p>
+<ul>
+<li>ES6之前，异步编程的几种方式：<ul>
+<li>回调函数</li>
+<li>事件监听</li>
+<li>发布/订阅</li>
+<li>Promise对象</li>
+</ul>
+</li>
+<li>其他：Generator函数，Thunk函数。可以用thunkify模块，结合Generator函数，封装一个run函数实现自动化流程管理。co模块(使用co的前提条件是，Generator函数的yield命令后面，只能是Thunk函数或Promise对象)。async函数，async函数就是Generator函数的语法糖，它的自动执行器不需要用户自己来实现。</li>
+<li>感觉上async最好用：</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">chainAnimationsAsync</span>(<span class="params">elem, animations</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> ret = <span class="literal">null</span>;</div><div class="line">  <span class="keyword">try</span> &#123;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> anim <span class="keyword">of</span> animations) &#123;</div><div class="line">      ret = <span class="keyword">await</span> anim(elem);</div><div class="line">    &#125;</div><div class="line">  &#125; <span class="keyword">catch</span>(e) &#123;</div><div class="line">    <span class="comment">/* 忽略错误，继续执行 */</span></div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> ret;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Class</p>
+<ul>
+<li>类的内部所有定义的方法，都是不可枚举的（enumerable）。</li>
+<li>constructor方法是类的默认方法，通过new命令生成对象实例时，自动调用该方法。constructor方法默认返回实例对象（即this），完全可以指定返回另外一个对象。</li>
+<li>实例的属性除非显式定义在其本身（即定义在this对象上），否则都是定义在原型上（即定义在class上）。</li>
+<li>Class表达式：采用Class表达式，可以写出立即执行的Class。</li>
+</ul>
+<figure class="highlight monkey"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> MyClass = <span class="class"><span class="keyword">class</span> <span class="title">Me</span> &#123;</span></div><div class="line">  getClassName() &#123;</div><div class="line">    <span class="keyword">return</span> Me.name;</div><div class="line">  &#125;</div><div class="line">&#125;;//需要注意的是，这个类的名字是MyClass而不是Me，Me只在<span class="class"><span class="keyword">Class</span>的内部代码可用，指代当前类。</span></div></pre></td></tr></table></figure>
+<ul>
+<li>Class不存在变量提升。</li>
+<li>继承：<code>class ColorPoint extends Point {}</code><ul>
+<li>super关键字，指代父类的实例(即父类的this对象)。<strong>子类必须在constructor方法中调用super方法，否则新建实例时会报错。这是因为子类没有自己的this对象，而是继承父类的this对象，然后对其进行加工。如果不调用super方法，子类就得不到this对象</strong>。ES5的继承，实质是先创造子类的实例对象this，然后再将父类的方法添加到this上面（Parent.apply(this)）。ES6的继承机制完全不同，实质是先创造父类的实例对象this（所以必须先调用super方法），然后再用子类的构造函数修改this。</li>
+<li>子类的<strong>proto</strong>属性，表示构造函数的继承，总是指向父类。子类prototype属性的<strong>proto</strong>属性，表示方法的继承，总是指向父类的prototype属性。这两条继承链，可以这样理解：作为一个对象，子类（B）的原型（<strong>proto</strong>属性）是父类（A）；作为一个构造函数，子类（B）的原型（prototype属性）是父类的实例。</li>
+<li>Object.getPrototypeOf方法可以用来从子类上获取父类。</li>
+<li>子类实例的<strong>proto</strong>属性的<strong>proto</strong>属性，指向父类实例的<strong>proto</strong>属性。也就是说，子类的原型的原型，是父类的原型。通过子类实例的<strong>proto</strong>.<strong>proto</strong>属性，可以修改父类实例的行为。</li>
+<li>ES6允许继承原生构造函数定义子类，因为ES6是先新建父类的实例对象this，然后再用子类的构造函数修饰this，使得父类的所有行为都可以继承。</li>
+<li>存值函数和取值函数是设置在属性的descriptor对象上的。</li>
+<li>父类的静态方法，可以被子类继承。</li>
+</ul>
+</li>
+<li>类相当于实例的原型，所有在类中定义的方法，都会被实例继承。如果在一个方法前，加上static关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。</li>
+<li>静态属性指的是Class本身的属性，即Class.propname，而不是定义在实例对象（this）上的属性。ES6明确规定，Class内部只有静态方法，没有静态属性。</li>
+<li>ES6为new命令引入了一个new.target属性，（在构造函数中）返回new命令作用于的那个构造函数。子类继承父类时，new.target会返回子类。</li>
+<li>Mixin模式指的是，将多个类的接口“混入”（mix in）另一个类。</li>
+</ul>
+<p>修饰器</p>
+<ul>
+<li>修饰器对类的行为的改变，是代码编译时发生的，而不是在运行时。这意味着，修饰器能在编译阶段运行代码。</li>
+</ul>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@decorator</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;&#125;</div><div class="line"></div><div class="line"><span class="comment">// 等同于</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;&#125;</div><div class="line">A = decorator(A) || A;</div></pre></td></tr></table></figure>
+<ul>
+<li>修饰器不仅可以修饰类，还可以修饰类的属性。修饰器有注释的作用。</li>
+<li>由于存在函数提升，使得修饰器不能用于函数。</li>
+<li>一些常用的库：core-decorators.js, traits-decorator…</li>
+</ul>
+<p>Module</p>
+<ul>
+<li>模块功能主要由两个命令构成：export和import。export命令用于规定模块的对外接口，import命令用于输入其他模块提供的功能。</li>
+<li>export语句输出的值是动态绑定，绑定其所在的模块。</li>
+<li>ES6支持多重加载，即所加载的模块中又加载其他模块。</li>
+<li>import命令具有提升效果，会提升到整个模块的头部，首先执行。</li>
+<li>除了指定加载某个输出值，还可以使用整体加载，即用星号（*）指定一个对象，所有输出值都加载在这个对象上面。</li>
+<li>module命令可以取代import语句，达到整体输入模块的作用。module命令后面跟一个变量，表示输入的模块定义在该变量上。</li>
+<li><strong>export default命令，为模块指定默认输出。</strong>使用export default时，对应的import语句不需要使用大括号；不使用export default时，对应的import语句需要使用大括号。一个模块只能有一个默认输出，因此export deault命令只能使用一次。</li>
+<li>模块之间也可以继承。</li>
+<li>一些常用的库：ES6 module transpiler, SystemJS</li>
+</ul>
+<p>编程风格</p>
+<ul>
+<li>let取代var</li>
+<li>在let和const之间，建议优先使用const，let表示的变量，只应出现在单线程运行的代码中，不能是多线程共享的。</li>
+<li>严格模式</li>
+<li>静态字符串一律使用单引号或反引号，不使用双引号。动态字符串使用反引号。</li>
+<li>使用数组成员对变量赋值，优先使用解构赋值。</li>
+<li>函数的参数如果是对象的成员，优先使用解构赋值。</li>
+<li>如果函数返回多个值，优先使用对象的解构赋值，而不是数组的解构赋值。这样便于以后添加返回值，以及更改返回值的顺序。</li>
+<li>单行定义的对象，最后一个成员不以逗号结尾。多行定义的对象，最后一个成员以逗号结尾。</li>
+<li>对象尽量静态化，一旦定义，就不得随意添加新的属性。如果添加属性不可避免，要使用Object.assign方法。</li>
+<li>如果对象的属性名是动态的，可以在创造对象的时候，使用属性表达式定义。</li>
+<li>对象的属性和方法，尽量采用简洁表达法，这样易于描述和书写。</li>
+<li>使用扩展运算符（…）拷贝数组。</li>
+<li>使用Array.from方法，将类似数组的对象转为数组。</li>
+<li>立即执行函数可以写成箭头函数的形式。</li>
+<li>那些需要使用函数表达式的场合，尽量用箭头函数代替。</li>
+<li>箭头函数取代Function.prototype.bind，不应再用self/_this/that绑定 this。</li>
+<li>所有配置项都应该集中在一个对象，放在最后一个参数，布尔值不可以直接作为参数。</li>
+<li>不要在函数体内使用arguments变量，使用rest运算符（…）代替。因为rest运算符显式表明你想要获取参数，而且arguments是一个类似数组的对象，而rest运算符可以提供一个真正的数组。</li>
+<li>使用默认值语法设置函数参数的默认值。</li>
+<li>注意区分Object和Map，只有模拟实体对象时，才使用Object。如果只是需要key:value的数据结构，使用Map。因为Map有内建的遍历机制。</li>
+<li>总是用class，取代需要prototype操作。</li>
+<li>使用extends实现继承，因为这样更简单，不会有破坏instanceof运算的危险。</li>
+<li>Module语法是JavaScript模块的标准写法，坚持使用这种写法。使用import取代require。</li>
+<li>使用export取代module.exports。</li>
+<li>不要在模块输入中使用通配符。因为这样可以确保你的模块之中，有一个默认输出（export default）。</li>
+<li>如果模块默认输出一个函数，函数名的首字母应该小写。如果模块默认输出一个对象，对象名的首字母应该大写。</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;异步操作和Async函数&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ES6之前，异步编程的几种方式：&lt;ul&gt;
+&lt;li&gt;回调函数&lt;/li&gt;
+&lt;li&gt;事件监听&lt;/li&gt;
+&lt;li&gt;发布/订阅&lt;/li&gt;
+&lt;li&gt;Promise对象&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;其他：Generator
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ES6 learning 四</title>
+    <link href="http://memory.lulutia.com/2015/10/23/ES6-4/"/>
+    <id>http://memory.lulutia.com/2015/10/23/ES6-4/</id>
+    <published>2015-10-23T12:22:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Iterator和for..of循环</p>
+<ul>
+<li>Iterator的作用有三个：<ul>
+<li>一是为各种数据结构，提供一个统一的、简便的访问接口；</li>
+<li>二是使得数据结构的成员能够按某种次序排列；</li>
+<li>三是ES6创造了一种新的遍历命令for…of循环，Iterator接口主要供for…of消费。</li>
+</ul>
+</li>
+<li>在ES6中，有三类数据结构原生具备Iterator接口：数组、某些类似数组的对象、Set和Map结构。调用Symbol.iterator方法，就会得到当前数据结构默认的遍历器生成函数。</li>
+<li>字符串是一个类似数组的对象，也原生具有Iterator接口。</li>
+<li>JavaScript原有的for…in循环，只能获得对象的键名，不能直接获取键值。ES6提供for…of循环，允许遍历获得键值。Set结构遍历时，返回的是一个值，而Map结构遍历时，返回的是一个数组，该数组的两个成员分别为当前Map成员的键名和键值。</li>
+<li>对于字符串来说，for…of循环还有一个特点，就是会正确识别32位UTF-16字符。</li>
+<li>对于普通的对象，for…of结构不能直接使用，会报错，必须部署了iterator接口后才能使用。一种解决方法是，使用Object.keys方法将对象的键名生成一个数组，然后遍历这个数组。另一个方法是使用Generator函数将对象重新包装一下。</li>
+<li>for…in循环主要是为遍历对象而设计的，不适用于遍历数组。</li>
+</ul>
+<p>Generator函数</p>
+<ul>
+<li>Generator函数是ES6提供的一种异步编程解决方案,Generator函数除了状态机，还是一个遍历器对象生成函数。返回的遍历器对象，可以依次遍历Generator函数内部的每一个状态。</li>
+<li>Generator函数是一个普通函数，但是有两个特征。一是，function命令与函数名之间有一个星号；二是，函数体内部使用yield语句，定义不同的内部状态。调用Generator函数后，该函数并不执行，返回的也不是函数运行结果，而是一个指向内部状态的指针对象，每次调用next方法，内部指针就从函数头部或上一次停下来的地方开始执行，直到遇到下一个yield语句（或return语句）为止。换言之，Generator函数是分段执行的，yield语句是暂停执行的标记，而next方法可以恢复执行。yield语句不能用在普通函数中，否则会报错。yield语句如果用在一个表达式之中，必须放在圆括号里面。yield语句用作函数参数或赋值表达式的右边，可以不加括号。for…of循环可以自动遍历Generator函数，且此时不再需要调用next方法。这里需要注意，一旦next方法的返回对象的done属性为true，for…of循环就会中止，且不包含该返回对象。</li>
+<li>如果Generator函数内部没有部署try…catch代码块，那么throw方法抛出的错误，将被外部try…catch代码块捕获。如果Generator函数内部部署了try…catch代码块，那么遍历器的throw方法抛出的错误，不影响下一次遍历，否则遍历直接终止。但是，如果使用throw命令抛出错误，不会影响遍历器状态。</li>
+<li>如果Generator函数内部有try…finally代码块，那么return方法会推迟到finally代码块执行完再执行。</li>
+<li>yield*语句，用来在一个Generator函数里面执行另一个Generator函数。</li>
+<li>可以并行执行、交换执行权的线程（或函数），就称为协程。如果将Generator函数当作协程，完全可以将多个需要互相协作的任务写成Generator函数，它们之间使用yield语句交换控制权。</li>
+</ul>
+<p>Promise对象</p>
+<ul>
+<li>所谓Promise，就是一个对象，用来传递异步操作的消息。它代表了某个未来才会知道结果的事件（通常是一个异步操作），并且这个事件提供统一的API，可供进一步处理。</li>
+<li>Promise对象代表一个异步操作，有三种状态：Pending（进行中）、Resolved（已完成，又称Fulfilled）和Rejected（已失败）。</li>
+<li>Promise对象的状态改变，只有两种可能：从Pending变为Resolved和从Pending变为Rejected。只要这两种情况发生，状态就凝固了，不会再变了，会一直保持这个结果。</li>
+<li>Promise也有一些缺点。首先，无法取消Promise，一旦新建它就会立即执行，无法中途取消。其次，如果不设置回调函数，Promise内部抛出的错误，不会反应到外部。第三，当处于Pending状态时，无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）。</li>
+<li>Promise实例具有then方法，也就是说，then方法是定义在原型对象,then方法返回的是一个新的Promise实例（注意，不是原来那个Promise实例）。因此可以采用链式写法，即then方法后面再调用另一个then方法。采用链式的then，可以指定一组按照次序调用的回调函数。</li>
+<li>Promise.prototype.catch方法是.then(null, rejection)的别名，用于指定发生错误时的回调函数。Promise在resolve语句后面，再抛出错误，不会被捕获，等于没有抛出。Promise对象的错误具有“冒泡”性质，会一直向后传递，直到被捕获为止。也就是说，错误总是会被下一个catch语句捕获。</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Iterator和for..of循环&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Iterator的作用有三个：&lt;ul&gt;
+&lt;li&gt;一是为各种数据结构，提供一个统一的、简便的访问接口；&lt;/li&gt;
+&lt;li&gt;二是使得数据结构的成员能够按某种次序排列；&lt;/li&gt;
+&lt;li&gt;三是ES6创造了一种新的遍历
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ES6 learning 三</title>
+    <link href="http://memory.lulutia.com/2015/10/22/ES6-3/"/>
+    <id>http://memory.lulutia.com/2015/10/22/ES6-3/</id>
+    <published>2015-10-22T02:09:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>对象的扩展</p>
+<ul>
+<li>ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。</li>
+<li>ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。<strong>注意，属性名表达式与简洁表示法，不能同时使用，会报错。</strong></li>
+<li>Object.is用来比较两个值是否严格相等。它与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于自身。</li>
+<li>Object.assign方法用来将源对象（source）的所有可枚举属性，复制到目标对象（target）。Object.assign只拷贝自身属性，不可枚举的属性（enumerable为false）和继承的属性不会被拷贝。</li>
+<li>对象的每个属性都有一个描述对象（Descriptor），用来控制该属性的行为。Object.getOwnPropertyDescriptor方法可以获取该属性的描述对象。</li>
+<li><strong>proto</strong>属性（前后各两个下划线），用来读取或设置当前对象的prototype对象。</li>
+<li>Object.observe()，Object.unobserve()。</li>
+<li>目前，ES7有一个提案，将rest参数/扩展运算符（…）引入对象。</li>
+</ul>
+<p>Symbol</p>
+<ul>
+<li>ES6引入了一种新的原始数据类型Symbol，表示独一无二的值。</li>
+<li>Symbol值通过Symbol函数生成。这就是说，对象的属性名现在可以有两种类型，一种是原来就有的字符串，另一种就是新增的Symbol类型。凡是属性名属于Symbol类型，就都是独一无二的，可以保证不会与其他属性名产生冲突。<code>let s=Symbol();</code>。</li>
+<li>Symbol值不能与其他类型的值进行运算，会报错。但是，Symbol值可以显式转为字符串。</li>
+<li>注意，Symbol值作为对象属性名时，不能用点运算符。同理，在对象的内部，使用Symbol值定义属性时，Symbol值必须放在方括号之中。</li>
+<li>Symbol作为属性名，该属性不会出现在for…in、for…of循环中，也不会被Object.keys()、Object.getOwnPropertyNames()返回。但是，它也不是私有属性，有一个Object.getOwnPropertySymbols方法，可以获取指定对象的所有Symbol属性名。Reflect.ownKeys方法可以返回所有类型的键名，包括常规键名和Symbol键名。</li>
+<li>Symbol.for方法接受一个字符串作为参数，然后搜索有没有以该参数作为名称的Symbol值。如果有，就返回这个Symbol值，否则就新建并返回一个以该字符串为名称的Symbol值。Symbol.keyFor方法返回一个已登记的Symbol类型值的key。</li>
+<li>Symbol.hasInstance, Symbol.isConcatSpreadable,Symbol.replace,Symbol.search,Symbol.split,Symbol.iterator,Symbol.toPrimitive,Symbol.toStringTag,Symbol.unscopables</li>
+</ul>
+<p>Proxy和Reflect</p>
+<ul>
+<li>Proxy可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。</li>
+<li>Reflect对象与Proxy对象一样，也是ES6为了操作对象而提供的新API。将Object对象的一些明显属于语言层面的方法，放到Reflect对象上。</li>
+</ul>
+<p>Set Map</p>
+<ul>
+<li>Set,它类似于数组，但是成员的值都是唯一的，没有重复的值。Set内部判断两个值是否不同，使用的算法类似于精确相等运算符（===），这意味着，两个对象总是不相等的。</li>
+<li>Array.from方法可以将Set结构转为数组。</li>
+<li>由于Set结构没有键名，只有键值（或者说键名和键值是同一个值），所以key方法和value方法的行为完全一致。</li>
+<li>WeakSet结构与Set类似，也是不重复的值的集合。但是，它与Set有两个区别。首先，WeakSet的成员只能是对象，而不能是其他类型的值。其次，WeakSet中的对象都是弱引用，即垃圾回收机制不考虑WeakSet对该对象的引用，也就是说，如果其他对象都不再引用该对象，那么垃圾回收机制会自动回收该对象所占用的内存，不考虑该对象还存在于WeakSet之中。这个特点意味着，无法引用WeakSet的成员，因此WeakSet是不可遍历的。</li>
+<li>ES6提供了Map数据结构。它类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。</li>
+<li>作为构造函数，Map也可以接受一个数组作为参数。该数组的成员是一个个表示键值对的数组。</li>
+<li>Map的键实际上是跟内存地址绑定的，只要内存地址不一样，就视为两个键。这就解决了同名属性碰撞（clash）的问题，我们扩展别人的库的时候，如果使用对象作为键名，就不用担心自己的属性与原作者的属性同名。</li>
+<li>set方法返回的是Map本身，因此可以采用链式写法。</li>
+<li>WeakMap结构与Map结构基本类似，唯一的区别是它只接受对象作为键名（null除外），不接受其他类型的值作为键名，而且键名所指向的对象，不计入垃圾回收机制。</li>
+<li>WeakMap与Map在API上的区别主要是两个，一是没有遍历操作（即没有key()、values()和entries()方法），也没有size属性；二是无法清空，即不支持clear方法。这与WeakMap的键不被计入引用、被垃圾回收机制忽略有关。因此，WeakMap只有四个方法可用：get()、set()、has()、delete()。</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;对象的扩展&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。&lt;/li&gt;
+&lt;li&gt;ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。&lt;strong&gt;注意，属性名表
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ES6 learning 二</title>
+    <link href="http://memory.lulutia.com/2015/10/21/ES6-2/"/>
+    <id>http://memory.lulutia.com/2015/10/21/ES6-2/</id>
+    <published>2015-10-21T14:16:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>字符串的扩展</p>
+<ul>
+<li>JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="string">"\u&#123;20BB7&#125;"</span>    <span class="regexp">//</span> <span class="string">"𠮷"</span></div></pre></td></tr></table></figure>
+<ul>
+<li>JavaScript内部，字符以UTF-16的格式储存，每个字符固定为2个字节。对于那些需要4个字节储存的字符（Unicode码点大于0xFFFF的字符），JavaScript会认为它们是两个字符。charAt方法无法读取字符，charCodeAt方法只能分别返回前两个字节和后两个字节的值。ES6提供了codePointAt方法，能够正确处理4个字节储存的字符，返回一个字符的码点。它的逆过程通过String.fromCodePoint实现，弥补了String.fromCharCode的溢出问题。</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">charCodeAt -&gt; codePointAt</div><div class="line"><span class="built_in">String</span>.fromCharCode -&gt; <span class="built_in">String</span>.fromCodePoint</div></pre></td></tr></table></figure>
+<ul>
+<li>for..of遍历字符串，可以识别大于0xFFFF的码点，传统的for循环无法识别这样的码点。</li>
+<li>ES7提供了字符串实例的at方法，可以识别Unicode编号大于0xFFFF的字符，返回正确的字符。</li>
+<li>ES6提供String.prototype.normalize()方法，用来将字符的不同表示方法统一为同样的形式，这称为Unicode正规化。</li>
+<li>includes(),startsWith(),endsWith(),repeat()</li>
+<li>模板字符串：模板字符串（template string）是增强版的字符串，用反引号（`）标识。如果使用模板字符串表示多行字符串，所有的空格和缩进都会被保留在输出之中。模板字符串中嵌入变量，需要将变量名写在${}之中。使用&lt;%= … %&gt;输出JavaScript表达式。</li>
+<li>标签模板：模板字符串可以紧跟在一个函数名后面，该函数将被调用来处理这个模板字符串。这被称为“标签模板”功能（tagged template）。</li>
+<li>String.raw方法，往往用来充当模板字符串的处理函数，返回一个斜杠都被转义（即斜杠前面再加一个斜杠）的字符串，对应于替换变量后的模板字符串。</li>
+</ul>
+<p>数值的扩展</p>
+<ul>
+<li>ES6提供了二进制和八进制数值的新的写法，分别用前缀0b和0o表示。</li>
+<li>Number.isFinite(),Number.isNaN() 区别于全局的isFinite()与isNaN()，他们不调用Number()方法进行转换。</li>
+<li>Number.parseInt(),Number.parseFloat()</li>
+<li>Number.isInterger(),Number.EPSILON</li>
+<li>Number.MAX_SAFE_INTERGER,Number.MIN_SAFE_INTERGER,Number.isSafeInteger()</li>
+<li>Math新增的方法：<ul>
+<li>Math.trunc()//去除小数部分，返回整数部分</li>
+<li>Math.sign()//判断一个数到底是正数，负数，还是0</li>
+<li>Math.cbrt()//计算一个数的立方根</li>
+<li>Math.clz32()//Math.clz32方法返回一个数的32位无符号整数形式有多少个前导0</li>
+<li>Math.imul()//Math.imul方法返回两个数以32位带符号整数形式相乘的结果，返回的也是一个32位的带符号整数。主要解决的精度问题。</li>
+<li>Math.fround()//返回一个数的单精度浮点数形式</li>
+<li>Math.hypot()//返回所有参数的平方和的平方根</li>
+<li>Math.expm1(),Math.log1p(),Math.log10(),Math.log2()</li>
+<li>Math.sinh(x),Math.cosh(x),Math.tanh(x),Math.asinh(x),Math.acosh(x),Math.atanh(x)</li>
+<li>ES7新增了一个指数运算符（<strong>）,```2 </strong> 3 = 2<em>2</em>2```。</li>
+</ul>
+</li>
+</ul>
+<p>数组的扩展</p>
+<ul>
+<li>Array.from方法用于将两类对象转为真正的数组：类似数组的对象（array-like object）和可遍历（iterable）的对象（包括ES6新增的数据结构Set和Map）。</li>
+<li>扩展运算符（…）也可以将某些数据结构转为数组,<code>var args = [...arguments];</code>。</li>
+<li>Array.of方法用于将一组值，转换为数组。这个方法的主要目的，是弥补数组构造函数Array()的不足。只有当参数个数不少于2个，Array()才会返回由参数组成的新数组。</li>
+<li>copyWithin方法，在当前数组内部，将指定位置的成员复制到其他位置（会覆盖原有成员），然后返回当前数组。也就是说，使用这个方法，会修改当前数组。</li>
+<li>find()//直接返回数组元素；findIndex()//返回数组元素索引</li>
+<li>fill方法使用给定值，填充一个数组。</li>
+<li>数组实例的entries()，keys()和values()。</li>
+<li>数组实例的includes()。</li>
+<li>注意对数组的空位的处理变化了。</li>
+<li><strong>数组推导</strong>[超级赞的功能]</li>
+<li>Array.observe(),Array.unobserve()这两个方法用于监听（取消监听）数组的变化，指定回调函数。</li>
+</ul>
+<p>函数的扩展</p>
+<ul>
+<li>ES6允许为函数的参数设置默认值，即直接写在参数定义的后面。<strong>指定了默认值以后，函数的length属性，将返回没有指定默认值的参数个数</strong>。参数默认值所处的作用域，不是全局作用域，而是函数作用域。参数变量是默认声明的，所以不能用let或const再次声明。</li>
+<li>ES6引入rest参数（形式为“…变量名”），用于获取<strong>函数</strong>的多余参数，这样就不需要使用arguments对象了。<strong>所有数组特有的方法都可以用于这个变量</strong>。注意，rest参数之后不能再有其他参数（即只能是最后一个参数），否则会报错。函数的length属性，不包括rest参数。</li>
+<li>扩展运算符（spread）是三个点（…）。它好比rest参数的逆运算，将一个数组转为用逗号分隔的参数序列。</li>
+<li>函数的name属性，返回该函数的函数名。bind返回的函数，name属性值会加上“bound ”前缀。</li>
+<li>ES6允许使用“箭头”（=&gt;）定义函数。<ul>
+<li>函数体内的this对象，绑定定义时所在的对象，而不是使用时所在的对象。由于this在箭头函数中被绑定，所以不能用call()、apply()、bind()这些方法去改变this的指向。</li>
+<li>不可以当作构造函数。</li>
+<li>不可以使用arguments对象，该对象在函数体内不存在。如果要用，可以用Rest参数代替。</li>
+</ul>
+</li>
+<li>函数绑定:函数绑定运算符是并排的两个双冒号（::），双冒号左边是一个对象，右边是一个函数。该运算符会自动将左边的对象，作为上下文环境（即this对象），绑定到右边的函数上面。如果双冒号左边为空，右边是一个对象的方法，则等于将该方法绑定在该对象上面。由于双冒号运算符返回的还是原对象，因此可以采用链式写法。</li>
+<li>尾调用:指某个函数的最后一步是调用另一个函数。“尾调用优化”（Tail call optimization），即只保留内层函数的调用帧。如果所有函数都是尾调用，那么完全可以做到每次执行时，调用帧只有一项，这将大大节省内存。这就是“尾调用优化”的意义。<strong>注意，只有不再用到外层函数的内部变量，内层函数的调用帧才会取代外层函数的调用帧，否则就无法进行“尾调用优化”。</strong>递归非常耗费内存，因为需要同时保存成千上百个调用帧，很容易发生“栈溢出”错误（stack overflow）。但对于尾递归来说，由于只存在一个调用帧，所以永远不会发生“栈溢出”错误。尾递归的实现，往往需要改写递归函数，确保最后一步只调用自身。</li>
+<li>ES7有一个提案，允许函数的最后一个参数有尾逗号（trailing comma）。</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;字符串的扩展&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;figure class=&quot;hig
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JavaScript中的delete一探</title>
+    <link href="http://memory.lulutia.com/2015/10/20/JavaScript-delete/"/>
+    <id>http://memory.lulutia.com/2015/10/20/JavaScript-delete/</id>
+    <published>2015-10-20T04:36:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li>核心内容借鉴自下面的<a href="http://perfectionkills.com/understanding-delete/" target="_blank" rel="external">网址</a></li>
+<li><p>delete一般用法：</p>
+<ul>
+<li><p>删除对象的属性 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var a=&#123;p:21&#125;;</div><div class="line">console.log(a.p);//21</div><div class="line">delete a.p;//true</div><div class="line">console.log(a.p);//undefined</div></pre></td></tr></table></figure>
+</li>
+<li><p>无法删除一般的变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var x=13;</div><div class="line">console.log(x);//13</div><div class="line">delete x;//false</div><div class="line">console.log(x);//13</div></pre></td></tr></table></figure>
+</li>
+<li><p>无法删除函数 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var p=function()&#123;&#125;;</div><div class="line">delete p;//false</div><div class="line">typeof(p);//function</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>造成上述表现的原因</p>
+<ul>
+<li><p>在ECMAScript中，有三种可执行代码类型：全局代码、函数代码、eval代码。对于以上几种代码都有相应的执行上下文。每个执行上下文又对应有变量对象，<strong>在源代码中声明的变量和方法实际上都是作为属性被加入到与当前上下文相关联的这个对象当中</strong>。</p>
+<ul>
+<li><p>全局代码时：变量对象是全局对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">    var global=33;</div><div class="line">    window.global;//33</div><div class="line">    global===window.global;//true</div><div class="line">    function uu()&#123;&#125;;</div><div class="line">    typeof window.uu;//&quot;function&quot;</div><div class="line">    window.uu===uu;//true</div><div class="line">    ``` </div><div class="line">    * 函数代码：此时有活动对象的概念。**在函数段中，并不是只有显式声明的变量和函数会成为活动对象的属性，对于每个函数中隐式存在的arguments对象（函数的参数列表）也是一样的**。</div><div class="line">    * eval函数：进入eval代码时并不会新建新的变量对象，而是沿用当前的环境。</div><div class="line">* 每一个变量属性都可以有以下任意多个属性: ReadOnly, DontEnum, DontDelete, Internal。在声明变量或者函数时，他们都变成了当前上下文对象的属性，这些属性在创建时 都带有DontDelete标记；但是显式或者隐式的赋值语句所产生的属性并不会带有这个标记。</div><div class="line">  </div><div class="line">```JavaScript:</div><div class="line">var test=1;</div><div class="line">delete test;//false</div><div class="line">test2 = 2;</div><div class="line">delete test2;//true</div><div class="line">```   </div><div class="line">* 一些内建的对象是自动持有DontDelete这个标记的，从而不能被删除，比如函数内的arguments，函数的传入参数以及函数的length属性。</div><div class="line">* 属性标记诸如DontDelete是在这个属性被创建的时候 产生的，之后对该属性的任何赋值都不会改变此属性的标记。</div><div class="line"></div><div class="line">```JavaScript:</div><div class="line">function y()&#123;&#125;;</div><div class="line">delete y;//false</div><div class="line">y=1;</div><div class="line">delete y;//false</div><div class="line">typeof y;//&quot;number&quot;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>在eval中声明的变量创建时都不会带有DontDelete标记,在函数内部也一样。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">eval(&apos;var ii=34;&apos;);</div><div class="line">delete ii;//true</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>在Firebug控制台中的代码最终将通过eval执行，而不是作为全局代码或函数代码。</p>
+</li>
+<li>IE6-8中的问题：<ul>
+<li>通过全局this变量去删除属性(delete this.x)总会出错</li>
+<li>直接删除该属性(delete x)时：<ul>
+<li>如果x是通过全局this赋值产生会(this.x=1)导致错误；</li>
+<li>如果x通过显式声明创建(var x=1)则delete会像我们预料的那样无法删除并返回false；</li>
+<li>如果x通过非声明式赋值创建(x=1)则delete可以正常删除。</li>
+</ul>
+</li>
+<li>原因： “IE的全局变量对象是通过JScript实现，而一般的全局变量是由host实现的。”</li>
+</ul>
+</li>
+<li>对于宿主对象而言，delete操作的结果是不可预料的。因为宿主对象根据不同浏览器的实现允许有不同的行为，这其中包括了delete。</li>
+<li>strict mode采用了更主动并且描述性的方法，而不是简单的忽略无效的删除操作。(比如平常删除一个不存在的变量会return true;但使用严格模式后会报错。)</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;核心内容借鉴自下面的&lt;a href=&quot;http://perfectionkills.com/understanding-delete/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;网址&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;delete一般用法：&lt;
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>面试回忆360</title>
+    <link href="http://memory.lulutia.com/2015/10/15/memory1/"/>
+    <id>http://memory.lulutia.com/2015/10/15/memory1/</id>
+    <published>2015-10-15T12:38:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>  一大早就跑南京去面360，完全高铁当公交的节奏……但是，我穷啊＝＝。总的来说面的特别的不好，还不是自己弱，怪谁啊，稍微纪录下吧。</p>
+<p>  <strong>岗位：web前端工程师</strong></p>
+<ul>
+<li>笔试题还记得吗？</li>
+<li>会哪些语言？</li>
+<li>啥叫面向对象？</li>
+<li>算法和数据结构怎么样？</li>
+<li>用JavaScript手写一个排序。</li>
+<li>学过哪些课程？这个课程教了些啥？</li>
+<li>操作系统熟吗？</li>
+<li>计算机如何实现减法的？</li>
+<li>数据库熟吗？了解哪些数据库？</li>
+<li>说一下数据库范式？</li>
+<li>说一下tcp/IP分层模型。</li>
+<li>说一下tcp三次握手协议。</li>
+<li>说一下应用层中的协议对应的网络层的协议。</li>
+<li>在TCP/IP协议中如何实现的IP的映射。</li>
+<li>说一下对JavaScript原型链的理解。</li>
+<li>用代码实现js中的继承。</li>
+<li>说一下对闭包的理解。让写程序实现一个计时器每隔一秒按顺序输出1-60中的一个值。</li>
+<li>说一下对作用域的理解，然后给了个程序，问输出。</li>
+<li>ECMAScript有哪些新变化。</li>
+<li>ECMAScript5最近加了哪些属性。</li>
+<li>现在主流的是ECMAScript几。</li>
+<li>如何理解html的语义化。</li>
+<li>css的选择器有哪些？</li>
+<li>有哪些行内元素标签？</li>
+<li>一行两个div，第一个固宽，用css实现后面的自适应。</li>
+<li>实现知道长宽的div的垂直居中。</li>
+<li><p>问了些项目相关。</p>
+<p>————————————————————————————————————————————————————————————————<br>总的感觉是他们希望招全栈工程师，当然我自己弱也是事实，os的确没系统的学过，数据库和网络学的太久远了忘记的差不多了，c++那些快两年没用过了也是退化的很严重啊。当然之前没想到前端会面这些所以也没系统的复习＝＝<br>打算工作决定后用接下来的半年好好系统的整理下整个计算机的知识，维护一个完整的知识网络。因为觉得这个还是很重要的一件事情。<br>最后提问阶段，我问了两个问题：</p>
+</li>
+<li>其一，刚才面试问的很宽泛，问题还没说完，面试官来了一句：我不问你这些问你哪些……，（其实我想说的是他们怎么看待重要性的问题的……）伤不起。</li>
+<li>知趣的问第二个问题，你们那边主要用什么技术，面试官来了一句：还不就是那一套……（我真心没法描述我当时心里的状况）……我接着说比如node这些会涉及吗？他来了句当然会涉及各种技术，比如可能进去会写PHP啊，总之大概意思就是全栈是趋势blabla。</li>
+</ul>
+<p>嘛～只能说不适合啰；我对计算机基础知识的掌握达不到面试官的要求，同样面试官对我提问的回答也达不到我的预期。不过还是给学校丢人了(大哭状)</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;  一大早就跑南京去面360，完全高铁当公交的节奏……但是，我穷啊＝＝。总的来说面的特别的不好，还不是自己弱，怪谁啊，稍微纪录下吧。&lt;/p&gt;
+&lt;p&gt;  &lt;strong&gt;岗位：web前端工程师&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;笔试题还记得吗？&lt;/li&gt;
+&lt;li&gt;会
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="面试" scheme="http://memory.lulutia.com/tags/%E9%9D%A2%E8%AF%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>(数据结构与算法JavaScript描述)读书笔记</title>
+    <link href="http://memory.lulutia.com/2015/10/13/note-structure01/"/>
+    <id>http://memory.lulutia.com/2015/10/13/note-structure01/</id>
+    <published>2015-10-13T08:06:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>数组</p>
+<ul>
+<li>判断是否数组：Array.isArray(sth);</li>
+<li>[]创建数组的效率比Array构造函数高;</li>
+<li>浅复制 VS 深复制；</li>
+<li>字符串生成数组:split();数组的字符串表示:join()/toString()</li>
+<li>sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：</li>
+</ul>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">compare</span><span class="params">(num1,num2)</span></span>&#123;</div><div class="line">    <span class="keyword">return</span> num1 - num2;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> nums = [<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">88</span>];</div><div class="line">nums.sort(compare);</div></pre></td></tr></table></figure>
+<ul>
+<li>迭代器方法: forEach();every();some();reduce()–累加；reduceRight();map();filter()–返回一个新数组，该数组包含应用该函数后结果为true的<strong>元素</strong>;</li>
+<li>创建多维数组的一般办法</li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">function <span class="built_in">matrix</span>(numrows,numcols,initial)&#123;</div><div class="line">    <span class="built_in">var</span> arr = [];</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> i = <span class="number">0</span>; i &lt; numrows; i++)&#123;</div><div class="line">        <span class="built_in">var</span> <span class="built_in">columns</span> = [];</div><div class="line">        <span class="keyword">for</span>(<span class="built_in">var</span> j = <span class="number">0</span>; j &lt; numcols; j++)&#123;</div><div class="line">            <span class="built_in">columns</span>[j] = initial;</div><div class="line">        &#125;</div><div class="line">        arr[i] = <span class="built_in">columns</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> arr;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>列表</p>
+<ul>
+<li>如果数据结构非常复杂。列表的作用就没有那么大了。</li>
+<li>如果数据储存的顺序不重要，也不必对数据进行查找，那么列表就很好。</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div></pre></td><td class="code"><pre><div class="line">function List()&#123;</div><div class="line">    <span class="keyword">this</span>.listSize = <span class="number">0</span>;<span class="comment">//列表长度</span></div><div class="line">    <span class="keyword">this</span>.pos = <span class="number">0</span>;<span class="comment">//列表的当前位置</span></div><div class="line">    <span class="keyword">this</span>.dataStore = [];<span class="comment">//初始化一个空数组来保存列表元素</span></div><div class="line">    <span class="keyword">this</span>.clear = clear;</div><div class="line">    <span class="keyword">this</span>.find = find;</div><div class="line">    <span class="keyword">this</span>.toString = toString;</div><div class="line">    <span class="keyword">this</span>.insert = insert;</div><div class="line">    <span class="keyword">this</span>.append = append;</div><div class="line">    <span class="keyword">this</span>.remove = remove;</div><div class="line">    <span class="keyword">this</span>.front = front;</div><div class="line">    <span class="keyword">this</span>.end = end;</div><div class="line">    <span class="keyword">this</span>.prev = prev;</div><div class="line">    <span class="keyword">this</span>.next = next;</div><div class="line">    <span class="keyword">this</span>.length = length;</div><div class="line">    <span class="keyword">this</span>.currPos = currPos;</div><div class="line">    <span class="keyword">this</span>.moveTo = moveTo;</div><div class="line">    <span class="keyword">this</span>.getElement = getElement;</div><div class="line">    <span class="keyword">this</span>.contains = contains;</div><div class="line">&#125;</div><div class="line">function append(element)&#123;</div><div class="line">    <span class="keyword">this</span>.dataStore[<span class="keyword">this</span>.listSize++] = element;</div><div class="line">&#125;</div><div class="line">function find(element)&#123;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i &lt; <span class="keyword">this</span>.dataStore.lenhgth;i++)&#123;</div><div class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.dataStore[i] == element)&#123;</div><div class="line">            <span class="keyword">return</span> i;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</div><div class="line">&#125;</div><div class="line">function remove(element)&#123;</div><div class="line">    <span class="keyword">var</span> foundAt = <span class="keyword">this</span>.find(element);</div><div class="line">    <span class="keyword">if</span>(foundAt &gt; <span class="number">-1</span>)&#123;</div><div class="line">        <span class="keyword">this</span>.dataStore.splice(found,<span class="number">1</span>);</div><div class="line">        --<span class="keyword">this</span>.listSize;</div><div class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div><div class="line">function length()&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.listSize;</div><div class="line">&#125;</div><div class="line">function toString()&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.dataStore;</div><div class="line">&#125;</div><div class="line">function insert(element, after)&#123;</div><div class="line">    <span class="keyword">var</span> insertPos = <span class="keyword">this</span>.find(after);</div><div class="line">    <span class="keyword">if</span>(insertPos &gt; <span class="number">-1</span>)&#123;</div><div class="line">        <span class="keyword">this</span>.dataStore.splice(insertPos+<span class="number">1</span>, <span class="number">0</span>, element);</div><div class="line">        ++<span class="keyword">this</span>.listSize;</div><div class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div><div class="line">function clear()&#123;</div><div class="line">    delete <span class="keyword">this</span>.dataStore;<span class="comment">//关于delete的用法重启一章描述</span></div><div class="line">    <span class="keyword">this</span>.dataStore = [];</div><div class="line">    <span class="keyword">this</span>.listSize = <span class="keyword">this</span>.pos = <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line">function contains(element)&#123;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;<span class="keyword">this</span>.dataStore.length;i++)&#123;</div><div class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.dataStore[i] == element)&#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div><div class="line">function front()&#123;</div><div class="line">    <span class="keyword">this</span>.pos = <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line">function end()&#123;</div><div class="line">    <span class="keyword">this</span>.pos = <span class="keyword">this</span>.listSize - <span class="number">1</span>;</div><div class="line">&#125;</div><div class="line">function prev()&#123;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">this</span>.pos &gt; <span class="number">0</span>)&#123;</div><div class="line">        --<span class="keyword">this</span>.pos;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">function next()&#123;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">this</span>.pos&lt;<span class="keyword">this</span>.listSize<span class="number">-1</span>)&#123;</div><div class="line">        ++<span class="keyword">this</span>.pos;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">function currPos()&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.pos;</div><div class="line">&#125;</div><div class="line">function moveTo(position)&#123;</div><div class="line">    <span class="keyword">this</span>.pos = position;</div><div class="line">&#125;</div><div class="line">function getElement()&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.dataStore[<span class="keyword">this</span>.pos];</div><div class="line">&#125;</div><div class="line">迭代器：</div><div class="line"><span class="keyword">var</span> names = [<span class="number">2</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">5</span>];</div><div class="line"><span class="keyword">for</span>(names.front();names.currPos()&lt;names.length();names.next())&#123;</div><div class="line">    console.log(names.getElement());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>栈<br><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Stack</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">this</span>.dataStore = [];</div><div class="line">    <span class="keyword">this</span>.top = <span class="number">0</span>;</div><div class="line">    <span class="keyword">this</span>.push = push;</div><div class="line">    <span class="keyword">this</span>.pop = pop;</div><div class="line">    <span class="keyword">this</span>.peek = peek;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">push</span><span class="params">(element)</span></span>&#123;</div><div class="line">    <span class="keyword">this</span>.dataStore[<span class="keyword">this</span>.top++] = element;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">pop</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.dataStore[--<span class="keyword">this</span>.top];</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">peek</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.dataStore[<span class="keyword">this</span>.top<span class="number">-1</span>];</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">length</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.top;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">clear</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">delete</span> <span class="keyword">this</span>.dataStore;<span class="comment">//关于delete的用法重启一章描述</span></div><div class="line">    <span class="keyword">this</span>.dataStore = [];</div><div class="line">    <span class="keyword">this</span>.top = <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>将数字转化为二至九进制的数字</li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">function mulBase(<span class="built_in">num</span>, base)&#123;</div><div class="line">    <span class="built_in">var</span> s = <span class="built_in">new</span> Stack();</div><div class="line">    <span class="keyword">do</span>&#123;</div><div class="line">        s.<span class="built_in">push</span>(num%base);</div><div class="line">        <span class="built_in">num</span> = Math.<span class="built_in">floor</span>(<span class="built_in">num</span>/=base);</div><div class="line">    &#125;<span class="keyword">while</span>(<span class="built_in">num</span>&gt;<span class="number">0</span>);</div><div class="line">    <span class="built_in">var</span> converted = <span class="string">""</span>;</div><div class="line">    <span class="keyword">while</span>(s.<span class="built_in">length</span>()&gt;<span class="number">0</span>)&#123;</div><div class="line">        converter += s.<span class="built_in">pop</span>();</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> converted;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>回文判断</li>
+</ul>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isPalindrome</span><span class="params">(word)</span></span>&#123;</div><div class="line">    <span class="keyword">var</span> s = <span class="keyword">new</span> Stack();</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;word.length; i++)&#123;</div><div class="line">        s.push(word[i]);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">var</span> rword = <span class="string">""</span>;</div><div class="line">    <span class="keyword">while</span>(s.lenght()&gt;<span class="number">0</span>)&#123;</div><div class="line">        rword += s.pop();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(word == rword)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;数组&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;判断是否数组：Array.isArray(sth);&lt;/li&gt;
+&lt;li&gt;[]创建数组的效率比Array构造函数高;&lt;/li&gt;
+&lt;li&gt;浅复制 VS 深复制；&lt;/li&gt;
+&lt;li&gt;字符串生成数组:split();数组的字符串表示:join()/t
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="算法" scheme="http://memory.lulutia.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>leetcode-JavaScript实现part2</title>
+    <link href="http://memory.lulutia.com/2015/10/12/leetcode2/"/>
+    <id>http://memory.lulutia.com/2015/10/12/leetcode2/</id>
+    <published>2015-10-12T10:09:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>其他见part1<br>Merge Two Sorted Lists</p>
+<ul>
+<li><a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank" rel="external">https://leetcode.com/problems/merge-two-sorted-lists/</a></li>
+<li>Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.</li>
+</ul>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Definition for singly-linked list.</div><div class="line"> * function ListNode(val) &#123;</div><div class="line"> *     this.val = val;</div><div class="line"> *     this.next = null;</div><div class="line"> * &#125;</div><div class="line"> */</div><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;ListNode&#125; l1</div><div class="line"> * @param &#123;ListNode&#125; l2</div><div class="line"> * @return &#123;ListNode&#125;</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> mergeTwoLists = function(l1, l2) &#123;</div><div class="line">    <span class="keyword">var</span> resultNode = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">    <span class="keyword">var</span> result = resultNode;</div><div class="line">    <span class="keyword">if</span>(l1===<span class="literal">null</span>&amp;&amp;l2===<span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">while</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">if</span>(l1===<span class="literal">null</span>)&#123;</div><div class="line">            result.<span class="keyword">val</span> = l2.<span class="keyword">val</span>;</div><div class="line">            l2 = l2.next;</div><div class="line">            <span class="keyword">if</span>(l2!==<span class="literal">null</span>)&#123;</div><div class="line">            result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">            result = result.next;&#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(l2===<span class="literal">null</span>)&#123;</div><div class="line">            result.<span class="keyword">val</span> = l1.<span class="keyword">val</span>;</div><div class="line">            l1 = l1.next;</div><div class="line">            <span class="keyword">if</span>(l1!==<span class="literal">null</span>)&#123;</div><div class="line">            result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">            result = result.next;&#125;</div><div class="line">            </div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            <span class="keyword">if</span>(l1.<span class="keyword">val</span>&lt;=l2.<span class="keyword">val</span>)&#123;</div><div class="line">                result.<span class="keyword">val</span> = l1.<span class="keyword">val</span>;</div><div class="line">                l1 = l1.next;</div><div class="line">                <span class="keyword">if</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">                result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">                result = result.next;&#125;</div><div class="line">                </div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span>&#123;</div><div class="line">                result.<span class="keyword">val</span> = l2.<span class="keyword">val</span>;</div><div class="line">                l2 = l2.next;</div><div class="line">                <span class="keyword">if</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">                result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">                result = result.next;&#125;</div><div class="line">                </div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> resultNode;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Remove Duplicates from Sorted Array</p>
+<ul>
+<li><a href="https://leetcode.com/problems/remove-duplicates-from-sorted-array/" target="_blank" rel="external">https://leetcode.com/problems/remove-duplicates-from-sorted-array/</a></li>
+<li>Given a sorted array, remove the duplicates in place such that each element appear only once and return the new length.<ul>
+<li>Do not allocate extra space for another array, you must do this in place with constant memory.</li>
+<li>For example,</li>
+<li>Given input array nums = [1,1,2],</li>
+<li>Your function should return length = 2, with the first two elements of nums being 1 and 2 respectively. It doesn’t matter what you leave beyond the new length.</li>
+</ul>
+</li>
+<li>注意返回的是length</li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;number[]&#125; nums</div><div class="line"> * @return &#123;number&#125;</div><div class="line"> */</div><div class="line"><span class="built_in">var</span> removeDuplicates = function(nums) &#123;</div><div class="line">    <span class="keyword">if</span>(nums.<span class="built_in">length</span>===<span class="number">0</span>)&#123;</div><div class="line">        <span class="built_in">return</span> <span class="number">0</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(nums.<span class="built_in">length</span>===<span class="number">1</span>)&#123;</div><div class="line">        <span class="built_in">return</span> nums.<span class="built_in">length</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> i=<span class="number">1</span> ;i&lt;nums.<span class="built_in">length</span>;i++)&#123;</div><div class="line">       <span class="keyword">if</span>(nums[i]===nums[i-<span class="number">1</span>])&#123;</div><div class="line">           nums.<span class="built_in">splice</span>(i,<span class="number">1</span>);</div><div class="line">           i = i-<span class="number">1</span>;</div><div class="line">       &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> nums.<span class="built_in">length</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Remove Element</p>
+<ul>
+<li><a href="https://leetcode.com/problems/remove-element/" target="_blank" rel="external">https://leetcode.com/problems/remove-element/</a></li>
+<li>Given an array and a value, remove all instances of that value in place and return the new length.The order of elements can be changed. It doesn’t matter what you leave beyond the new length.</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @param &#123;<span class="built_in">number</span>[]&#125; nums</div><div class="line"> * @param &#123;<span class="built_in">number</span>&#125; val</div><div class="line"> * @<span class="literal">return</span> &#123;<span class="built_in">number</span>&#125;</div><div class="line"> */</div><div class="line">var removeElement = function(nums, val) &#123;</div><div class="line">    var <span class="built_in">count</span> = nums.<span class="built_in">length</span>;</div><div class="line">    <span class="keyword">if</span>(nums.<span class="built_in">length</span>===<span class="number">0</span>)&#123;</div><div class="line"><span class="built_in">        return</span> null;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span>(var i=<span class="number">0</span>; i&lt;nums.<span class="built_in">length</span>;i++)&#123;</div><div class="line">        <span class="keyword">if</span>(nums[i]===val)&#123;</div><div class="line">            nums.splice(i,<span class="number">1</span>);</div><div class="line">            i = i<span class="number">-1</span>;</div><div class="line">            <span class="built_in">count</span> = <span class="built_in">count</span><span class="number">-1</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"><span class="built_in">    return</span> <span class="built_in">count</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Implement strStr()</p>
+<ul>
+<li><a href="https://leetcode.com/problems/implement-strstr/" target="_blank" rel="external">https://leetcode.com/problems/implement-strstr/</a></li>
+<li>mplement strStr().Returns the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @param &#123;<span class="built_in">string</span>&#125; haystack</div><div class="line"> * @param &#123;<span class="built_in">string</span>&#125; needle</div><div class="line"> * @<span class="literal">return</span> &#123;<span class="built_in">number</span>&#125;</div><div class="line"> */</div><div class="line">var strStr = function(haystack, needle) &#123;</div><div class="line">    <span class="keyword">if</span>(haystack.<span class="built_in">length</span>&lt;needle.<span class="built_in">length</span>)&#123;</div><div class="line"><span class="built_in">        return</span> <span class="number">-1</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(haystack.<span class="built_in">length</span>===<span class="number">0</span>&amp;&amp;needle.<span class="built_in">length</span>&gt;<span class="number">0</span>)&#123;</div><div class="line"><span class="built_in">        return</span> <span class="number">-1</span>;</div><div class="line">    &#125;</div><div class="line"><span class="built_in">    return</span> haystack.indexOf(needle);</div><div class="line">    </div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Valid Sudoku</p>
+<ul>
+<li><a href="https://leetcode.com/problems/valid-sudoku/" target="_blank" rel="external">https://leetcode.com/problems/valid-sudoku/</a></li>
+<li>Determine if a Sudoku is valid, according to: <a href="http://sudoku.com.au/TheRules.aspx" target="_blank" rel="external">Sudoku Puzzles - The Rules</a>.The Sudoku board could be partially filled, where empty cells are filled with the character ‘.’.</li>
+<li>Note:A valid Sudoku board (partially filled) is not necessarily solvable. Only the filled cells need to be validated.</li>
+<li>简单的说确认是否是有效的数独。即满足每一行、每一列、每一个粗线宫内的数字均含1-9，不重复。</li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;character[][]&#125; board</div><div class="line"> * @return &#123;boolean&#125;</div><div class="line"> */</div><div class="line"><span class="built_in">var</span> isValidSudoku = function(board) &#123;</div><div class="line">    <span class="built_in">var</span> array3 = [];</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> q=<span class="number">0</span>;q&lt;<span class="number">3</span>;q++)&#123;</div><div class="line">            array3[q] = [];</div><div class="line">            <span class="keyword">for</span>(<span class="built_in">var</span> f=<span class="number">0</span> ; f&lt;<span class="number">3</span>;f++)&#123;</div><div class="line">            array3[q][f] = [];&#125;</div><div class="line">        &#125;</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> i=<span class="number">0</span>;i&lt;<span class="number">9</span>;i++)&#123;</div><div class="line">        <span class="built_in">var</span> <span class="built_in">array</span> = [];</div><div class="line">        <span class="built_in">var</span> array2 = [];</div><div class="line">        <span class="keyword">for</span>(<span class="built_in">var</span> j=<span class="number">0</span>;j&lt;<span class="number">9</span>;j++)&#123;</div><div class="line">            <span class="built_in">var</span> fir = parseInt(i/<span class="number">3</span>);</div><div class="line">            <span class="built_in">var</span> <span class="built_in">sec</span> = parseInt(j/<span class="number">3</span>);</div><div class="line">            <span class="keyword">if</span>(array3[fir][<span class="built_in">sec</span>].indexOf(board[i][j])!==-<span class="number">1</span>&amp;&amp;board[i][j]!==<span class="string">"."</span>)&#123;</div><div class="line">                <span class="built_in">return</span> <span class="literal">false</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span>(<span class="built_in">array</span>.indexOf(board[i][j])!==-<span class="number">1</span>&amp;&amp;board[i][j]!==<span class="string">"."</span>)&#123;</div><div class="line">                <span class="built_in">return</span> <span class="literal">false</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">if</span>(array2.indexOf(board[j][i])!==-<span class="number">1</span>&amp;&amp;board[j][i]!==<span class="string">"."</span>)&#123;</div><div class="line">                <span class="built_in">return</span> <span class="literal">false</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> &#123;</div><div class="line">                array3[fir][<span class="built_in">sec</span>].<span class="built_in">push</span>(board[i][j]);</div><div class="line">                <span class="built_in">array</span>.<span class="built_in">push</span>(board[i][j]);</div><div class="line">                array2.<span class="built_in">push</span>(board[j][i]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> <span class="literal">true</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Length of Last Word</p>
+<ul>
+<li><a href="https://leetcode.com/problems/length-of-last-word/" target="_blank" rel="external">https://leetcode.com/problems/length-of-last-word/</a></li>
+<li>Given a string s consists of upper/lower-case alphabets and empty space characters ‘ ‘, return the length of last word in the string.If the last word does not exist, return 0.<ul>
+<li>Note: A word is defined as a character sequence consists of non-space characters only.</li>
+<li>For example, Given s = “Hello World”,return 5.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;string&#125; s</div><div class="line"> * @return &#123;number&#125;</div><div class="line"> */</div><div class="line">// <span class="built_in">var</span> lengthOfLastWord = function(s) &#123;</div><div class="line">//     s = s.trim();</div><div class="line">//     <span class="keyword">if</span>(s[s.<span class="built_in">length</span>-<span class="number">1</span>]===<span class="string">" "</span>)&#123;<span class="built_in">return</span> <span class="number">0</span>;&#125;</div><div class="line">//     <span class="built_in">var</span> arr = s.<span class="built_in">split</span>(<span class="string">" "</span>);</div><div class="line">//     <span class="built_in">return</span> arr[arr.<span class="built_in">length</span>-<span class="number">1</span>].<span class="built_in">length</span>;</div><div class="line">// &#125;;</div><div class="line">// 上面这种效率太低了</div><div class="line"><span class="built_in">var</span> lengthOfLastWord = function(s) &#123;</div><div class="line">    s = s.trim();</div><div class="line">    <span class="keyword">if</span>(s[s.<span class="built_in">length</span>-<span class="number">1</span>]===<span class="string">" "</span>)&#123;<span class="built_in">return</span> <span class="number">0</span>;&#125;</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> i=s.<span class="built_in">length</span>-<span class="number">1</span>;i&gt;=<span class="number">0</span>;i--)&#123;</div><div class="line">        <span class="keyword">if</span>(s[i]===<span class="string">" "</span>)&#123;</div><div class="line">            <span class="built_in">return</span> s.<span class="built_in">length</span>-<span class="number">1</span>-i;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> s.<span class="built_in">length</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Plus One</p>
+<ul>
+<li><a href="https://leetcode.com/problems/plus-one/" target="_blank" rel="external">https://leetcode.com/problems/plus-one/</a></li>
+<li>Given a non-negative number represented as an array of digits, plus one to the number.The digits are stored such that the most significant digit is at the head of the list.</li>
+</ul>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @param &#123;number[]&#125; <span class="keyword">digits</span></div><div class="line"> * @<span class="keyword">return</span> &#123;number[]&#125;</div><div class="line"> */</div><div class="line"> //之前用字符串parseInt来做会越界</div><div class="line">var plusOne = <span class="keyword">function</span>(<span class="keyword">digits</span>) &#123;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">digits</span>.length===<span class="number">0</span>)&#123;</div><div class="line">        <span class="keyword">return</span> [<span class="number">1</span>];</div><div class="line">    &#125;</div><div class="line">   <span class="keyword">for</span>(var i=<span class="number">0</span>;i&lt;<span class="keyword">digits</span>.length;i++)&#123;</div><div class="line">       <span class="keyword">if</span>(<span class="keyword">digits</span>[<span class="keyword">digits</span>.length-i-<span class="number">1</span>]+<span class="number">1</span>&gt;=<span class="number">10</span>)&#123;</div><div class="line">           <span class="keyword">digits</span>[<span class="keyword">digits</span>.length-i-<span class="number">1</span>] = <span class="number">0</span>;</div><div class="line">           <span class="keyword">if</span>(<span class="keyword">digits</span>.length-i-<span class="number">1</span>-<span class="number">1</span>&lt;<span class="number">0</span>)&#123;</div><div class="line">               <span class="keyword">digits</span>.unshift(<span class="number">1</span>);</div><div class="line">               <span class="keyword">return</span> <span class="keyword">digits</span>;</div><div class="line">           &#125;</div><div class="line">           flag = <span class="literal">true</span>;</div><div class="line">       &#125;</div><div class="line">       <span class="keyword">else</span> &#123;</div><div class="line">           <span class="keyword">digits</span>[<span class="keyword">digits</span>.length-i-<span class="number">1</span>]=<span class="keyword">digits</span>[<span class="keyword">digits</span>.length-i-<span class="number">1</span>]+<span class="number">1</span>;</div><div class="line">           <span class="keyword">return</span> <span class="keyword">digits</span>;</div><div class="line">       &#125;</div><div class="line">   &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Climbing Stairs</p>
+<ul>
+<li><a href="https://leetcode.com/problems/climbing-stairs/" target="_blank" rel="external">https://leetcode.com/problems/climbing-stairs/</a></li>
+<li>You are climbing a stair case. It takes n steps to reach to the top.Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?</li>
+<li>测试可知，其实是一个斐波拉契数列n为1，2，3，4，5时，结果为1，2，3，5，8.</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@param</span> &#123;number&#125; n</div><div class="line"> * <span class="doctag">@return</span> &#123;number&#125;</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> climbStairs = <span class="function"><span class="keyword">function</span><span class="params">(n)</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">step</span><span class="params">(n)</span></span>&#123;</div><div class="line">        <span class="keyword">var</span> a=<span class="number">1</span>,b=<span class="number">2</span>;</div><div class="line">        <span class="keyword">if</span>(n===<span class="number">2</span>)&#123;<span class="keyword">return</span> b;&#125;</div><div class="line">        <span class="keyword">if</span>(n===<span class="number">1</span>)&#123;<span class="keyword">return</span> a;&#125;</div><div class="line">        <span class="keyword">var</span> sum;</div><div class="line">        n -= <span class="number">2</span>;</div><div class="line">        <span class="keyword">while</span>(n--)&#123;</div><div class="line">            sum = a+b;</div><div class="line">            a = b;</div><div class="line">            b = sum;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> sum;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> step(n);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Remove Duplicates from Sorted List</p>
+<ul>
+<li><a href="https://leetcode.com/problems/remove-duplicates-from-sorted-list/" target="_blank" rel="external">https://leetcode.com/problems/remove-duplicates-from-sorted-list/</a></li>
+<li>Given a sorted linked list, delete all duplicates such that each element appear only once.<ul>
+<li>For example,</li>
+<li>Given 1-&gt;1-&gt;2, return 1-&gt;2.</li>
+<li>Given 1-&gt;1-&gt;2-&gt;3-&gt;3, return 1-&gt;2-&gt;3.</li>
+</ul>
+</li>
+<li>注意的点：处理最后一位如果为重复的情况,所以放了一个暂时变量tmp，因为链表是有序的，所以只需要对比head的下一个与result的最后一个是否一样。</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Definition for singly-linked list.</div><div class="line"> * function ListNode(val) &#123;</div><div class="line"> *     this.val = val;</div><div class="line"> *     this.next = null;</div><div class="line"> * &#125;</div><div class="line"> */</div><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@param</span> &#123;ListNode&#125; head</div><div class="line"> * <span class="doctag">@return</span> &#123;ListNode&#125;</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> deleteDuplicates = function(head) &#123;</div><div class="line">    <span class="keyword">if</span>(head===<span class="literal">null</span>)&#123;<span class="keyword">return</span> [];&#125;</div><div class="line">    <span class="keyword">var</span> outNode = new ListNode(<span class="number">0</span>);</div><div class="line">    <span class="keyword">var</span> result = outNode;</div><div class="line">    result.<span class="keyword">val</span> = head.<span class="keyword">val</span>;</div><div class="line">    <span class="keyword">while</span>(head.next!==<span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">var</span> tmp = head.next;</div><div class="line">        <span class="keyword">if</span>(tmp.<span class="keyword">val</span>!==result.<span class="keyword">val</span>)&#123;</div><div class="line">            result.next = new ListNode(<span class="number">0</span>);</div><div class="line">            result = result.next;</div><div class="line">            result.<span class="keyword">val</span> = tmp.<span class="keyword">val</span>;</div><div class="line">            head = head.next</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            head = head.next;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> outNode;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Merge Sorted Array</p>
+<ul>
+<li><a href="https://leetcode.com/problems/merge-sorted-array/" target="_blank" rel="external">https://leetcode.com/problems/merge-sorted-array/</a></li>
+<li>Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.<ul>
+<li>Note:You may assume that nums1 has enough space (size that is greater or equal to m + n) to hold additional elements from nums2. The number of elements initialized in nums1 and nums2 are m and n respectively.</li>
+</ul>
+</li>
+<li>注意的点：<ul>
+<li>可能数组中有0，但是0是不计入数量的，所以最好一开始就将不符合长度的值去掉。</li>
+<li>另外需要处理nums1已经遍历完了，但是nums2还有剩的情况，直接将nums2剩下的加入nums1中，因为本来他们两个就是有序的。</li>
+<li>注意不要return。</li>
+<li>splice的用法好好体会，记得是在第一个值之前插入。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@param</span> &#123;number[]&#125; nums1</div><div class="line"> * <span class="doctag">@param</span> &#123;number&#125; m</div><div class="line"> * <span class="doctag">@param</span> &#123;number[]&#125; nums2</div><div class="line"> * <span class="doctag">@param</span> &#123;number&#125; n</div><div class="line"> * <span class="doctag">@return</span> &#123;void&#125; Do not return anything, modify nums1 in-place instead.</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> merge = <span class="function"><span class="keyword">function</span><span class="params">(nums1, m, nums2, n)</span> </span>&#123;</div><div class="line">    nums1.splice(m);</div><div class="line">    nums2.splice(n);</div><div class="line">    <span class="keyword">var</span> pp=<span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;n;i++)&#123;</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">var</span> j=pp;j&lt;m;j++)&#123;</div><div class="line">            <span class="keyword">if</span>(nums2[i]&lt;=nums1[j])&#123;</div><div class="line">                <span class="keyword">if</span>(j===<span class="number">0</span>)&#123;</div><div class="line">                    nums1.unshift(nums2[i]);</div><div class="line">                    pp = j + <span class="number">1</span>;</div><div class="line">                    m = m + <span class="number">1</span>;</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">else</span>&#123;</div><div class="line">                    nums1.splice(j,<span class="number">0</span>,nums2[i]);</div><div class="line">                    pp = j+<span class="number">1</span>;</div><div class="line">                    m = m + <span class="number">1</span>;</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span>(j&gt;=m)&#123;nums1.push(nums2[i])&#125;</div><div class="line">    &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;其他见part1&lt;br&gt;Merge Two Sorted Lists&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://leetcode.com/problems/merge-two-sorted-lists/&quot; target=&quot;_blank&quot; rel=&quot;exte
+    
+    </summary>
+    
+      <category term="Algorithm" scheme="http://memory.lulutia.com/categories/Algorithm/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="算法" scheme="http://memory.lulutia.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ES6 learning</title>
+    <link href="http://memory.lulutia.com/2015/10/11/ES6/"/>
+    <id>http://memory.lulutia.com/2015/10/11/ES6/</id>
+    <published>2015-10-11T14:38:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Environment Prepare</p>
+<ul>
+<li><p>Bable</p>
+<ul>
+<li>node –harmony</li>
+<li>node –v8-options | grep harmony</li>
+<li>npm install –global babel</li>
+<li>babel-node</li>
+<li>babel-node es6.js</li>
+<li>babel es6.js -o es5.js</li>
+<li>babel -d build-dir source-dir</li>
+<li>babel -d build-dir source-dir -s</li>
+<li><p>use Bable in browser:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"node_modules/babel-core/browser.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/babel"</span>&gt;</span><span class="actionscript"></span></div><div class="line"><span class="comment">// Your ES6 code</span></div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>Traceur</p>
+  <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">    <span class="comment">&lt;!-- 加载Traceur编译器 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://google.github.io/traceur-compiler/bin/traceur.js"</span></span></div><div class="line">        <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;<span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="comment">&lt;!-- 将Traceur编译器用于网页 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://google.github.io/traceur-compiler/src/bootstrap.js"</span></span></div><div class="line">        <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;<span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="comment">&lt;!-- 打开实验选项，否则有些特性可能编译不成功 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="actionscript"></span></div><div class="line">        traceur.options.experimental = <span class="literal">true</span>;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"module"</span>&gt;</span><span class="actionscript"></span></div><div class="line">  <span class="comment">//Your ES6 code</span></div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>npm install -g traceur</li>
+<li>traceur es6.js</li>
+<li>traceur –script es6.js –out es5.js  –experimental</li>
+</ul>
+</li>
+</ul>
+<p>Some commands</p>
+<ul>
+<li>let <ul>
+<li>块级作用域</li>
+<li>不存在变量提升</li>
+<li>暂时性死区[在代码块内，使用let命令声明变量之前，该变量都是不可用的。这在语法上，称为“暂时性死区”（temporal dead zone，简称TDZ）]</li>
+<li>不允许重复声明</li>
+<li>块级作用域外部，无法调用块级作用域内部定义的函数</li>
+</ul>
+</li>
+<li>const<ul>
+<li>声明后不可变</li>
+<li>同样是块级作用域，不提升，有暂时性死区，不可重复声明</li>
+<li>const命令只是指向变量所在的地址，所以将一个对象声明为常量必须非常小心，因为可以改变其属性</li>
+<li>对对象冻结：Object.freeze</li>
+</ul>
+</li>
+<li>ES6规定，var命令和function命令声明的全局变量，属于全局对象的属性；let命令、const命令、class命令声明的全局变量，不属于全局对象的属性。</li>
+</ul>
+<p>跨模块常量：<br><figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="section">export XXX</span></div><div class="line">-----</div><div class="line"><span class="section">import * as XXX from XXX</span></div><div class="line">-----</div><div class="line">import &#123;XXX&#125; from XXX</div></pre></td></tr></table></figure></p>
+<p>变量的解构赋值</p>
+<ul>
+<li>如果解构不成功，变量的值就等于undefined</li>
+<li>解构赋值允许指定默认值</li>
+<li>如果等号的右边不是数组（或者严格地说，不是可遍历的结构，参见《Iterator》一章），那么将会报错,解构不仅可以用于数组，还可以用于对象</li>
+<li>类似数组的对象都有一个length属性，因此还可以对这个属性解构赋值</li>
+<li>不能使用圆括号的情况<ul>
+<li>变量声明语句中，模式不能带有圆括号</li>
+<li>函数参数中，模式不能带有圆括号</li>
+<li>不能将整个模式，或嵌套模式中的一层，放在圆括号之中</li>
+</ul>
+</li>
+<li>可以使用圆括号的情况只有一种：赋值语句的非模式部分，可以使用圆括号</li>
+</ul>
+<p>Iterator</p>
+<ul>
+<li>Waiting</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Environment Prepare&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Bable&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;node –harmony&lt;/li&gt;
+&lt;li&gt;node –v8-options | grep harmony&lt;/li&gt;
+&lt;li&gt;npm install –globa
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>leetcode-JavaScript实现</title>
+    <link href="http://memory.lulutia.com/2015/10/11/leetcode/"/>
+    <id>http://memory.lulutia.com/2015/10/11/leetcode/</id>
+    <published>2015-10-11T10:22:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。<br>Add Two Numbers</p>
+<ul>
+<li><a href="https://leetcode.com/problems/add-two-numbers/" target="_blank" rel="external">https://leetcode.com/problems/add-two-numbers/</a></li>
+<li>You are given two linked lists representing two non-negative numbers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.<ul>
+<li>Input: (2 -&gt; 4 -&gt; 3) + (5 -&gt; 6 -&gt; 4)</li>
+<li>Output: 7 -&gt; 0 -&gt; 8</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Definition for singly-linked list.</div><div class="line"> * function ListNode(val) &#123;</div><div class="line"> *     this.val = val;</div><div class="line"> *     this.next = null;</div><div class="line"> * &#125;</div><div class="line"> */</div><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;ListNode&#125; l1</div><div class="line"> * @param &#123;ListNode&#125; l2</div><div class="line"> * @return &#123;ListNode&#125;</div><div class="line"> */</div><div class="line"><span class="built_in">var</span> addTwoNumbers = function(l1, l2) &#123;</div><div class="line">    <span class="built_in">var</span> resultNode = <span class="literal">new</span> ListNode(<span class="number">0</span>);</div><div class="line">    <span class="built_in">var</span> result = resultNode;</div><div class="line">    <span class="built_in">var</span> <span class="keyword">sum</span> = <span class="number">0</span>;</div><div class="line">    <span class="keyword">if</span>(l1===<span class="built_in">null</span>&amp;&amp;l2===<span class="built_in">null</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="built_in">null</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">while</span>(l1!==<span class="built_in">null</span>||l2!==<span class="built_in">null</span>)&#123;</div><div class="line">        <span class="keyword">if</span>(l1!==<span class="built_in">null</span>)&#123;</div><div class="line">            <span class="keyword">sum</span> = <span class="keyword">sum</span>+l1.val;</div><div class="line">            l1 = l1.next;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span>(l2!==<span class="built_in">null</span>)&#123;</div><div class="line">            <span class="keyword">sum</span> = <span class="keyword">sum</span>+l2.val;</div><div class="line">            l2 = l2.next;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span>(<span class="keyword">sum</span>&gt;<span class="number">9</span>)&#123;</div><div class="line">            result.val = <span class="keyword">sum</span><span class="number">-10</span>;</div><div class="line">            result.next = <span class="literal">new</span> ListNode(<span class="number">1</span>);</div><div class="line">            result = result.next;</div><div class="line">            <span class="keyword">sum</span> = <span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            result.val = <span class="keyword">sum</span>;</div><div class="line">            <span class="keyword">if</span>(l1!==<span class="built_in">null</span>||l2!==<span class="built_in">null</span>)&#123;</div><div class="line">            result.next = <span class="literal">new</span> ListNode(<span class="number">0</span>);</div><div class="line">            result = result.next;</div><div class="line">            <span class="keyword">sum</span> = <span class="number">0</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> resultNode;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Longest Substring Without Repeating Characters：</p>
+<ul>
+<li><a href="https://leetcode.com/problems/longest-substring-without-repeating-characters/" target="_blank" rel="external">https://leetcode.com/problems/longest-substring-without-repeating-characters/</a></li>
+<li>Given a string, find the length of the longest substring without repeating characters. For example, the longest substring without repeating letters for “abcabcbb” is “abc”, which the length is 3. For “bbbbb” the longest substring is “b”, with the length of 1.</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * @param &#123;<span class="built_in">string</span>&#125; s</div><div class="line"> * @<span class="literal">return</span> &#123;<span class="built_in">number</span>&#125;</div><div class="line"> */</div><div class="line">var lengthOfLongestSubstring = function(s) &#123;</div><div class="line">    var <span class="built_in">item</span> = <span class="string">""</span>;</div><div class="line">    var num=<span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span>(var i=<span class="number">0</span>;i&lt;s.<span class="built_in">length</span>;i++)&#123;</div><div class="line">        <span class="keyword">if</span>(<span class="built_in">item</span>.indexOf(s[i])===<span class="number">-1</span>)&#123;</div><div class="line">        <span class="built_in">item</span> = <span class="built_in">item</span> + s[i];</div><div class="line">        var len = <span class="built_in">item</span>.<span class="built_in">length</span>;</div><div class="line">            <span class="keyword">if</span> (len&gt;num)&#123;</div><div class="line">                num = len;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            var index = <span class="built_in">item</span>.indexOf(s[i]);</div><div class="line">            <span class="built_in">item</span> = <span class="built_in">item</span>.substr(index+<span class="number">1</span>);</div><div class="line">            <span class="built_in">item</span> = <span class="built_in">item</span>+s[i];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"><span class="built_in">    return</span> num;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>ZigZag Conversion</p>
+<ul>
+<li><a href="https://leetcode.com/problems/zigzag-conversion/" target="_blank" rel="external">https://leetcode.com/problems/zigzag-conversion/</a></li>
+<li>简单的说就是从左边开始不停画Z字型路线，然后从上部读取字母拼成输出。</li>
+<li>后来网上找了下，<a href="http://fisherlei.blogspot.com/2013/01/leetcode-zigzag-conversion.html" target="_blank" rel="external">这个孩子</a>的分析思路和我的基本一样。</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@param</span> &#123;string&#125; s</div><div class="line"> * <span class="doctag">@param</span> &#123;number&#125; numRows</div><div class="line"> * <span class="doctag">@return</span> &#123;string&#125;</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> convert = function(s, numRows) &#123;</div><div class="line">    <span class="keyword">if</span>(s===<span class="string">""</span>||numRows&lt;<span class="number">1</span>||s===<span class="literal">null</span>)&#123;<span class="keyword">return</span> <span class="string">""</span>&#125;</div><div class="line">    <span class="keyword">if</span>(numRows===<span class="number">1</span>)&#123;<span class="keyword">return</span> s&#125;</div><div class="line">    <span class="keyword">if</span>(s.length&lt;=numRows)&#123;<span class="keyword">return</span> s&#125;</div><div class="line">    <span class="keyword">var</span> step = <span class="number">2</span>*numRows - <span class="number">2</span>;</div><div class="line">    <span class="keyword">var</span> output=<span class="string">""</span>;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>; i&lt;numRows; i++ )&#123;</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">var</span> j=i; j&lt;s.length; j=j+step)&#123;</div><div class="line">            output += s[j];</div><div class="line">            <span class="keyword">if</span>(i!==<span class="number">0</span>&amp;&amp;i!==(numRows<span class="number">-1</span>))&#123;</div><div class="line">                <span class="keyword">var</span> minStep = step - i*<span class="number">2</span>;</div><div class="line">                <span class="keyword">if</span>((j+minStep)&lt;s.length)&#123;</div><div class="line">                output += s[j+minStep];&#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> output;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Reverse Integer</p>
+<ul>
+<li><a href="https://leetcode.com/problems/reverse-integer/" target="_blank" rel="external">https://leetcode.com/problems/reverse-integer/</a></li>
+<li>Reverse digits of an integer.<ul>
+<li>Example1: x = 123, return 321</li>
+<li>Example2: x = -123, return -321</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * <span class="doctag">@param</span> &#123;number&#125; x</div><div class="line"> * <span class="doctag">@return</span> &#123;number&#125;</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> reverse = function(x) &#123;</div><div class="line">    <span class="keyword">var</span> flag = <span class="literal">false</span></div><div class="line">    <span class="keyword">if</span>(x&lt;<span class="number">0</span>)&#123;</div><div class="line">        flag = <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    x = Math.abs(x);</div><div class="line">    <span class="keyword">var</span> str = x+ <span class="string">""</span>;</div><div class="line">    <span class="keyword">var</span> <span class="keyword">out</span> = <span class="string">""</span></div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;str.length;i++)&#123;</div><div class="line">        <span class="keyword">out</span> += str[str.length-i<span class="number">-1</span>];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">out</span> = parseInt(<span class="keyword">out</span>);</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">out</span> &gt; Number.parseInt(<span class="string">"1111111111111111111111111111111"</span>, <span class="number">2</span>))&#123;<span class="keyword">return</span> <span class="number">0</span>&#125;</div><div class="line">    <span class="keyword">if</span>(flag)&#123;</div><div class="line">        <span class="keyword">out</span> = -<span class="keyword">out</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">out</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>String to Integer (atoi)</p>
+<ul>
+<li><a href="https://leetcode.com/problems/string-to-integer-atoi/" target="_blank" rel="external">https://leetcode.com/problems/string-to-integer-atoi/</a></li>
+<li>Implement atoi to convert a string to an integer.<ul>
+<li>Hint: Carefully consider all possible input cases. If you want a challenge, please do not see below and ask yourself what are the possible input cases.</li>
+<li>Notes: It is intended for this problem to be specified vaguely (ie, no given input specs). You are responsible to gather all the input requirements up front.</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;string&#125; str</div><div class="line"> * @return &#123;number&#125;</div><div class="line"> */</div><div class="line">var myAtoi = function(<span class="keyword">str</span>) &#123;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">str</span>.length === <span class="number">0</span>)&#123;<span class="keyword">return</span> <span class="number">0</span>;&#125;</div><div class="line">    var <span class="keyword">count</span> = <span class="number">0</span>;</div><div class="line">    var flag = <span class="keyword">false</span>;</div><div class="line">    <span class="keyword">str</span> = <span class="keyword">str</span>.trim();</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">str</span>[<span class="number">0</span>]===<span class="string">"+"</span>||<span class="keyword">str</span>[<span class="number">0</span>]===<span class="string">"-"</span>)&#123;</div><div class="line">        flag = <span class="keyword">true</span>;</div><div class="line">        <span class="keyword">if</span>(isNaN(parseInt(<span class="keyword">str</span>[<span class="number">1</span>])))&#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(flag)&#123;</div><div class="line">        <span class="keyword">for</span>(var i=<span class="number">1</span> ; i&lt;<span class="keyword">str</span>.length;i++)&#123;</div><div class="line">             <span class="keyword">if</span>(isNaN(parseInt(<span class="keyword">str</span>[i])))&#123;</div><div class="line">                <span class="keyword">str</span> = <span class="keyword">str</span>.substr(<span class="number">0</span>,i);</div><div class="line">        &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span>&#123;</div><div class="line">         <span class="keyword">for</span>(var j=<span class="number">0</span> ; j&lt;<span class="keyword">str</span>.length;j++)&#123;</div><div class="line">             <span class="keyword">if</span>(isNaN(parseInt(<span class="keyword">str</span>[j]))&amp;&amp;j!==<span class="number">0</span>)&#123;</div><div class="line">                <span class="keyword">str</span> = <span class="keyword">str</span>.substr(<span class="number">0</span>,j);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(isNaN(parseInt(<span class="keyword">str</span>[j]))&amp;&amp;j===<span class="number">0</span>)&#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">        &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(parseInt(<span class="keyword">str</span>)&lt;<span class="number">-2147483648</span>) &#123;<span class="keyword">return</span> <span class="number">-2147483648</span>;&#125;</div><div class="line">    <span class="keyword">if</span>(parseInt(<span class="keyword">str</span>)&gt; <span class="number">2147483647</span>) &#123;<span class="keyword">return</span> <span class="number">2147483647</span>;&#125;</div><div class="line">    <span class="keyword">return</span> parseInt(<span class="keyword">str</span>);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Palindrome Number</p>
+<ul>
+<li><a href="https://leetcode.com/problems/palindrome-number/" target="_blank" rel="external">https://leetcode.com/problems/palindrome-number/</a></li>
+<li>Determine whether an integer is a palindrome. Do this without extra space.</li>
+</ul>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;number&#125; x</div><div class="line"> * @return &#123;boolean&#125;</div><div class="line"> */</div><div class="line">var isPalindrome = function(x) &#123;</div><div class="line">    <span class="keyword">if</span>(x&lt;<span class="number">0</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line">    var <span class="keyword">str</span> = x + <span class="string">""</span>;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">str</span>.length===<span class="number">1</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(<span class="keyword">str</span>.length%<span class="number">2</span>===<span class="number">0</span>)&#123;</div><div class="line">        <span class="keyword">for</span>(var i=<span class="number">0</span>; i&lt;(<span class="keyword">str</span>.length/<span class="number">2</span>); i++)&#123;</div><div class="line">            <span class="keyword">if</span>(<span class="keyword">str</span>[i]!==<span class="keyword">str</span>[<span class="keyword">str</span>.length<span class="number">-1</span>-i])&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span>&#123;</div><div class="line">        <span class="keyword">for</span>(var j=<span class="number">0</span>; j&lt;((<span class="keyword">str</span>.length+<span class="number">1</span>)/<span class="number">2</span>)<span class="number">-1</span>;j++)&#123;</div><div class="line">            <span class="keyword">if</span>(<span class="keyword">str</span>[j]!==<span class="keyword">str</span>[<span class="keyword">str</span>.length-j<span class="number">-1</span>])&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Roman to Integer</p>
+<ul>
+<li><a href="https://leetcode.com/problems/roman-to-integer/" target="_blank" rel="external">https://leetcode.com/problems/roman-to-integer/</a></li>
+<li>Given a roman numeral, convert it to an integer.Input is guaranteed to be within the range from 1 to 3999.</li>
+<li>题目没写具体的罗马数规律，查了一下，如下：<a href="http://blog.csdn.net/wzy_1988/article/details/17057929" target="_blank" rel="external">罗马数规律</a></li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;string&#125; s</div><div class="line"> * @return &#123;number&#125;</div><div class="line"> */</div><div class="line"><span class="built_in">var</span> romanToInt = function(s) &#123;</div><div class="line">    <span class="built_in">var</span> <span class="built_in">num</span> = [];</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> i=<span class="number">0</span>; i&lt;s.<span class="built_in">length</span>; i++)&#123;</div><div class="line">        switch(s[i])&#123;</div><div class="line">            case <span class="string">"I"</span>:</div><div class="line">                <span class="built_in">num</span>.<span class="built_in">push</span>(<span class="number">1</span>);</div><div class="line">                <span class="built_in">break</span>;</div><div class="line">            case <span class="string">"V"</span>:</div><div class="line">                <span class="built_in">num</span>.<span class="built_in">push</span>(<span class="number">5</span>);</div><div class="line">                <span class="built_in">break</span>;</div><div class="line">            case <span class="string">"X"</span>:</div><div class="line">               <span class="built_in">num</span>.<span class="built_in">push</span>(<span class="number">10</span>);</div><div class="line">                <span class="built_in">break</span>;</div><div class="line">            case <span class="string">"L"</span>:</div><div class="line">                <span class="built_in">num</span>.<span class="built_in">push</span>(<span class="number">50</span>);</div><div class="line">                <span class="built_in">break</span>;</div><div class="line">            case <span class="string">"C"</span>:</div><div class="line">               <span class="built_in">num</span>.<span class="built_in">push</span>(<span class="number">100</span>);</div><div class="line">                <span class="built_in">break</span>;</div><div class="line">            case <span class="string">"D"</span>:</div><div class="line">                <span class="built_in">num</span>.<span class="built_in">push</span>(<span class="number">500</span>);</div><div class="line">                <span class="built_in">break</span>;</div><div class="line">            case <span class="string">"M"</span>:</div><div class="line">                <span class="built_in">num</span>.<span class="built_in">push</span>(<span class="number">1000</span>);</div><div class="line">                <span class="built_in">break</span>;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(<span class="built_in">num</span>.<span class="built_in">length</span>===<span class="number">0</span>)&#123;<span class="built_in">return</span> <span class="number">0</span>;&#125;</div><div class="line">    <span class="keyword">if</span>(<span class="built_in">num</span>.<span class="built_in">length</span>===<span class="number">1</span>)&#123;<span class="built_in">return</span> <span class="built_in">num</span>[<span class="number">0</span>];&#125;</div><div class="line">    <span class="built_in">var</span> <span class="built_in">sum</span> = <span class="built_in">num</span>[<span class="number">0</span>];</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> j=<span class="number">1</span> ;j&lt;<span class="built_in">num</span>.<span class="built_in">length</span>;j++)&#123;</div><div class="line">        <span class="keyword">if</span>(<span class="built_in">num</span>[j]&lt;=<span class="built_in">num</span>[j-<span class="number">1</span>])&#123;</div><div class="line">            <span class="built_in">sum</span> += <span class="built_in">num</span>[j];</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            <span class="built_in">sum</span> = <span class="built_in">sum</span> - <span class="number">2</span>*<span class="built_in">num</span>[j-<span class="number">1</span>] + <span class="built_in">num</span>[j];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> <span class="built_in">sum</span>;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>Longest Common Prefix</p>
+<ul>
+<li><a href="https://leetcode.com/problems/longest-common-prefix/" target="_blank" rel="external">https://leetcode.com/problems/longest-common-prefix/</a></li>
+<li>Write a function to find the longest common prefix string amongst an array of strings.</li>
+</ul>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;string[]&#125; strs</div><div class="line"> * @return &#123;string&#125;</div><div class="line"> */</div><div class="line"><span class="built_in">var</span> longestCommonPrefix = function(strs) &#123;</div><div class="line">    <span class="keyword">if</span>(strs.<span class="built_in">length</span>===<span class="number">0</span>)&#123;<span class="built_in">return</span> <span class="string">""</span>;&#125;</div><div class="line">    <span class="built_in">var</span> short=strs[<span class="number">0</span>].<span class="built_in">length</span>;</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> i=<span class="number">0</span>;i&lt;strs.<span class="built_in">length</span>;i++)&#123;</div><div class="line">        <span class="keyword">if</span>(strs[i].<span class="built_in">length</span>&lt;short)&#123;</div><div class="line">            short = strs[i].<span class="built_in">length</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">var</span> pre = <span class="string">""</span>;</div><div class="line">    <span class="keyword">for</span>(<span class="built_in">var</span> j=<span class="number">0</span>;j&lt;short;j++)&#123;</div><div class="line">        <span class="keyword">for</span>(<span class="built_in">var</span> k=<span class="number">1</span>;k&lt;strs.<span class="built_in">length</span>;k++)&#123;</div><div class="line">            <span class="keyword">if</span>(strs[k][j]!==strs[k-<span class="number">1</span>][j])&#123;</div><div class="line">                <span class="built_in">return</span> pre;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        pre = pre + strs[<span class="number">0</span>][j];</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">return</span> pre;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。&lt;br&gt;Add Two Numbers&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://leetcode.co
+    
+    </summary>
+    
+      <category term="Algorithm" scheme="http://memory.lulutia.com/categories/Algorithm/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="算法" scheme="http://memory.lulutia.com/tags/%E7%AE%97%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>留档：Node学习脚印一</title>
+    <link href="http://memory.lulutia.com/2015/10/11/Node1/"/>
+    <id>http://memory.lulutia.com/2015/10/11/Node1/</id>
+    <published>2015-10-11T10:21:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>资料准备部分</p>
+<ul>
+<li><a href="http://www.nodebeginner.org/index-zh-cn.html" target="_blank" rel="external">Node入门</a></li>
+<li>深入浅出Node.js</li>
+</ul>
+<p>Node入门部分<br>目标：</p>
+<ul>
+<li>用户通过浏览器使用此应用。</li>
+<li>当用户请求<a href="http://domain/start时，可以看到一个欢迎页面，页面上有一个文件上传的表单。" target="_blank" rel="external">http://domain/start时，可以看到一个欢迎页面，页面上有一个文件上传的表单。</a></li>
+<li>用户可以选择一个图片并提交表单，随后文件将被上传到<a href="http://domain/upload，该页面完成上传后会把图片显示在页面上。" target="_blank" rel="external">http://domain/upload，该页面完成上传后会把图片显示在页面上。</a></li>
+</ul>
+<p>模块分析：</p>
+<ul>
+<li>Web页面：HTTP服务器</li>
+<li>不同的URL：路由</li>
+<li>请求处理程序</li>
+<li>上传数据</li>
+<li>保存展示数据</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//index.js</span></div><div class="line"><span class="keyword">var</span> server = <span class="built_in">require</span>(<span class="string">"./server"</span>);</div><div class="line"><span class="keyword">var</span> router = <span class="built_in">require</span>(<span class="string">"./router"</span>);</div><div class="line"><span class="keyword">var</span> requestHandlers = <span class="built_in">require</span>(<span class="string">"./requestHandlers"</span>);</div><div class="line"></div><div class="line"><span class="keyword">var</span> handle = &#123;&#125;;</div><div class="line">handle[<span class="string">"/"</span>] = requestHandlers.start;</div><div class="line">handle[<span class="string">"/start"</span>] = requestHandlers.start;</div><div class="line">handle[<span class="string">"/upload"</span>] = requestHandlers.upload;</div><div class="line">handle[<span class="string">"/show"</span>] = requestHandlers.show;</div><div class="line"></div><div class="line">server.start(router.router, handle);</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//server.js</span></div><div class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">"http"</span>);</div><div class="line"><span class="keyword">var</span> url = <span class="built_in">require</span>(<span class="string">"url"</span>);</div><div class="line"></div><div class="line"><span class="keyword">var</span> server = &#123;&#125;;</div><div class="line">server.start = <span class="function"><span class="keyword">function</span>(<span class="params">router, handle</span>)</span>&#123;</div><div class="line">    http.createServer(<span class="function"><span class="keyword">function</span>(<span class="params">req,res</span>)</span>&#123;</div><div class="line">        <span class="keyword">var</span> pathname = url.parse(req.url).pathname;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">"Request for "</span> + pathname + <span class="string">" received"</span>);</div><div class="line">        router(handle, pathname, res, req);        </div><div class="line">    &#125;).listen(<span class="number">8124</span>);</div><div class="line"></div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Server running at http://127.0.0.1:8124/"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = server;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//router.js</span></div><div class="line"><span class="keyword">var</span> router = &#123;&#125;;</div><div class="line">router.router = <span class="function"><span class="keyword">function</span>(<span class="params">handle, pathname, res, req</span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"About to route a request for "</span> + pathname);</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> handle[pathname] === <span class="string">"function"</span>)&#123;</div><div class="line">        handle[pathname](res, req);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">"no router "</span> + pathname);</div><div class="line">        res.writeHead(<span class="number">404</span>, &#123;<span class="string">"Content-Type"</span>: <span class="string">"text/plain"</span>&#125;);</div><div class="line">        res.write(<span class="string">"404 Not found"</span>);</div><div class="line">        res.end();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = router;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//requestHandlers.js</span></div><div class="line"><span class="keyword">var</span> querystring = <span class="built_in">require</span>(<span class="string">"querystring"</span>);</div><div class="line"><span class="keyword">var</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</div><div class="line"><span class="keyword">var</span> formidable = <span class="built_in">require</span>(<span class="string">"formidable"</span>);</div><div class="line"></div><div class="line"><span class="keyword">var</span> requestHandlers = &#123;&#125;;</div><div class="line">requestHandlers.start = <span class="function"><span class="keyword">function</span>(<span class="params">res, req</span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Request handler 'start' was called."</span>);</div><div class="line"></div><div class="line">      <span class="keyword">var</span> body = <span class="string">'&lt;html&gt;'</span>+</div><div class="line">          <span class="string">'&lt;head&gt;'</span>+</div><div class="line">          <span class="string">'&lt;meta http-equiv="Content-Type" '</span>+</div><div class="line">          <span class="string">'content="text/html; charset=UTF-8" /&gt;'</span>+</div><div class="line">          <span class="string">'&lt;/head&gt;'</span>+</div><div class="line">          <span class="string">'&lt;body&gt;'</span>+</div><div class="line">          <span class="string">'&lt;form action="/upload" enctype="multipart/form-data" '</span>+</div><div class="line">          <span class="string">'method="post"&gt;'</span>+</div><div class="line">          <span class="string">'&lt;input type="file" name="upload"&gt;'</span>+</div><div class="line">          <span class="string">'&lt;input type="submit" value="Upload file" /&gt;'</span>+</div><div class="line">          <span class="string">'&lt;/form&gt;'</span>+</div><div class="line">          <span class="string">'&lt;/body&gt;'</span>+</div><div class="line">          <span class="string">'&lt;/html&gt;'</span>;</div><div class="line"></div><div class="line">        res.writeHead(<span class="number">200</span>, &#123;<span class="string">"Content-Type"</span>: <span class="string">"text/html"</span>&#125;);</div><div class="line">        res.write(body);</div><div class="line">        res.end();</div><div class="line">&#125;</div><div class="line">requestHandlers.upload = <span class="function"><span class="keyword">function</span>(<span class="params">res, req</span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"upload"</span>);</div><div class="line">    <span class="keyword">var</span> form = <span class="keyword">new</span> formidable.IncomingForm();</div><div class="line">    form.parse(req, <span class="function"><span class="keyword">function</span>(<span class="params">error, fields, files</span>)</span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">"parsing done"</span>);</div><div class="line">        fs.renameSync(files.upload.path, <span class="string">"/tmp/test.png"</span>);</div><div class="line">        res.writeHead(<span class="string">"200"</span>, &#123;<span class="string">"Content-Type"</span>: <span class="string">"text/html"</span>&#125;);</div><div class="line">        res.write(<span class="string">"received image:&lt;br/&gt;"</span>);</div><div class="line">        res.write(<span class="string">"&lt;img src='/show' /&gt;"</span>);</div><div class="line">        res.end();</div><div class="line">    &#125;)</div><div class="line">&#125;</div><div class="line">requestHandlers.show = <span class="function"><span class="keyword">function</span>(<span class="params">res, postData</span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"SHOW"</span>);</div><div class="line">    fs.readFile(<span class="string">"/tmp/test.png"</span>, <span class="string">"binary"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">error, file</span>)</span>&#123;</div><div class="line">        <span class="keyword">if</span>(error)&#123;</div><div class="line">            res.writeHead(<span class="number">500</span>, &#123;<span class="string">"Content-Type"</span>: <span class="string">"text/plain"</span>&#125;);</div><div class="line">            res.write(error + <span class="string">"\n"</span>);</div><div class="line">            res.end();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            res.writeHead(<span class="number">200</span>, &#123;<span class="string">"Content-Type"</span>: <span class="string">"image/png"</span>&#125;);</div><div class="line">            res.write(file, <span class="string">"binary"</span>);</div><div class="line">            res.end();</div><div class="line">        &#125;</div><div class="line">    &#125;)</div><div class="line">&#125;</div><div class="line"><span class="built_in">module</span>.exports = requestHandlers;</div></pre></td></tr></table></figure>
+<p>注意点</p>
+<ul>
+<li>阻塞和非阻塞的问题</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;资料准备部分&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.nodebeginner.org/index-zh-cn.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Node入门&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;深入浅出Node.js
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>留档：GitHub＋hexo＋godaddy</title>
+    <link href="http://memory.lulutia.com/2015/09/11/hello-world/"/>
+    <id>http://memory.lulutia.com/2015/09/11/hello-world/</id>
+    <published>2015-09-11T11:22:00.000Z</published>
+    <updated>2017-06-07T02:42:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>环境准备部分</p>
+<ul>
+<li>安装Node，去<a href="https://nodejs.org/" target="_blank" rel="external">node官网</a>根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成在里面了。</li>
+<li>安装git，我用的是git的客户端<a href="https://www.sourcetreeapp.com/" target="_blank" rel="external">SourceTree</a>，选择很多，怎样顺手怎样来。</li>
+</ul>
+<p>github部分<br><a href="https://github.com/" target="_blank" rel="external"><strong>github</strong></a>是一个开源代码库以及版本控制系统。</p>
+<ul>
+<li>申请一个GitHub的账号，路径点击上面链接。</li>
+<li>建立项目的仓库，这里根据你希望搭建的博客形式分为了两种方式：<ol>
+<li>个人或者组织的，这种情况下，你建立的仓库必须与你的用户名保持一致。比如：atmos/atmos.github.io。而且在这个仓库下的master分支将作为内容被建立并且发布到GitHub Pages site。</li>
+<li>项目的主页。在这种情况下，可以针对每个具体的项目仓库创建其相对的主页，分支gh-pages作为内容来建立和发布内容。它的访问url一般为username(orgname).github.io/projectname。</li>
+<li>总结：如果是希望建立全局性(内容上)的网页建议用第一种方式，否则用第二种方式。详细对比可见<a href="https://help.github.com/articles/user-organization-and-project-pages/" target="_blank" rel="external">GitHub Help</a>。</li>
+</ol>
+</li>
+<li>添加SSH公匙到Account settings －》SSH Keys －》Add SSH Key(其实如果不用SSH连接是可以省略这一步的)，具体过程<a href="https://help.github.com/articles/generating-ssh-keys/" target="_blank" rel="external">点击我</a>。将的很详细，跟着走就可以了。</li>
+<li>将此仓库克隆到本地(此处需要建立没有历史纪录和操作记录的新分支，所以最好新克隆)，然后创建gh-pages的分支并且将里面的内容都删除，此处不要提交修改。具体过程<a href="https://help.github.com/articles/creating-project-pages-manually/" target="_blank" rel="external">点击我</a>。</li>
+</ul>
+<p>hexo部分<br><a href="https://hexo.io/zh-cn/" target="_blank" rel="external"><strong>hexo</strong></a>是一个快速，简洁高效的博客框架。</p>
+<ul>
+<li><p>在命令行里输入<code>npm install hexo-cli -g</code>进行安装。这里可能会出现几个问题。</p>
+<ul>
+<li>需要权限，此时输入变为<code>sudo npm install hexo-cli -g</code>即可。</li>
+<li><p>卡node-gyp rebuild的问题，比如以下错误:</p>
+  <figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">node-gyp rebuild</div><div class="line">gyp WARN install got an error, rolling back install</div><div class="line">gyp ERR! configure error </div><div class="line">gyp ERR! stack Error: EPERM, utime <span class="string">'/Users/dirk/.node-gyp/0.12.4'</span></div><div class="line">gyp ERR! stack     at Error (native)</div><div class="line">gyp ERR! System Darwin 14.3.0</div><div class="line">gyp ERR! <span class="built_in">command</span> <span class="string">"node"</span> <span class="string">"/usr/local/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js"</span> <span class="string">"rebuild"</span></div><div class="line">gyp ERR! cwd /usr/<span class="built_in">local</span>/lib/node_modules/hexo-cli/node_modules/hexo-fs/node_modules/chokidar/node_modules/fsevents</div><div class="line">gyp ERR! node -v v0.12.4</div><div class="line">gyp ERR! node-gyp -v v1.0.3</div><div class="line">gyp ERR! not ok </div><div class="line">npm WARN optional dep failed, continuing fsevents@0.3.6</div></pre></td></tr></table></figure>
+<p>  原因就是GFW啦，所以要使用下国内镜像然后安装，如下：</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> npm install -g cnpm --registry=https://registry.npm.taobao.org <span class="comment">#可能需要sudo</span></span></div><div class="line"><span class="meta">$</span><span class="bash"> cnpm install hexo-cli -g</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>接着执行以下代码，主要就是初始化blog，如果没有指定文件夹则默认就在当下文件夹，然后切换到初始化后的文件夹安装依赖，最后开启本地服务器，此时访问本地<a href="http://localhost:4000/就可以了，命令如下：" target="_blank" rel="external">http://localhost:4000/就可以了，命令如下：</a></p>
+  <figure class="highlight armasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="symbol">hexo</span> init <span class="keyword">blog</span></div><div class="line"><span class="symbol">cd</span> <span class="keyword">blog</span></div><div class="line"><span class="symbol">npm</span> install</div></pre></td></tr></table></figure>
+<p>  但是在实际执行中可能会遇见一些问题，比如：</p>
+  <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[Error: Module did <span class="keyword">not</span> self-<span class="keyword">register</span>.]</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/default/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/Debug/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">ERROR Plugin load failed: hexo-generator-feed</div><div class="line">ReferenceError: hexo is <span class="keyword">not</span> defined</div></pre></td></tr></table></figure>
+<p>  解决方案：</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm <span class="keyword">install</span> hexo-generator-feed <span class="comment">--save</span></div><div class="line">npm <span class="keyword">install</span> hexo <span class="comment">--save</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>以上只是部署到了本地，实际上我们需要部署到github上，所以需要去修改hexo的配置，主要修改deploy部分，修改如下,注意type不能写github：</p>
+  <figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">deploy</span>:</div><div class="line">  <span class="attribute">type</span>: git</div><div class="line">  <span class="attribute">repository</span>: <span class="attribute">https</span>:<span class="comment">//github.com/&lt;username&gt;/&lt;username&gt;.github.io.git</span></div><div class="line">  <span class="attribute">branch</span>: gh-pages</div></pre></td></tr></table></figure>
+<p>  然后执行以下命令：</p>
+  <figure class="highlight ebnf"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">hexo g</span></div><div class="line">hexo deploy</div></pre></td></tr></table></figure>
+<p>  实际中可能遇见的问题，比如：</p>
+  <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/Release/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/default/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/Debug/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div></pre></td></tr></table></figure>
+<p>  解决方案：</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm <span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>主题安装<br><a href="https://github.com/hexojs/hexo/wiki/Themes" target="_blank" rel="external"><strong>主题寻找地址</strong></a><br>安装方法也很简单，具体的每个主题下有，大概就是将他们克隆到本地的themes文件夹下，然后修改hexo的配置里的theme为希望的主题。</p>
+<p>域名部署</p>
+<ul>
+<li>我是之前在godaddy上买过一个域名。</li>
+<li><a href="https://support.dnspod.cn/Kb/showarticle/tsid/42" target="_blank" rel="external">Godaddy注册商域名修改DNS地址</a>。</li>
+<li>在DNSPod添加域名后进入控制台添加纪录，这边已经有两条记录了，此时再添加两条，一条是A纪录的host为@指向github的ip，这里是固定的192.30.252.153。另外一条CNAME纪录的host为www指向你的主页<username>.github.io(当然这里也可以通过dig命令获取具体的ip值)，同理，如果是项目主页可以添加二级目录指向<username>.github.io。</username></username></li>
+<li>在具体的项目下添加一个文件CNAME。里面写上你希望对应的域名，然后提交。接着生成部署hexo就行。</li>
+<li><a href="https://help.github.com/articles/about-custom-domains-for-github-pages-sites/" target="_blank" rel="external">更加详细内容参照</a>。</li>
+</ul>
+<p>另外一些参考资料</p>
+<ul>
+<li><a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">资料一</a></li>
+<li><a href="https://medium.com/@LovettLovett/github-pages-godaddy-f0318c2f25a" target="_blank" rel="external">资料二</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;环境准备部分&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;安装Node，去&lt;a href=&quot;https://nodejs.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;node官网&lt;/a&gt;根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="环境搭建" scheme="http://memory.lulutia.com/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
+    
+  </entry>
+  
+</feed>
