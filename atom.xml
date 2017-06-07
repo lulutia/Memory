@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://memory.lulutia.com/"/>
-  <updated>2017-06-07T02:51:33.000Z</updated>
+  <updated>2017-06-07T03:27:29.000Z</updated>
   <id>http://memory.lulutia.com/</id>
   
   <author>
@@ -19,17 +19,17 @@
     <title>WEBGL系列之二维操作</title>
     <link href="http://memory.lulutia.com/2017/06/07/webgl01/"/>
     <id>http://memory.lulutia.com/2017/06/07/webgl01/</id>
-    <published>2017-06-07T02:45:01.000Z</published>
-    <updated>2017-06-07T02:51:33.000Z</updated>
+    <published>2017-06-07T03:15:45.000Z</published>
+    <updated>2017-06-07T03:27:29.000Z</updated>
     
-    <content type="html"><![CDATA[<p>###背景介绍</p>
+    <content type="html"><![CDATA[<p>背景介绍</p>
 <ul>
 <li>WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]</li>
 <li>具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。</li>
 <li>OpenGL2.0开始支持的可编程着色器方法被OpenGL ES2.0继承，成为了WebGL1.0标准的核心部分。而着色器方法或称为着色器，是使用一种类似C的编程语言实现精美的视觉效果。而编写着色器的语言称为着色器语言，WebGL使用OpenGL ES着色器语言，亦即GLSLES。</li>
 <li>WebGL规范的建立由Khronos(也负责OpenGL规范的更新和标准化)建立的WebGL工作小组负责。2011年发布了WebGL规范的第一个版本。<a href="https://www.khronos.org/registry/webgl/specs/latest/2.0/" target="_blank" rel="external">WebGL2.0</a>处于<a href="http://stackoverflow.com/questions/6692762/what-is-the-difference-between-a-w3c-working-draft-and-an-editors-draft" target="_blank" rel="external">Editor’s Draft</a>状态，它主要提供与OpenGL3.0新特性的对应，现阶段它并不与WebGL1.0完全向下兼容。</li>
 </ul>
-<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>  WebGL主要是用于渲染2D、3D矢量图形。在进入它的使用细节之前，我们先分析下它到底做了件什么事以及其执行的顺序。<br>  如果你有过一点三模建模方面的经验的话，你就会知道，所有的三维模型都是由点，线，三角形构成的。譬如下面这只超级出名的bunny兔子。模型的精细程度与其面片的数量直接相关，当面片数量足够多时，人类的视觉是无法分辨三角形的。<br>  同理，如果我们打开WebGL的绘图API，我们就会发现，它处理的也是点，线，三角形。那么它是如何由这些最基础的东西构建出整个世界的呢。其实，它主要执行了三方面的操作：</p>
+<p>基本概念<br>  WebGL主要是用于渲染2D、3D矢量图形。在进入它的使用细节之前，我们先分析下它到底做了件什么事以及其执行的顺序。<br>  如果你有过一点三模建模方面的经验的话，你就会知道，所有的三维模型都是由点，线，三角形构成的。譬如下面这只超级出名的bunny兔子。模型的精细程度与其面片的数量直接相关，当面片数量足够多时，人类的视觉是无法分辨三角形的。<br>  同理，如果我们打开WebGL的绘图API，我们就会发现，它处理的也是点，线，三角形。那么它是如何由这些最基础的东西构建出整个世界的呢。其实，它主要执行了三方面的操作：</p>
 <ul>
 <li>获取顶点坐标<ul>
 <li>简单图形，可以显示定义</li>
@@ -56,8 +56,7 @@
 </li>
 </ul>
 <p> 下面图示为整体流程:</p>
-<p> <img src="http://okzzg7ifm.bkt.clouddn.com/01.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="整体流程"></p>
-<p>###GLSE中的数据类型</p>
+<p> <img src="http://okzzg7ifm.bkt.clouddn.com/01.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="整体流程"><br>GLSE中的数据类型</p>
 <ul>
 <li>基本类型<ul>
 <li>float: 表示浮点数</li>
@@ -100,7 +99,7 @@
 </li>
 <li>预处理指令<br>  预处理指令用来在真正编译之前对代码进行预处理，都以#开始</li>
 </ul>
-<p>###核心思想</p>
+<p>核心思想</p>
 <ul>
 <li><p><a href="http://lulutia.com/webgldemo/01/" target="_blank" rel="external">获取WebGL上下文</a>：<br><img src="http://okzzg7ifm.bkt.clouddn.com/02.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="获取上下文"></p>
   <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">'example'</span>);</div><div class="line"><span class="keyword">var</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</div><div class="line">ctx.fillStyle = <span class="string">'rgba(0, 0, 255, 1.0)'</span>;</div></pre></td></tr></table></figure>
@@ -171,7 +170,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="具体API"><a href="#具体API" class="headerlink" title="具体API"></a>具体API</h3><p><strong>注：文中demo根据WebGL编程指南demo改编而来</strong></p>
+<p>具体API<br><strong>注：文中demo根据WebGL编程指南demo改编而来</strong></p>
 <ol>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createShader" target="_blank" rel="external">gl.createShader(type)</a>: 创建由type指定的着色器对象，type的值分别为gl.VERTEX_SHADER表示顶点着色器 gl.FRAGMENT_SHADER表示片元着色器</li>
 <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/shaderSource" target="_blank" rel="external">gl.shaderSource(shader, source)</a>: 将source指定的字符串形式的代码传入shader指定着色器，如果之前已经向shader传入过代码了，旧的代码将会被替换掉</li>
@@ -216,10 +215,10 @@
     
     <summary type="html">
     
-      &lt;p&gt;###背景介绍&lt;/p&gt;
+      &lt;p&gt;背景介绍&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]&lt;/li&gt;
-&lt;li&gt;具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算
+&lt;li&gt;具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智
     
     </summary>
     
@@ -237,7 +236,7 @@
     <link href="http://memory.lulutia.com/2017/01/08/2017HELLO/"/>
     <id>http://memory.lulutia.com/2017/01/08/2017HELLO/</id>
     <published>2017-01-08T12:51:32.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/assets/img/2017.jpg" alt=""></p>
 <p>又一年匆匆走过，这一年说长不长说短不短，但的的确确发生了好多好多事情。先来篇流水帐总结。</p>
@@ -276,7 +275,7 @@
     <link href="http://memory.lulutia.com/2016/05/27/RN/"/>
     <id>http://memory.lulutia.com/2016/05/27/RN/</id>
     <published>2016-05-27T14:36:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>React Native是个啥?</p>
 <ul>
@@ -367,7 +366,7 @@
     <link href="http://memory.lulutia.com/2015/11/03/yeoman%E5%BB%BA%E7%AB%8B%E8%84%9A%E6%89%8B%E6%9E%B6/"/>
     <id>http://memory.lulutia.com/2015/11/03/yeoman建立脚手架/</id>
     <published>2015-11-03T14:10:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>首先你要先安装yeoman，<code>npm install -g yo bower grunt-cli gulp</code>。</li>
@@ -427,7 +426,7 @@
     <link href="http://memory.lulutia.com/2015/11/02/ES6-5/"/>
     <id>http://memory.lulutia.com/2015/11/02/ES6-5/</id>
     <published>2015-11-02T13:36:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>异步操作和Async函数</p>
 <ul>
@@ -549,7 +548,7 @@
     <link href="http://memory.lulutia.com/2015/10/23/ES6-4/"/>
     <id>http://memory.lulutia.com/2015/10/23/ES6-4/</id>
     <published>2015-10-23T12:22:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>Iterator和for..of循环</p>
 <ul>
@@ -611,7 +610,7 @@
     <link href="http://memory.lulutia.com/2015/10/22/ES6-3/"/>
     <id>http://memory.lulutia.com/2015/10/22/ES6-3/</id>
     <published>2015-10-22T02:09:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>对象的扩展</p>
 <ul>
@@ -677,7 +676,7 @@
     <link href="http://memory.lulutia.com/2015/10/21/ES6-2/"/>
     <id>http://memory.lulutia.com/2015/10/21/ES6-2/</id>
     <published>2015-10-21T14:16:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>字符串的扩展</p>
 <ul>
@@ -774,7 +773,7 @@
     <link href="http://memory.lulutia.com/2015/10/20/JavaScript-delete/"/>
     <id>http://memory.lulutia.com/2015/10/20/JavaScript-delete/</id>
     <published>2015-10-20T04:36:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>核心内容借鉴自下面的<a href="http://perfectionkills.com/understanding-delete/" target="_blank" rel="external">网址</a></li>
@@ -847,7 +846,7 @@
     <link href="http://memory.lulutia.com/2015/10/15/memory1/"/>
     <id>http://memory.lulutia.com/2015/10/15/memory1/</id>
     <published>2015-10-15T12:38:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>  一大早就跑南京去面360，完全高铁当公交的节奏……但是，我穷啊＝＝。总的来说面的特别的不好，还不是自己弱，怪谁啊，稍微纪录下吧。</p>
 <p>  <strong>岗位：web前端工程师</strong></p>
@@ -913,7 +912,7 @@
     <link href="http://memory.lulutia.com/2015/10/13/note-structure01/"/>
     <id>http://memory.lulutia.com/2015/10/13/note-structure01/</id>
     <published>2015-10-13T08:06:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>数组</p>
 <ul>
@@ -973,7 +972,7 @@
     <link href="http://memory.lulutia.com/2015/10/12/leetcode2/"/>
     <id>http://memory.lulutia.com/2015/10/12/leetcode2/</id>
     <published>2015-10-12T10:09:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>其他见part1<br>Merge Two Sorted Lists</p>
 <ul>
@@ -1091,7 +1090,7 @@
     <link href="http://memory.lulutia.com/2015/10/11/ES6/"/>
     <id>http://memory.lulutia.com/2015/10/11/ES6/</id>
     <published>2015-10-11T14:38:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>Environment Prepare</p>
 <ul>
@@ -1187,7 +1186,7 @@
     <link href="http://memory.lulutia.com/2015/10/11/leetcode/"/>
     <id>http://memory.lulutia.com/2015/10/11/leetcode/</id>
     <published>2015-10-11T10:22:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。<br>Add Two Numbers</p>
 <ul>
@@ -1277,7 +1276,7 @@
     <link href="http://memory.lulutia.com/2015/10/11/Node1/"/>
     <id>http://memory.lulutia.com/2015/10/11/Node1/</id>
     <published>2015-10-11T10:21:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:15:45.000Z</updated>
     
     <content type="html"><![CDATA[<p>资料准备部分</p>
 <ul>
@@ -1331,7 +1330,7 @@
     <link href="http://memory.lulutia.com/2015/09/11/hello-world/"/>
     <id>http://memory.lulutia.com/2015/09/11/hello-world/</id>
     <published>2015-09-11T11:22:00.000Z</published>
-    <updated>2017-06-07T02:42:51.000Z</updated>
+    <updated>2017-06-07T03:26:56.000Z</updated>
     
     <content type="html"><![CDATA[<p>环境准备部分</p>
 <ul>
