@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://memory.lulutia.com/"/>
-  <updated>2017-06-07T06:36:11.000Z</updated>
+  <updated>2017-07-06T09:46:29.000Z</updated>
   <id>http://memory.lulutia.com/</id>
   
   <author>
@@ -14,6 +14,486 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>React Native 学习系列二</title>
+    <link href="http://memory.lulutia.com/2017/07/06/reactnative02/"/>
+    <id>http://memory.lulutia.com/2017/07/06/reactnative02/</id>
+    <published>2017-07-06T08:58:30.000Z</published>
+    <updated>2017-07-06T09:46:29.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="状态管理"><a href="#状态管理" class="headerlink" title="状态管理"></a>状态管理</h3><ul>
+<li><p>历史情况</p>
+<ul>
+<li>最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程</li>
+<li>人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑</li>
+<li>数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发生时，只有那些确实需要变化的进行变化。这种方式对事件变更本身会进行一层处理，导致需要按照特定的API进行处理</li>
+<li>脏检测: 创建了值的观察器，一旦应用中发生变化，就检测这个观察器里的值是否与之前的值相同，如果不同就重新渲染这个值到UI。这种方式因为没有告诉框架是否变了以及什么地方变化了，所以只能通过外部来检查，比如有一种方法就是一旦交互产生，就重新把所有观察器跑一遍。这种方式遇见UI比较复杂或者重绘经常性发生时就很可能产生性能问题</li>
+<li><p>虚拟DOM: 思想上与服务器端渲染类似。只要状态发生变化，就全部重新渲染一次。但是其不同的地方在于他不是在真正DOM上执行这个操作，而是渲染到虚拟DOM，即一个轻量的纯javaScript的对象结构，里面是简单对象和数组来表达真实的DOM对象。之后再通过一个特殊的过程根据这个虚拟DOM来创建真实DOM。因此当一个值发生变化时，会通过对比新生成的虚拟DOM与之前的虚拟DOM而找出涉及DOM的变化，之后将变化反应在真正的DOM上。这种方式不用跟踪变动，减少了昂贵的DOM操作，这部分的详细了解推荐通过<a href="https://github.com/Matt-Esch/virtual-dom#dom-model" target="_blank" rel="external">virtual-dom</a>这个项目来进行分析，总的来说流程如下:</p>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/virtualdom.png" alt="virtualdom"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="JSX"><a href="#JSX" class="headerlink" title="JSX"></a>JSX</h3><ul>
+<li><p>什么是JSX</p>
+<blockquote>
+<p>It is called JSX, and it is a syntax extension to JavaScript. We recommend using it with React to describe what the UI should look like. JSX may remind you of a template language, but it comes with the full power of JavaScript.JSX produces React “elements”.</p>
+</blockquote>
+<ul>
+<li>我们可以看见两个关键点：<ol>
+<li>它是JS的语法扩展(我们可以理解我为它就是一个比较高级的语法糖)</li>
+<li>与模板语言不一样，它能利用JS自带的语法和特性。因此基本会写JS就能写JSX，学习成本低，并且能利用JS本身的语法</li>
+<li>React基于Virtual DOM创造的JSX，JSX创造的是React element，它不是真正的DOM，因此也意味着在没有真正DOM的情况下，它也能模拟DOM的行为(React-Native中实际也没有真正的DOM)</li>
+</ol>
+</li>
+<li><p>具体行为</p>
+<ul>
+<li><p>以react举例下面两段代码完全一致：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> p1 = React.createElement(<span class="string">'p'</span>, <span class="literal">null</span>, <span class="string">'my test'</span>)</div><div class="line"><span class="keyword">var</span> root = React.createElement(<span class="string">'div'</span>, &#123; <span class="attr">className</span>: <span class="string">'root-div'</span> &#125;, p1);</div></pre></td></tr></table></figure>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> root = (</div><div class="line">	&lt;div className='root-div'&gt;</div><div class="line">		&lt;p&gt;my test&lt;/p&gt;</div><div class="line">	&lt;/div&gt;</div><div class="line">)</div></pre></td></tr></table></figure>
+</li>
+<li><p>JSX之后会被专门的解释器解释为JS(在打包阶段就完成了，因此不会有性能上的问题)再执行</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>JSX语法</p>
+<ul>
+<li><p>在JSX中你可以使用{}来包裹JS表达式，下面以RN来举例</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123;refundDetailData.return.returnPics &amp;&amp; &lt;View style=&#123;[Style.basicLayout, Style.image]&#125;&gt;</div><div class="line">   	&lt;Text style=&#123;[Style.textColor, Style.navTitle]&#125;&gt;图片信息:&lt;/Text&gt;</div><div class="line">   	&lt;ImageShow picUrls=&#123;refundDetailData.return.returnPics&#125;/&gt;</div><div class="line"> 	&lt;/View&gt;&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>JSX本身也是一种表达式，因此可以在if语句，for循环等各种场合中使用</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dataList.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> (</div><div class="line">  &lt;TouchableHighlight key=&#123;index&#125;&gt;</div><div class="line">    &lt;View&gt;</div><div class="line">      &lt;Text&gt;&#123;item.contactName&#125;&lt;/Text&gt;</div><div class="line">      &lt;Text&gt;&#123;item.contactTel&#125;&lt;/Text&gt;</div><div class="line">    &lt;/View&gt;</div><div class="line">  &lt;/TouchableHighlight&gt;</div><div class="line">));</div></pre></td></tr></table></figure>
+</li>
+<li><p>JSX可以定义属性，一般每个组件都会接受一组属性(props)</p>
+<ul>
+<li>属性的名字可以自定义</li>
+<li>属性的值能够是变量，当属性值是变量时需要通过{}包裹起来，此时注意如果在这个大括号外层用双引号包裹，则此时整条语句会作为字符串进行解析，而不是变量了</li>
+<li>虽然JSX与HTML有很多类似处，但是其最后还是编译为JS的，因此，在React DOM中的属性名是遵循驼峰命名法的</li>
+<li><p>当忽略属性的值时，JSX会按照true来对待它。而不使用属性时，其对应的值与组件实现内部默认值有关</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="comment">/*下面两条代码实现的效果一样*/</span>&#125;</div><div class="line">&lt;Input type=<span class="string">"button"</span> disabled /&gt;;</div><div class="line">&lt;Input type="button" disabled=&#123;true&#125; /&gt;;</div><div class="line"></div><div class="line">&#123;/*下面两条代码实现的效果一样*/&#125;</div><div class="line">&lt;Input type="button" /&gt;;</div><div class="line">&lt;Input type="button" disabled=&#123;false&#125; /&gt;;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>JSX标签能够包含子元素就如HTML一样，而且其子元素也可以运用JS的语法进行构建</p>
+</li>
+<li><p>JSX中的注释就如JS类似，但是需要注意当在子元素中进行注释时，需要用{}将注释包裹起来</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;Nav&gt;</div><div class="line">   &#123;<span class="comment">/* child comment, put &#123;&#125; around */</span>&#125;</div><div class="line">   &lt;Person</div><div class="line">     <span class="comment">/* multi</span></div><div class="line">        line</div><div class="line">        comment */</div><div class="line">     name=&#123;<span class="built_in">window</span>.isLoggedIn ? <span class="built_in">window</span>.name : <span class="string">''</span>&#125; <span class="comment">// end of line comment</span></div><div class="line">   /&gt;</div><div class="line"> &lt;/Nav&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>JSX中的事件处理是直接绑定在组件上的，下面以RN为例</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;TouchableHighlight style=&#123;Style.tabBtn&#125; underlayColor=&#123;Colors.yellowLighten&#125;onPress=&#123;<span class="keyword">this</span>.goToReturnList&#125;&gt;</div><div class="line">  &lt;Text style=&#123;Style.tabBtnText&#125;&gt;退货单&lt;/Text&gt;</div><div class="line">&lt;<span class="regexp">/TouchableHighlight&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li><p>相比于使用下面这种方式，界面元素和业务逻辑的耦合会更加明显</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'#my-button'</span>).on(<span class="string">'click'</span>, <span class="keyword">this</span>.checkAndSubmit.bind(<span class="keyword">this</span>));</div></pre></td></tr></table></figure>
+</li>
+<li><p>在JSX中，需要注意事件名依然按照驼峰命名法来进行，而大括号中就是事件触发时返回的事件处理函数。JSX中绑定的事件自动进行了解绑处理，当对应的DOM不存在时，其绑定的事件就自动解绑了。</p>
+</li>
+<li>React有一个模拟事件系统。它并不会将事件绑定到真正的节点上，当React启动时，他开始在顶层用一个单独的事件监听器来监听所有的事件。当一个组件加载或者移除时，它绑定的事件将在一个内置的映射上被添加或者移除。当事件真正触发时，React知道如何运用这个映射来dispatch这个事件。</li>
+<li>虽然整个事件系统由React来管理了，但是其API和使用方法与原生事件一致。因此做到了浏览器的兼容。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h3><ul>
+<li>在React中，组件只是一种状态机，整个UI的渲染可以算做是状态驱动的。你更新一个组件的状态，然后根据新的状态渲染UI，React会以一种最效率的方式来更新DOM</li>
+<li>大多数组件只需要根据传入的props里面的数据进行渲染，属性是在组件初始化之后就从父级组件带入到组件内部。我们无法在使用的过程中对组件的属性进行修改。但是当需要对用户输入，时间的流逝，服务端请求作出反应时，需要用state来进行状态记录，state是实际上组件中使用的数据，它可以被修改</li>
+<li>在React中，通过调用setState(data, callback)来告诉它数据变动了，这个方法将data合并进this.state，之后告诉组件状态变动了需要进行重新渲染，callback会在重新渲染完毕后被调用。注意setState()这个方法是异步的，同步的多个setState方法只会触发一次实际render</li>
+<li><p>组件在实例化之后就开始了它的生命周期过程。它的整个生命周期主要由以下几个部分组成:</p>
+<ul>
+<li><p>getDefaultProps():在组件类创建的时候调用<strong>一次</strong>，然后返回值被缓存下来, 它返回的任何复杂对象用于设置默认的props, 并且这些将会在实例间共享，而不是每个实例拥有一份拷贝。注意只能在子组件或组件树上调用setProps。别调用this.setProps或者直接修改this.props。可以通propTypes对props的类型进行验证</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> propTypes = &#123;</div><div class="line">   <span class="attr">data</span>: PropTypes.object,</div><div class="line">   <span class="attr">pickerNameStyle</span>: Text.propTypes.style</div><div class="line">  &#125;;</div></pre></td></tr></table></figure>
+</li>
+<li><p>getInitialState():在组件挂载之前调用<strong>一次</strong>。返回值将会作为 this.state的初始值。这个方法执行时已经可以访问组件的props。注意state是每个组件自带的，而props是所有实例共享的</p>
+</li>
+<li>componentWillMount():在初始化渲染执行之前立刻调用，且只调用一次，这是渲染前最后修改state的机会</li>
+<li>render():render方法返回的结果并不是真正的DOM元素，而是一个虚拟的表现，类似于一个DOM tree的结构的对象。它是唯一一个必须的方法。在这个方法中，会检测this.props和this.state，返回一个单子级组件,当然也可以返回null或者false。render函数不应该修改state,操作DOM或者与浏览器交互</li>
+<li><p>componentDidMount():在初始化渲染执行之后立刻调用一次,在生命周期中的这个时间点，组件拥有一个DOM展现[即虚拟DOM构建完毕]，你可以通过this.getDOMNode()来获取相应DOM节点。当需要从组件获取真实DOM的节点，可以使用ref属性。注意在RN中，是先调用子组件的componentDidMount()，然后调用父组件的函数。这个函数之后，就进入了稳定运行状态，等待事件触发</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">......</div><div class="line">return &lt;canvas ref=<span class="string">'mainCanvas'</span>&gt;</div><div class="line">......</div><div class="line">componentDidMount: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">var</span> canvas = <span class="keyword">this</span>.refs.mainCanvas.getDOMNode();</div><div class="line">    <span class="comment">//可以访问到 Canvas 节点</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>componentWillReceiveProps():用此函数可以作为react在props传入之后，render()渲染之前更新state的机会,新的props是传入的,老的props可以通过this.props来获取。注意在该函数中调用this.setState()将不会引起二次渲染</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">componentWillReceiveProps: <span class="function"><span class="keyword">function</span>(<span class="params">nextProps</span>) </span>&#123;</div><div class="line">	<span class="keyword">this</span>.setState(&#123;</div><div class="line">	    <span class="attr">likesIncreasing</span>: nextProps.likeCount &gt; <span class="keyword">this</span>.props.likeCount</div><div class="line">	&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>shouldComponentUpdate():在接收到新的props或者state,将要渲染之前调用。如果shouldComponentUpdate返回false,则render()将不会执行,直到下一次state改变。(通过此函数可以提高性能)</p>
+</li>
+<li>componentWillUpdate():和componentWillMount类似,在组件接收到了新的props或者state即将进行重新渲染前调用,注意你不能在该方法中使用this.setState()。如果需要更新state来响应某个prop的改变,请使用componentWillReceiveProps。紧接着这个函数，就会调用render()来更新界面了</li>
+<li>componentDidUpdate():和componentDidMount类似,使用该方法可以在组件更新之后操作DOM元素</li>
+<li><p>componentWillUnmount():当组件从DOM中移除的时候立刻调用来完成所有的清理和销毁工作,在conponentDidMount中添加的任务都需要再该方法中撤销,如创建的定时器或事件监听器</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/reactlife.png" alt="virtualdom"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="运行组件UI-example"><a href="#运行组件UI-example" class="headerlink" title="运行组件UI example"></a>运行组件UI example</h3><ul>
+<li>运行官方案例(即在虚拟机上查看RN各个组件的实际效果)<ul>
+<li><a href="https://github.com/facebook/react-native#examples" target="_blank" rel="external">运行方法</a></li>
+<li>运行过程中可能出现的问题<ul>
+<li>What went wrong: Execution failed for task ‘:ReactAndroid:buildReactNdkLib’. <ul>
+<li><a href="http://stackoverflow.com/questions/36209774/unable-to-run-react-native-uiexplorer-example-project" target="_blank" rel="external">解决办法</a></li>
+</ul>
+</li>
+<li>安卓新项目起不来<ul>
+<li>解决办法: 注意下是不是老项目的shell还在运行，需要重新编译链接一次</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="官方组件举例"><a href="#官方组件举例" class="headerlink" title="官方组件举例"></a>官方组件举例</h3><ul>
+<li><p>ScrollView</p>
+<ul>
+<li>ScrollView是一个普通的可滚动容器，它能包含多个组件和View。</li>
+<li>ScrollView能纵向滚动也能横向滚动</li>
+<li>ScrollView一般用来展示限制尺寸的少量东西。因为所有ScrollView里面的元素和组件都会被渲染，不管它当前是否展示在屏幕上。</li>
+<li>ScrollView必须有一个确定的高度才能正常工作，因为滚动的本质就是将一系列不确定高度的子组件装进一个确定高度的容器</li>
+<li><p>属性</p>
+<ul>
+<li>contentContainerStyle：传入的样式属性，其作为样式会应用在包裹所有子元素的内容元素容器上</li>
+<li><p>horizontal：确定横向还是纵向滚动，默认为false，即默认纵向滚动</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;ScrollView style=&#123;styles.listTab&#125; horizontal&gt; </div><div class="line">      &#123;<span class="keyword">this</span>.level.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</div><div class="line">        <span class="keyword">return</span> (</div><div class="line">          &lt;View style=&#123;styles.tabTextContainer&#125; key=&#123;index&#125;&gt;</div><div class="line">            &lt;Text&gt;&#123;item&#125;&lt;/Text&gt;</div><div class="line">          &lt;/View&gt;</div><div class="line">          )</div><div class="line">      &#125;)&#125;         </div><div class="line">     &lt;<span class="regexp">/ScrollView&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>keyboardDismissMode：决定当拖拽时，键盘是否消失</p>
+<ul>
+<li>none：默认，拖拽不会让键盘消失</li>
+<li>on-drag：当拖拽开始时，键盘消失</li>
+<li>interactive：安卓上不支持，键盘伴随拖拽操作同步地消失，并且如果往上滑动会恢复键盘</li>
+</ul>
+</li>
+<li>keyboardShouldPersistTaps：决定当点击时，键盘是否可见。这个属性特别重要。比如ScrollView里面有很多输入框时，我们希望点击输入框是输入框本身拿到事件，而键盘并不会在切换时进行关闭再打开的操作。<ul>
+<li>never：默认，当点击文本输入框之外时，如果键盘是打开的则关闭键盘。当这个发生时，子元素将不会接收到点击事件</li>
+<li>always：键盘将不会自动关闭，并且scroll view不会捕捉到点击事件，但是子元素能够捕捉到点击事件</li>
+<li>handle：键盘将不会自动关闭当点击是由子元素触发的</li>
+<li>false：用never替代</li>
+<li>true：用always替代</li>
+</ul>
+</li>
+<li><p>onContentSizeChange：当滚动视图的内容尺寸大小发生变化的时候调用</p>
+  <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">this.level = ['我常买', '热卖', '一级类目', '鸡腿系列', '海鲜系列', '鸭制品系列'];</div><div class="line">...</div><div class="line">&lt;TouchableHighlight onPress=&#123;() =&gt; &#123;this.level.pop(); this.forceUpdate();&#125;&#125;&gt;</div><div class="line">     &lt;View style=&#123;styles.button&#125; &gt;</div><div class="line">       &lt;Text style=&#123;styles.add&#125;&gt;+&lt;/Text&gt;</div><div class="line">     &lt;/View&gt;</div><div class="line">   &lt;/TouchableHighlight&gt;</div><div class="line">   ...</div><div class="line">   &lt;ScrollView style=&#123;styles.listTab&#125; horizontal onContentSizeChange=&#123;(contentWidth, contentHeight) =&gt; &#123;console.debug(contentWidth, contentHeight);&#125;&#125;&gt; </div><div class="line">      &#123;this.level.map((item, index) =&gt; &#123;</div><div class="line">        return (</div><div class="line">          &lt;View style=&#123;styles.tabTextContainer&#125; key=&#123;index&#125;&gt;</div><div class="line">            &lt;Text&gt;&#123;item&#125;&lt;/Text&gt;</div><div class="line">          &lt;/View&gt;</div><div class="line">          )</div><div class="line">      &#125;)&#125;         </div><div class="line">      &lt;/ScrollView&gt;</div></pre></td></tr></table></figure>
+<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/contentSizechange.png" alt="life"></p>
+</li>
+<li>onScroll：该方法在滚动的时候每frame(帧)调用一次，调用的频率可以用scrollEventThrottle属性来控制。当滚动到边界后无法触发</li>
+<li>refreshControl：一个refreshControl组件，主要在下拉刷新时使用</li>
+<li>pagingEnabled：默认false，当为true时，scroll view会停留在其尺寸的倍数的位置。这个能够被用在在横向翻页。具体表现就是，超过Scroll View尺寸一点时页面会自动会回退回去，超过很多但是尚未到达其尺寸两倍的位置，则会向前到达其两倍尺寸的位置，之后如此类推</li>
+<li>removeClippedSubviews：默认为true，在ScrollView视图之外的子视图(该视图的overflow属性值必须要为hidden)会被暂时移除，该设置可以提高滚动的性能</li>
+<li>scrollEnabled：默认true，当为false时，内容不会滚动</li>
+<li>showsHorizontalScrollIndicator：默认true，当为true时，横向滚动会展示滑条</li>
+<li>showsVerticalScrollIndicator：默认true，当为true时，纵向滚动会展示滑条</li>
+</ul>
+</li>
+<li>仅Android支持的属性:<ul>
+<li>endFillColor：当滚动内容没填充满Scroll View时设定填充不满的区域</li>
+<li>scrollPerfTag：在Scroll View上记录滚动性能的标签</li>
+</ul>
+</li>
+<li>仅iOS支持的属性:<ul>
+<li>alwaysBounceHorizontal：横向弹簧效果，当horizontal ={true}默认是true，horizontal={false}默认是false</li>
+<li>alwaysBounceVertical：纵向弹簧效果，当horizontal ={true}默认是false，horizontal={false}默认是true</li>
+<li>automaticallyAdjustContentInsets：默认true，自动调节内容内偏移，控制是否自动调节内容内偏移以便于一个navigation bar或者tab bar或者toolbar不挡住Scrollview中的内容</li>
+<li>bounces：默认true，控制水平方向与垂直方向的弹簧效果，优先级比alwaysBounce* 属性高</li>
+<li>bouncesZoom：控制拉近与缩小超过限制时是否有弹性动画，当为true时有</li>
+<li>canCancelContentTouches：默认true，控制ScrollView是否可以拖动，如果为false不能拖动</li>
+<li>centerContent：默认false，为true时如果ScrollView中内容小于ScrollView的边界，则它们自动居中，超过边界时无效</li>
+<li>contentInset：内部内容距离ScrollView边界的内偏移量，默认为{top: 0, left: 0, bottom: 0, right: 0}</li>
+<li>contentOffset：用来手动设置起始滚动偏移量。默认为 {x: 0,y: 0} </li>
+<li>decelerationRate：指定手指抬起减速速率<ul>
+<li>normal: 0.998，为默认</li>
+<li>fast: 0.99</li>
+<li>也可以指定一个浮点数，确定减速快慢</li>
+</ul>
+</li>
+<li>directionalLockEnabled：默认false，为true时控制只有一个方向可以滚动当拖拽</li>
+<li>indicatorStyle：指示器样式，default与black相同，black与白色背景搭配，white与黑色背景搭配</li>
+<li>maximumZoomScale：默认是1.0，放大的最大系数</li>
+<li>minimumZoomScale：默认是1.0，缩小的最大系数</li>
+<li>onScrollAnimationEnd：滚动动画完成后触发</li>
+<li>scrollEventThrottle：控制滚动时滚动事件触发频率</li>
+<li>scrollIndicatorInsets： {top: number, left: number, bottom: number, right: number}，指定指示器内偏移量，应与contentInset值相同，默认{0, 0, 0, 0}</li>
+<li>scrollsToTop：默认true，默认true时，Scroll View滚动到顶部当状态条被点击时</li>
+<li>snapToAlignment：当snapToInterval指定时，这个属性定义这个停驻点相对于Scroll View的关系。<ul>
+<li>start (默认) 会将停驻点对齐在左侧（水平）或顶部（垂直）</li>
+<li>center 会将停驻点对齐到中间</li>
+<li>end 会将停驻点对齐到右侧（水平）或底部（垂直）</li>
+</ul>
+</li>
+<li>snapToInterval：当指定时，会导致Scroll View停留在这个参数的倍数的位置。这个属性一般与snapToAlignment一起用</li>
+<li>stickyHeaderIndices：子元素索引构成的数组，用来指定滚动时这些元素停靠到界面的顶部，比如传递stickyHeaderIndices={[0]}将让第一个子元素固定到Scroll View的顶部。当horizontal={true}时，这个属性不支持</li>
+<li>zoomScale：当前Scroll View内容的缩放比例</li>
+</ul>
+</li>
+<li>方法<ul>
+<li>scrollTo()：例如scrollTo({x: 0; y: 0; animated: true})，滚动到指定的x, y偏移处。第三个参数为是否启用平滑滚动动画</li>
+<li>scrollToEnd()：如果是纵向的滚动，则滚动到底部，如果是横向，则滚动到右部</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="官方API举例"><a href="#官方API举例" class="headerlink" title="官方API举例"></a>官方API举例</h3><ul>
+<li><p>BackHandler</p>
+<ul>
+<li><p>监听硬件的back键操作。如果没有任何监听函数，或者监听函数的返回值不是true，则会调用默认的back键功能来退出应用</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">this</span>.backAndroidListener = BackHandler.addEventListener(<span class="string">'hardwareBackPress'</span>, () =&gt; &#123;</div><div class="line">	<span class="keyword">if</span> (navigator.getCurrentRoutes().length &gt; <span class="number">1</span>) &#123;</div><div class="line">		navigator.pop();</div><div class="line">		<span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="keyword">this</span>.onExitApp();</div><div class="line">   &#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>方法：</p>
+<ul>
+<li>exitApp：当你在监听里面无法立刻判断是否要退出，比如你需要获取异步操作执行成功后再调用，此时可以用这个函数来退出</li>
+<li>addEventListener：绑定监听函数</li>
+<li>removeEventListener：移除监听函数</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="http://teropa.info/blog/2015/03/02/change-and-its-detection-in-javascript-frameworks.html" target="_blank" rel="external">Change And Its Detection In JavaScript Frameworks</a></li>
+<li><a href="http://www.race604.com/react-native-component-lifecycle/" target="_blank" rel="external">React Native 中组件的生命周期</a></li>
+<li><a href="https://davidwalsh.name/event-delegate" target="_blank" rel="external">How JavaScript Event Delegation Works</a></li>
+<li><a href="http://www.infoq.com/cn/articles/react-jsx-and-component" target="_blank" rel="external">深入浅出React（三）：理解JSX和组件</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;状态管理&quot;&gt;&lt;a href=&quot;#状态管理&quot; class=&quot;headerlink&quot; title=&quot;状态管理&quot;&gt;&lt;/a&gt;状态管理&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;历史情况&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="ReactNative" scheme="http://memory.lulutia.com/tags/ReactNative/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>React Native 学习系列一</title>
+    <link href="http://memory.lulutia.com/2017/07/06/reactnative01/"/>
+    <id>http://memory.lulutia.com/2017/07/06/reactnative01/</id>
+    <published>2017-07-06T07:11:10.000Z</published>
+    <updated>2017-07-06T08:59:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<h4 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h4><ul>
+<li>创造者: Facebook</li>
+<li>时间: React.js Conf 2015 上发布，9月推出Android版本</li>
+<li>使用范围: 用于开发<strong>iOS和Android</strong>原生应用</li>
+<li>设计理念: 既拥有Native的<strong>用户体验</strong>、又保留React的<strong>开发效率</strong></li>
+<li>产生原因:<ul>
+<li>Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画</li>
+<li>Native开发成本高</li>
+</ul>
+</li>
+<li>发展趋势: 开源不到1周github上star破万</li>
+<li>基本特点:<ul>
+<li>Learn once, write anywhere<ul>
+<li>用React.js抽象操作系统的原生UI组件，继而代替DOM元素来渲染</li>
+</ul>
+</li>
+<li>具备流畅和反应灵敏的优势<ul>
+<li>在后台，React Native运行在主线程之外，而在另一个专门的后台线程里运行JavaScript引擎，两个线程之间通过异步消息协议来通信。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>对应技术栈<ul>
+<li>JSX vs HTML</li>
+<li>CSS-layout vs css</li>
+<li>ECMAScript 6 vs ECMAScript 5</li>
+<li>React Native View vs DOM</li>
+</ul>
+</li>
+</ul>
+<h4 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h4><ul>
+<li>按照React Native官方文档搭建环境<ul>
+<li><a href="http://facebook.github.io/react-native/docs/getting-started.html" target="_blank" rel="external">英文版</a>搭建流程</li>
+<li><a href="http://reactnative.cn/docs/0.46/getting-started.html" target="_blank" rel="external">中文版</a>搭建流程</li>
+<li>模拟器推荐使用<a href="https://www.genymotion.com/" target="_blank" rel="external">Genymotion</a>。</li>
+</ul>
+</li>
+<li>安装过程中可能出现的问题<ul>
+<li>$ANDROIDNDK 和 $ANDROIDHOME 没有正确设置: <ul>
+<li>解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存<a href="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/在。" target="_blank" rel="external">https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/在。</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="http://reactnative.cn/docs/0.41/running-on-device-android.html#content" target="_blank" rel="external">真机调试</a><ul>
+<li>注意iOS系统真机调试需要有开发者账号</li>
+<li>可能有些机型无法用这种方式进行(比如小米4C)，可以手动安装</li>
+</ul>
+</li>
+</ul>
+<h4 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h4><ul>
+<li>文件结构</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/structure.png" alt="文件结构"></p>
+<ul>
+<li>代码结构<ul>
+<li>7-13: 引入需要用到的模块</li>
+<li>15-32: 本组件的渲染逻辑</li>
+<li>34-51: 样式定义</li>
+<li>53: AppRegistry是JS运行所有React Native应用的入口，应用的根组件应当通过AppRegistry.registerComponent方法注册自己，然后原生系统才可以加载应用的代码包并且在启动完成之后通过调用AppRegistry.runApplication来真正运行应用</li>
+<li>样式定义可以单独提出作为一个模块，甚至组件的具体实现也可以和应用注册分离开来</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/code.png" alt="文件结构"></p>
+<h4 id="样式"><a href="#样式" class="headerlink" title="样式"></a>样式</h4><ul>
+<li>React Native中用JS来写样式</li>
+<li>所有的核心组件都接受名为style的属性。这些样式名基本上是遵循了web上的CSS的命名，只是按照JS的语法要求使用了驼峰命名法</li>
+<li>style属性可以是一个普通的JavaScript对象，也可以是一个数组，在数组中位置居后的样式对象比居前的优先级更高</li>
+<li><a href="http://reactnative.cn/docs/0.41/text.html#style" target="_blank" rel="external">Text样式</a></li>
+<li><a href="http://reactnative.cn/docs/0.41/view.html#style" target="_blank" rel="external">View样式</a></li>
+<li>最简单的调试方法: 当错误的书写了样式属性时，应用会抛出一个warning，在这个warning里面会列出当前元素所有可使用的样式</li>
+<li>实际开发中组件的样式会越来越复杂，官方建议使用StyleSheet.create来集中定义组件的样式。StyleSheet提供了一种类似CSS样式表的抽象，相比于plain object，其主要有以下优势<ul>
+<li>代码质量:<ul>
+<li>移除了render里面的具体样式内容，使代码组织更加合理</li>
+<li>给样式命名可以对render函数中的原始组件进行一种作用标记</li>
+</ul>
+</li>
+<li>性能角度:<ul>
+<li>创建一个样式表，就可以使得我们后续更容易通过ID来引用样式，而不是每次都创建一个新的对象</li>
+<li>它还使得样式只会在JavaScript和原生之间传递一次，随后的过程都可以只传递一个ID(现在还没实现)</li>
+</ul>
+</li>
+<li>因此，如果我们直接打印styles.xxx，我们只会得到一个number，要使用StyleSheet.flatten(styles.xxx)才能得到具体内容</li>
+</ul>
+</li>
+</ul>
+<h4 id="Flex布局"><a href="#Flex布局" class="headerlink" title="Flex布局"></a>Flex布局</h4><ul>
+<li>在React Native中布局采用的是FleBox(弹性框)进行布局</li>
+<li>Flex布局主要思想是让容器有能力让其子项目能够改变其宽度、高度(甚至顺序)，以最佳方式填充可用空间(主要是为了适应所有类型的显示设备和屏幕大小)</li>
+</ul>
+<p>像素无关</p>
+<ul>
+<li><p>React Native中的尺寸都是无单位的，表示的是与设备像素密度无关的逻辑像素点</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;View style=&#123; &#123;<span class="attr">width</span>:<span class="number">100</span>,<span class="attr">height</span>:<span class="number">100</span>,<span class="attr">margin</span>:<span class="number">40</span>,<span class="attr">backgroundColor</span>:<span class="string">'gray'</span>&#125;&#125;&gt;</div><div class="line">      &lt;Text style=&#123; &#123;fontSize:16,margin:20&#125;&#125;&gt;尺寸&lt;/Text&gt;</div><div class="line">&lt;<span class="regexp">/View&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>上面的例子，运行在Android上时，View的长和宽被解释成100dp 其单位是dp，字体被解释成16sp 其单位是sp，运行在iOS上时尺寸单位被解释称了pt，这些单位确保了布局在任何不同dpi的手机屏幕上显示不会发生改变。如果希望获取实际的像素尺寸，则需要使用尺寸 * pixelRatio。<a href="https://facebook.github.io/react-native/docs/pixelratio.html" target="_blank" rel="external">pixelRatio使用</a></p>
+</li>
+</ul>
+<p>React Native中的FlexBox 和Web CSS中的FlexBox不全相同</p>
+<ul>
+<li>flexDirection: React Native中默认为flexDirection:’column’，在Web CSS中默认为flex-direction:’row’</li>
+<li>alignItems: React Native中默认为alignItems:’stretch’，在Web CSS中默认align-items:’flex-start’</li>
+<li>flexWrap: React Native中没有wrap-reverse，在Web CSS中有</li>
+<li>flex: 相比Web CSS的flex接受多参数，如:flex: 2 2 10%;，但在 React Native中flex只接受一个参数</li>
+<li>不支持属性：align-content，flex-flow等</li>
+</ul>
+<p>Flex基本知识[基于RN]<br>  <img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/flex.png" alt="flex基本概念"></p>
+<ul>
+<li><p>父容器属性</p>
+<ul>
+<li>flexDirection属性定义了父视图中的子元素沿横轴或侧轴方片的排列方式，默认为column: ‘row’, ‘column’,’row-reverse’,’column-reverse’</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/flexdirection.png" alt="flexDirection"></p>
+<ul>
+<li>flexWrap属性定义了子元素在父视图内是否允许多行排列，默认为nowrap: ‘wrap’, ‘nowrap’</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/wrap.png" alt="flexWrap"></p>
+<ul>
+<li>justifyContent属性定义了浏览器如何分配顺着父容器主轴的弹性（flex）元素之间及其周围的空间，默认为flex-start: ‘flex-start’, ‘flex-end’, ‘center’, ‘space-between’, ‘space-around’</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/justifyContent.png" alt="justifyContent"></p>
+<ul>
+<li>alignItems属性以与justify-content相同的方式在侧轴方向上将当前行上的弹性元素对齐，默认为stretch: ‘flex-start’, ‘flex-end’, ‘center’, ‘stretch’。这里需要注意，当选择stretch时，侧轴上的元素不能有固定的size，否则无效</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/alignItems.png" alt="alignItems"></p>
+</li>
+<li><p>子容器属性</p>
+<ul>
+<li>alignSelf决定了元素在父元素的次轴方向的排列方式（此样式设置在子元素上），其值会覆盖父元素的alignItems的值，默认auto: ‘auto’, ‘flex-start’, ‘flex-end’, ‘center’, ‘stretch’</li>
+</ul>
+</li>
+<li><p>flex 属性定义了一个可伸缩元素的能力，默认为0</p>
+</li>
+<li>视图边框: border[Bottom/Top/Left/Right]Width，borderColor等</li>
+<li>尺寸: width，height</li>
+<li>外边距: margin[Bottom/Top/Left/Right/Horizontal/Vertical]等</li>
+<li>内边距: padding[Bottom/Top/Left/Right/Horizontal/Vertical]等</li>
+<li>边缘: left，right，top，bottom等</li>
+<li>定位: absolute，relative</li>
+<li><a href="https://reactnative.cn/docs/0.39/layout-props.html" target="_blank" rel="external">更多参考</a></li>
+</ul>
+<p>图片布局</p>
+<ul>
+<li><p>图片有一个stretchMode. 通过Image.resizeMode访问，其主要有以下几种模式(默认采用cover模式):</p>
+<ul>
+<li>cover: 在保持图片宽高比的前提下缩放图片，直到宽度和高度都大于等于容器视图的尺寸（如果容器有padding内衬的话，则相应减去）。这样图片完全覆盖甚至超出容器，容器中不留任何空白</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/cover.png" alt="cover"></p>
+<ul>
+<li>contain: 在保持图片宽高比的前提下缩放图片，直到宽度和高度都小于等于容器视图的尺寸（如果容器有padding内衬的话，则相应减去）。这样图片完全被包裹在容器中，容器中可能留有空白</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/contain.png" alt="contain"></p>
+<ul>
+<li>stretch: 拉伸图片且不维持宽高比，直到宽高都刚好填满容器</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/stretch.png" alt="stretch"></p>
+<ul>
+<li>repeat: 重复平铺图片直到填满容器。图片会维持原始尺寸。仅iOS可用，android使用会报错</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/repeat.png" alt="repeat"></p>
+<ul>
+<li>center: 居中不拉伸</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/center.png" alt="center"></p>
+</li>
+</ul>
+<p>文本元素  </p>
+<ul>
+<li>文本可嵌套</li>
+<li><p><text>元素在布局上不同于其它组件：在Text内部的元素不再使用flexbox布局，而是采用文本布局。这意味着<text>内部的元素不再是一个个矩形，而可能会在行末进行折叠</text></text></p>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/text.png" alt="center"></p>
+</li>
+<li><p>你必须把你的文本节点放在<text>组件内。你不能直接在<view>下放置一段文本</view></text></p>
+</li>
+<li>不能直接设置一整颗子树的默认样式。使用一个一致的文本和尺寸的推荐方式是创建一个包含相关样式的组件MyAppText，然后在你的App中反复使用它</li>
+<li>文本标签的子树还是可以继承的，继承父元素的样式</li>
+<li>通过numberOfLines={}可以实现文字截断效果</li>
+<li>注意ios和android的默认文字样式是不一样的，主要是fontSize和color的不同。</li>
+</ul>
+<p>参考</p>
+<ul>
+<li><a href="https://code.facebook.com/posts/1014532261909640/react-native-bringing-modern-web-techniques-to-mobile/" target="_blank" rel="external">React Native: Bringing modern web techniques to mobile</a></li>
+<li><a href="http://www.jianshu.com/p/1e990aac7836" target="_blank" rel="external">基于Facebook Buck改造Android构建系统之初体验</a></li>
+<li><a href="https://github.com/amfe/article/issues/32" target="_blank" rel="external">flow——A static type checker for javascript</a></li>
+<li><a href="https://git-scm.com/book/zh/v1/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-Git%E5%B1%9E%E6%80%A7" target="_blank" rel="external">自定义 Git - Git属性</a></li>
+<li><a href="http://reactnative.cn/docs/0.36/appregistry.html" target="_blank" rel="external">AppRegistry</a></li>
+<li><a href="https://github.com/crazycodeboy/RNStudyNotes/blob/master/React%20Native%E5%B8%83%E5%B1%80/React%20Native%E5%B8%83%E5%B1%80%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97/React%20Native%E5%B8%83%E5%B1%80%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97.md" target="_blank" rel="external">React Native布局详细指南</a></li>
+<li><a href="http://weibo.com/1712131295/CoRnElNkZ?ref=collection&amp;type=comment#_rnd1486356368337" target="_blank" rel="external">flex布局示意图</a></li>
+<li><a href="https://segmentfault.com/a/1190000002658374" target="_blank" rel="external">react-native 之布局篇</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;背景介绍&quot;&gt;&lt;a href=&quot;#背景介绍&quot; class=&quot;headerlink&quot; title=&quot;背景介绍&quot;&gt;&lt;/a&gt;背景介绍&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;创造者: Facebook&lt;/li&gt;
+&lt;li&gt;时间: React.js Conf 2015 上发布，9月推出An
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="ReactNative" scheme="http://memory.lulutia.com/tags/ReactNative/"/>
+    
+  </entry>
   
   <entry>
     <title>WEBGL系列之二维操作</title>
@@ -263,97 +743,6 @@
     
     
       <category term="总结" scheme="http://memory.lulutia.com/tags/%E6%80%BB%E7%BB%93/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>React Native入个小门</title>
-    <link href="http://memory.lulutia.com/2016/05/27/RN/"/>
-    <id>http://memory.lulutia.com/2016/05/27/RN/</id>
-    <published>2016-05-27T14:36:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>React Native是个啥?</p>
-<ul>
-<li>创造者:FaceBook</li>
-<li>时间:React.js Conf 2015 上发布，9月推出Android版本</li>
-<li>使用范围:用于开发iOS和Android原生应用</li>
-<li>基本特点:<ul>
-<li>用React.js抽象操作系统的原生UI组件，继而代替DOM元素来渲染。–&gt;Learn once, write anywhere</li>
-<li>在后台React Native运行在主线程之外，而在另一个专门的后台线程里运行JavaScript引擎，两个线程之间通过异步消息协议来通信。–&gt;具备流畅和反应灵敏的优势</li>
-</ul>
-</li>
-<li>对应技术栈<ul>
-<li>JSX vs HTML</li>
-<li>CSS-layout vs css</li>
-<li>ECMAScript 6 vs ECMAScript 5</li>
-<li>React Native View vs DOM</li>
-</ul>
-</li>
-</ul>
-<p>如何玩React Native?</p>
-<ul>
-<li>按照React Native官方文档搭建环境，如下有<a href="http://facebook.github.io/react-native/docs/getting-started.html" target="_blank" rel="external">英文版</a>，<a href="http://reactnative.cn/docs/0.26/getting-started.html" target="_blank" rel="external">中文版</a>。模拟器推荐使用<a href="https://www.genymotion.com/" target="_blank" rel="external">Genymotion</a>。IDE推荐使用<a href="https://www.jetbrains.com/webstorm/" target="_blank" rel="external">WebStorm</a>,其注册码<a href="http://us.idea.lanyus.com/" target="_blank" rel="external">在此</a>。整个上述过程中可能遇见的问题如下:<ul>
-<li>$ANDROID_NDK 和 $ANDROID_HOME 没有正确设置: <ul>
-<li>解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存在。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>运行官方案例(即在虚拟机上查看RN各个组件的实际效果)，方法如此<a href="https://github.com/facebook/react-native/tree/master/Examples/UIExplorer" target="_blank" rel="external">链接</a>,可能遇见的问题如下:<ul>
-<li><code>What went wrong: Execution failed for task &#39;:ReactAndroid:buildReactNdkLib&#39;.</code>  <ul>
-<li><a href="http://stackoverflow.com/questions/36209774/unable-to-run-react-native-uiexplorer-example-project" target="_blank" rel="external">解决办法</a></li>
-</ul>
-</li>
-<li>安卓新项目起不来<ul>
-<li>注意下是不是老项目的shell还在运行，需要重新编译链接一次。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><a href="https://github.com/fbsamples/f8app" target="_blank" rel="external">运行F8 App方法</a>,其开发指南<a href="http://f8-app.liaohuqiu.net/" target="_blank" rel="external">在此</a>。可能遇见的问题如下:</p>
-<ul>
-<li>pod install无反应问题。<ul>
-<li><a href="http://www.cnblogs.com/yiqiedejuanlian/p/3698788.html" target="_blank" rel="external">解决办法</a>,关于CocoaPods使用方法及各种问题强烈推荐下面<a href="http://www.jianshu.com/p/969dcb9907cf" target="_blank" rel="external">这篇文章</a></li>
-</ul>
-</li>
-<li><code>Could not find com.google.android.gms:play-services-gcm:8.3.0.</code><ul>
-<li><a href="https://github.com/fbsamples/f8app/issues/16" target="_blank" rel="external">解决办法</a></li>
-</ul>
-</li>
-<li><figure class="highlight subunit"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">    $ adb reverse tcp:8081 tcp:8081</div><div class="line"><span class="keyword">error: </span>closed  </div><div class="line"><span class="keyword">error: </span>closed</div></pre></td></tr></table></figure>
-<ul>
-<li>原因：对于 Android 5.0 及以上的设备，可以直接运行；对于其以下的版本，按照官方文档，需要按 menu 键或者摇晃手机，在开发菜单中设置一下 dev server 的 IP 地址。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>接下来就可以欢快的自己写代码了。写的途中还会遇见各种坑，就具体情况具体分析吧。总结下：<ul>
-<li>确保相关工具和Android SDK都是最新版本。</li>
-<li>确保网络畅通，特别是翻好墙。（此处应有微笑</li>
-<li>注意看官方文档及其issue。</li>
-</ul>
-</li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;React Native是个啥?&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;创造者:FaceBook&lt;/li&gt;
-&lt;li&gt;时间:React.js Conf 2015 上发布，9月推出Android版本&lt;/li&gt;
-&lt;li&gt;使用范围:用于开发iOS和Android原生应用&lt;/li&gt;
-&lt;li&gt;基本
-    
-    </summary>
-    
-      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
-    
-    
-      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
-    
-      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
     
   </entry>
   

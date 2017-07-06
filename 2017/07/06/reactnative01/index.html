@@ -6,17 +6,33 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
-  <title>Archives: 2016/5 | lulutia</title>
+  <title>React Native 学习系列一 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Keep going">
-<meta property="og:type" content="website">
-<meta property="og:title" content="lulutia">
-<meta property="og:url" content="http://memory.lulutia.com/archives/2016/05/index.html">
+  <meta name="description" content="背景介绍 创造者: Facebook 时间: React.js Conf 2015 上发布，9月推出Android版本 使用范围: 用于开发iOS和Android原生应用 设计理念: 既拥有Native的用户体验、又保留React的开发效率 产生原因: Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画 Native开发成本高   发展趋势: 开源不到1周">
+<meta name="keywords" content="前端,计算机,ReactNative">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React Native 学习系列一">
+<meta property="og:url" content="http://memory.lulutia.com/2017/07/06/reactnative01/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="Keep going">
+<meta property="og:description" content="背景介绍 创造者: Facebook 时间: React.js Conf 2015 上发布，9月推出Android版本 使用范围: 用于开发iOS和Android原生应用 设计理念: 既拥有Native的用户体验、又保留React的开发效率 产生原因: Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画 Native开发成本高   发展趋势: 开源不到1周">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/structure.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/code.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/flex.png">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/flexdirection.png">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/wrap.png">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/justifyContent.png">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/alignItems.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/cover.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/contain.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/stretch.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/repeat.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/center.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/text.png">
+<meta property="og:updated_time" content="2017-07-06T08:59:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="lulutia">
-<meta name="twitter:description" content="Keep going">
+<meta name="twitter:title" content="React Native 学习系列一">
+<meta name="twitter:description" content="背景介绍 创造者: Facebook 时间: React.js Conf 2015 上发布，9月推出Android版本 使用范围: 用于开发iOS和Android原生应用 设计理念: 既拥有Native的用户体验、又保留React的开发效率 产生原因: Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画 Native开发成本高   发展趋势: 开源不到1周">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/structure.png">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -156,36 +172,246 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-reactnative01" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2016" class="archive-year">2016</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2016/05/27/RN/" class="archive-article-date">
-  	<time datetime="2016-05-27T14:36:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-05-27</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2016/05/27/RN/">React Native入个小门</a>
+    <h1 class="article-title" itemprop="name">
+      React Native 学习系列一
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2017/07/06/reactnative01/" class="archive-article-date">
+  	<time datetime="2017-07-06T07:11:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h4><ul>
+<li>创造者: Facebook</li>
+<li>时间: React.js Conf 2015 上发布，9月推出Android版本</li>
+<li>使用范围: 用于开发<strong>iOS和Android</strong>原生应用</li>
+<li>设计理念: 既拥有Native的<strong>用户体验</strong>、又保留React的<strong>开发效率</strong></li>
+<li>产生原因:<ul>
+<li>Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画</li>
+<li>Native开发成本高</li>
+</ul>
+</li>
+<li>发展趋势: 开源不到1周github上star破万</li>
+<li>基本特点:<ul>
+<li>Learn once, write anywhere<ul>
+<li>用React.js抽象操作系统的原生UI组件，继而代替DOM元素来渲染</li>
+</ul>
+</li>
+<li>具备流畅和反应灵敏的优势<ul>
+<li>在后台，React Native运行在主线程之外，而在另一个专门的后台线程里运行JavaScript引擎，两个线程之间通过异步消息协议来通信。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>对应技术栈<ul>
+<li>JSX vs HTML</li>
+<li>CSS-layout vs css</li>
+<li>ECMAScript 6 vs ECMAScript 5</li>
+<li>React Native View vs DOM</li>
+</ul>
+</li>
+</ul>
+<h4 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h4><ul>
+<li>按照React Native官方文档搭建环境<ul>
+<li><a href="http://facebook.github.io/react-native/docs/getting-started.html" target="_blank" rel="external">英文版</a>搭建流程</li>
+<li><a href="http://reactnative.cn/docs/0.46/getting-started.html" target="_blank" rel="external">中文版</a>搭建流程</li>
+<li>模拟器推荐使用<a href="https://www.genymotion.com/" target="_blank" rel="external">Genymotion</a>。</li>
+</ul>
+</li>
+<li>安装过程中可能出现的问题<ul>
+<li>$ANDROIDNDK 和 $ANDROIDHOME 没有正确设置: <ul>
+<li>解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存<a href="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/在。" target="_blank" rel="external">https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/在。</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="http://reactnative.cn/docs/0.41/running-on-device-android.html#content" target="_blank" rel="external">真机调试</a><ul>
+<li>注意iOS系统真机调试需要有开发者账号</li>
+<li>可能有些机型无法用这种方式进行(比如小米4C)，可以手动安装</li>
+</ul>
+</li>
+</ul>
+<h4 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h4><ul>
+<li>文件结构</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/structure.png" alt="文件结构"></p>
+<ul>
+<li>代码结构<ul>
+<li>7-13: 引入需要用到的模块</li>
+<li>15-32: 本组件的渲染逻辑</li>
+<li>34-51: 样式定义</li>
+<li>53: AppRegistry是JS运行所有React Native应用的入口，应用的根组件应当通过AppRegistry.registerComponent方法注册自己，然后原生系统才可以加载应用的代码包并且在启动完成之后通过调用AppRegistry.runApplication来真正运行应用</li>
+<li>样式定义可以单独提出作为一个模块，甚至组件的具体实现也可以和应用注册分离开来</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/code.png" alt="文件结构"></p>
+<h4 id="样式"><a href="#样式" class="headerlink" title="样式"></a>样式</h4><ul>
+<li>React Native中用JS来写样式</li>
+<li>所有的核心组件都接受名为style的属性。这些样式名基本上是遵循了web上的CSS的命名，只是按照JS的语法要求使用了驼峰命名法</li>
+<li>style属性可以是一个普通的JavaScript对象，也可以是一个数组，在数组中位置居后的样式对象比居前的优先级更高</li>
+<li><a href="http://reactnative.cn/docs/0.41/text.html#style" target="_blank" rel="external">Text样式</a></li>
+<li><a href="http://reactnative.cn/docs/0.41/view.html#style" target="_blank" rel="external">View样式</a></li>
+<li>最简单的调试方法: 当错误的书写了样式属性时，应用会抛出一个warning，在这个warning里面会列出当前元素所有可使用的样式</li>
+<li>实际开发中组件的样式会越来越复杂，官方建议使用StyleSheet.create来集中定义组件的样式。StyleSheet提供了一种类似CSS样式表的抽象，相比于plain object，其主要有以下优势<ul>
+<li>代码质量:<ul>
+<li>移除了render里面的具体样式内容，使代码组织更加合理</li>
+<li>给样式命名可以对render函数中的原始组件进行一种作用标记</li>
+</ul>
+</li>
+<li>性能角度:<ul>
+<li>创建一个样式表，就可以使得我们后续更容易通过ID来引用样式，而不是每次都创建一个新的对象</li>
+<li>它还使得样式只会在JavaScript和原生之间传递一次，随后的过程都可以只传递一个ID(现在还没实现)</li>
+</ul>
+</li>
+<li>因此，如果我们直接打印styles.xxx，我们只会得到一个number，要使用StyleSheet.flatten(styles.xxx)才能得到具体内容</li>
+</ul>
+</li>
+</ul>
+<h4 id="Flex布局"><a href="#Flex布局" class="headerlink" title="Flex布局"></a>Flex布局</h4><ul>
+<li>在React Native中布局采用的是FleBox(弹性框)进行布局</li>
+<li>Flex布局主要思想是让容器有能力让其子项目能够改变其宽度、高度(甚至顺序)，以最佳方式填充可用空间(主要是为了适应所有类型的显示设备和屏幕大小)</li>
+</ul>
+<p>像素无关</p>
+<ul>
+<li><p>React Native中的尺寸都是无单位的，表示的是与设备像素密度无关的逻辑像素点</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;View style=&#123; &#123;<span class="attr">width</span>:<span class="number">100</span>,<span class="attr">height</span>:<span class="number">100</span>,<span class="attr">margin</span>:<span class="number">40</span>,<span class="attr">backgroundColor</span>:<span class="string">'gray'</span>&#125;&#125;&gt;</div><div class="line">      &lt;Text style=&#123; &#123;fontSize:16,margin:20&#125;&#125;&gt;尺寸&lt;/Text&gt;</div><div class="line">&lt;<span class="regexp">/View&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>上面的例子，运行在Android上时，View的长和宽被解释成100dp 其单位是dp，字体被解释成16sp 其单位是sp，运行在iOS上时尺寸单位被解释称了pt，这些单位确保了布局在任何不同dpi的手机屏幕上显示不会发生改变。如果希望获取实际的像素尺寸，则需要使用尺寸 * pixelRatio。<a href="https://facebook.github.io/react-native/docs/pixelratio.html" target="_blank" rel="external">pixelRatio使用</a></p>
+</li>
+</ul>
+<p>React Native中的FlexBox 和Web CSS中的FlexBox不全相同</p>
+<ul>
+<li>flexDirection: React Native中默认为flexDirection:’column’，在Web CSS中默认为flex-direction:’row’</li>
+<li>alignItems: React Native中默认为alignItems:’stretch’，在Web CSS中默认align-items:’flex-start’</li>
+<li>flexWrap: React Native中没有wrap-reverse，在Web CSS中有</li>
+<li>flex: 相比Web CSS的flex接受多参数，如:flex: 2 2 10%;，但在 React Native中flex只接受一个参数</li>
+<li>不支持属性：align-content，flex-flow等</li>
+</ul>
+<p>Flex基本知识[基于RN]<br>  <img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/flex.png" alt="flex基本概念"></p>
+<ul>
+<li><p>父容器属性</p>
+<ul>
+<li>flexDirection属性定义了父视图中的子元素沿横轴或侧轴方片的排列方式，默认为column: ‘row’, ‘column’,’row-reverse’,’column-reverse’</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/flexdirection.png" alt="flexDirection"></p>
+<ul>
+<li>flexWrap属性定义了子元素在父视图内是否允许多行排列，默认为nowrap: ‘wrap’, ‘nowrap’</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/wrap.png" alt="flexWrap"></p>
+<ul>
+<li>justifyContent属性定义了浏览器如何分配顺着父容器主轴的弹性（flex）元素之间及其周围的空间，默认为flex-start: ‘flex-start’, ‘flex-end’, ‘center’, ‘space-between’, ‘space-around’</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/justifyContent.png" alt="justifyContent"></p>
+<ul>
+<li>alignItems属性以与justify-content相同的方式在侧轴方向上将当前行上的弹性元素对齐，默认为stretch: ‘flex-start’, ‘flex-end’, ‘center’, ‘stretch’。这里需要注意，当选择stretch时，侧轴上的元素不能有固定的size，否则无效</li>
+</ul>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/alignItems.png" alt="alignItems"></p>
+</li>
+<li><p>子容器属性</p>
+<ul>
+<li>alignSelf决定了元素在父元素的次轴方向的排列方式（此样式设置在子元素上），其值会覆盖父元素的alignItems的值，默认auto: ‘auto’, ‘flex-start’, ‘flex-end’, ‘center’, ‘stretch’</li>
+</ul>
+</li>
+<li><p>flex 属性定义了一个可伸缩元素的能力，默认为0</p>
+</li>
+<li>视图边框: border[Bottom/Top/Left/Right]Width，borderColor等</li>
+<li>尺寸: width，height</li>
+<li>外边距: margin[Bottom/Top/Left/Right/Horizontal/Vertical]等</li>
+<li>内边距: padding[Bottom/Top/Left/Right/Horizontal/Vertical]等</li>
+<li>边缘: left，right，top，bottom等</li>
+<li>定位: absolute，relative</li>
+<li><a href="https://reactnative.cn/docs/0.39/layout-props.html" target="_blank" rel="external">更多参考</a></li>
+</ul>
+<p>图片布局</p>
+<ul>
+<li><p>图片有一个stretchMode. 通过Image.resizeMode访问，其主要有以下几种模式(默认采用cover模式):</p>
+<ul>
+<li>cover: 在保持图片宽高比的前提下缩放图片，直到宽度和高度都大于等于容器视图的尺寸（如果容器有padding内衬的话，则相应减去）。这样图片完全覆盖甚至超出容器，容器中不留任何空白</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/cover.png" alt="cover"></p>
+<ul>
+<li>contain: 在保持图片宽高比的前提下缩放图片，直到宽度和高度都小于等于容器视图的尺寸（如果容器有padding内衬的话，则相应减去）。这样图片完全被包裹在容器中，容器中可能留有空白</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/contain.png" alt="contain"></p>
+<ul>
+<li>stretch: 拉伸图片且不维持宽高比，直到宽高都刚好填满容器</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/stretch.png" alt="stretch"></p>
+<ul>
+<li>repeat: 重复平铺图片直到填满容器。图片会维持原始尺寸。仅iOS可用，android使用会报错</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/repeat.png" alt="repeat"></p>
+<ul>
+<li>center: 居中不拉伸</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/center.png" alt="center"></p>
+</li>
+</ul>
+<p>文本元素  </p>
+<ul>
+<li>文本可嵌套</li>
+<li><p><text>元素在布局上不同于其它组件：在Text内部的元素不再使用flexbox布局，而是采用文本布局。这意味着<text>内部的元素不再是一个个矩形，而可能会在行末进行折叠</text></text></p>
+<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/text.png" alt="center"></p>
+</li>
+<li><p>你必须把你的文本节点放在<text>组件内。你不能直接在<view>下放置一段文本</view></text></p>
+</li>
+<li>不能直接设置一整颗子树的默认样式。使用一个一致的文本和尺寸的推荐方式是创建一个包含相关样式的组件MyAppText，然后在你的App中反复使用它</li>
+<li>文本标签的子树还是可以继承的，继承父元素的样式</li>
+<li>通过numberOfLines={}可以实现文字截断效果</li>
+<li>注意ios和android的默认文字样式是不一样的，主要是fontSize和color的不同。</li>
+</ul>
+<p>参考</p>
+<ul>
+<li><a href="https://code.facebook.com/posts/1014532261909640/react-native-bringing-modern-web-techniques-to-mobile/" target="_blank" rel="external">React Native: Bringing modern web techniques to mobile</a></li>
+<li><a href="http://www.jianshu.com/p/1e990aac7836" target="_blank" rel="external">基于Facebook Buck改造Android构建系统之初体验</a></li>
+<li><a href="https://github.com/amfe/article/issues/32" target="_blank" rel="external">flow——A static type checker for javascript</a></li>
+<li><a href="https://git-scm.com/book/zh/v1/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-Git%E5%B1%9E%E6%80%A7" target="_blank" rel="external">自定义 Git - Git属性</a></li>
+<li><a href="http://reactnative.cn/docs/0.36/appregistry.html" target="_blank" rel="external">AppRegistry</a></li>
+<li><a href="https://github.com/crazycodeboy/RNStudyNotes/blob/master/React%20Native%E5%B8%83%E5%B1%80/React%20Native%E5%B8%83%E5%B1%80%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97/React%20Native%E5%B8%83%E5%B1%80%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97.md" target="_blank" rel="external">React Native布局详细指南</a></li>
+<li><a href="http://weibo.com/1712131295/CoRnElNkZ?ref=collection&amp;type=comment#_rnd1486356368337" target="_blank" rel="external">flex布局示意图</a></li>
+<li><a href="https://segmentfault.com/a/1190000002658374" target="_blank" rel="external">react-native 之布局篇</a></li>
+</ul>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -197,11 +423,15 @@
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
         		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">ReactNative</a>
+        		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -214,17 +444,96 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://memory.lulutia.com/2017/07/06/reactnative01/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2017/07/06/reactnative02/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          React Native 学习系列二
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2017/06/07/webgl01/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">WEBGL系列之二维操作</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
+  
+  
   
 
-    
+  
+
+  
 
 
           </div>
@@ -247,8 +556,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
@@ -328,15 +637,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">环境搭建</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">环境搭建</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">ReactNative</a>
               </li>
             
             <div class="clearfix"></div>
