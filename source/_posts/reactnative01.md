@@ -31,7 +31,7 @@ tags: [前端,计算机,ReactNative]
   * 模拟器推荐使用[Genymotion](https://www.genymotion.com/)。
 * 安装过程中可能出现的问题
   * $ANDROIDNDK 和 $ANDROIDHOME 没有正确设置: 
-    * 解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/在。
+    * 解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存在。
 * [真机调试](http://reactnative.cn/docs/0.41/running-on-device-android.html#content)
   * 注意iOS系统真机调试需要有开发者账号
   * 可能有些机型无法用这种方式进行(比如小米4C)，可以手动安装
