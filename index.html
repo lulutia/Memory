@@ -207,7 +207,7 @@
 <ul>
 <li><p>以react举例下面两段代码完全一致：</p>
   <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> p1 = React.createElement(<span class="string">'p'</span>, <span class="literal">null</span>, <span class="string">'my test'</span>)</div><div class="line"><span class="keyword">var</span> root = React.createElement(<span class="string">'div'</span>, &#123; <span class="attr">className</span>: <span class="string">'root-div'</span> &#125;, p1);</div></pre></td></tr></table></figure>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> root = (</div><div class="line">	&lt;div className='root-div'&gt;</div><div class="line">		&lt;p&gt;my test&lt;/p&gt;</div><div class="line">	&lt;/div&gt;</div><div class="line">)</div></pre></td></tr></table></figure>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> root = (</div><div class="line">	<span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">'root-div'</span>&gt;</span></span></div><div class="line">		<span class="tag">&lt;<span class="name">p</span>&gt;</span>my test<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">)</div></pre></td></tr></table></figure>
 </li>
 <li><p>JSX之后会被专门的解释器解释为JS(在打包阶段就完成了，因此不会有性能上的问题)再执行</p>
 </li>
@@ -218,10 +218,10 @@
 <li><p>JSX语法</p>
 <ul>
 <li><p>在JSX中你可以使用{}来包裹JS表达式，下面以RN来举例</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123;refundDetailData.return.returnPics &amp;&amp; &lt;View style=&#123;[Style.basicLayout, Style.image]&#125;&gt;</div><div class="line">   	&lt;Text style=&#123;[Style.textColor, Style.navTitle]&#125;&gt;图片信息:&lt;/Text&gt;</div><div class="line">   	&lt;ImageShow picUrls=&#123;refundDetailData.return.returnPics&#125;/&gt;</div><div class="line"> 	&lt;/View&gt;&#125;</div></pre></td></tr></table></figure>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123;refundDetailData.return.returnPics &amp;&amp; <span class="xml"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>=<span class="string">&#123;[Style.basicLayout,</span> <span class="attr">Style.image</span>]&#125;&gt;</span></span></div><div class="line">   	<span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;[Style.textColor,</span> <span class="attr">Style.navTitle</span>]&#125;&gt;</span>图片信息:<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">   	<span class="tag">&lt;<span class="name">ImageShow</span> <span class="attr">picUrls</span>=<span class="string">&#123;refundDetailData.return.returnPics&#125;/</span>&gt;</span></div><div class="line"> 	<span class="tag">&lt;/<span class="name">View</span>&gt;</span>&#125;</div></pre></td></tr></table></figure>
 </li>
 <li><p>JSX本身也是一种表达式，因此可以在if语句，for循环等各种场合中使用</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dataList.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> (</div><div class="line">  &lt;TouchableHighlight key=&#123;index&#125;&gt;</div><div class="line">    &lt;View&gt;</div><div class="line">      &lt;Text&gt;&#123;item.contactName&#125;&lt;/Text&gt;</div><div class="line">      &lt;Text&gt;&#123;item.contactTel&#125;&lt;/Text&gt;</div><div class="line">    &lt;/View&gt;</div><div class="line">  &lt;/TouchableHighlight&gt;</div><div class="line">));</div></pre></td></tr></table></figure>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dataList.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> (</div><div class="line">  <span class="xml"><span class="tag">&lt;<span class="name">TouchableHighlight</span> <span class="attr">key</span>=<span class="string">&#123;index&#125;</span>&gt;</span></span></div><div class="line">    <span class="tag">&lt;<span class="name">View</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">Text</span>&gt;</span>&#123;item.contactName&#125;<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">Text</span>&gt;</span>&#123;item.contactTel&#125;<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">View</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">TouchableHighlight</span>&gt;</span></div><div class="line">));</div></pre></td></tr></table></figure>
 </li>
 <li><p>JSX可以定义属性，一般每个组件都会接受一组属性(props)</p>
 <ul>
@@ -236,10 +236,10 @@
 <li><p>JSX标签能够包含子元素就如HTML一样，而且其子元素也可以运用JS的语法进行构建</p>
 </li>
 <li><p>JSX中的注释就如JS类似，但是需要注意当在子元素中进行注释时，需要用{}将注释包裹起来</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;Nav&gt;</div><div class="line">   &#123;<span class="comment">/* child comment, put &#123;&#125; around */</span>&#125;</div><div class="line">   &lt;Person</div><div class="line">     <span class="comment">/* multi</span></div><div class="line">        line</div><div class="line">        comment */</div><div class="line">     name=&#123;<span class="built_in">window</span>.isLoggedIn ? <span class="built_in">window</span>.name : <span class="string">''</span>&#125; <span class="comment">// end of line comment</span></div><div class="line">   /&gt;</div><div class="line"> &lt;/Nav&gt;</div></pre></td></tr></table></figure>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;Nav&gt;</div><div class="line">   &#123;<span class="comment">/* child comment, put &#123;&#125; around */</span>&#125;</div><div class="line">   &lt;Person</div><div class="line">     <span class="comment">/* multi</span></div><div class="line">        line</div><div class="line">        comment */</div><div class="line">     name=&#123;<span class="built_in">window</span>.isLoggedIn ? <span class="built_in">window</span>.name : <span class="string">''</span>&#125; <span class="comment">// end of line comment</span></div><div class="line">   /&gt;</div><div class="line"> <span class="xml"><span class="tag">&lt;/<span class="name">Nav</span>&gt;</span></span></div></pre></td></tr></table></figure>
 </li>
 <li><p>JSX中的事件处理是直接绑定在组件上的，下面以RN为例</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;TouchableHighlight style=&#123;Style.tabBtn&#125; underlayColor=&#123;Colors.yellowLighten&#125;onPress=&#123;<span class="keyword">this</span>.goToReturnList&#125;&gt;</div><div class="line">  &lt;Text style=&#123;Style.tabBtnText&#125;&gt;退货单&lt;/Text&gt;</div><div class="line">&lt;<span class="regexp">/TouchableHighlight&gt;</span></div></pre></td></tr></table></figure>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;TouchableHighlight style=&#123;Style.tabBtn&#125; underlayColor=&#123;Colors.yellowLighten&#125;onPress=&#123;<span class="keyword">this</span>.goToReturnList&#125;&gt;</div><div class="line">  <span class="xml"><span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;Style.tabBtnText&#125;</span>&gt;</span>退货单<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span></div><div class="line">&lt;<span class="regexp">/TouchableHighlight&gt;</span></div></pre></td></tr></table></figure>
 <ul>
 <li><p>相比于使用下面这种方式，界面元素和业务逻辑的耦合会更加明显</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'#my-button'</span>).on(<span class="string">'click'</span>, <span class="keyword">this</span>.checkAndSubmit.bind(<span class="keyword">this</span>));</div></pre></td></tr></table></figure>
@@ -310,7 +310,7 @@
 <ul>
 <li>contentContainerStyle：传入的样式属性，其作为样式会应用在包裹所有子元素的内容元素容器上</li>
 <li><p>horizontal：确定横向还是纵向滚动，默认为false，即默认纵向滚动</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;ScrollView style=&#123;styles.listTab&#125; horizontal&gt; </div><div class="line">      &#123;<span class="keyword">this</span>.level.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</div><div class="line">        <span class="keyword">return</span> (</div><div class="line">          &lt;View style=&#123;styles.tabTextContainer&#125; key=&#123;index&#125;&gt;</div><div class="line">            &lt;Text&gt;&#123;item&#125;&lt;/Text&gt;</div><div class="line">          &lt;/View&gt;</div><div class="line">          )</div><div class="line">      &#125;)&#125;         </div><div class="line">     &lt;<span class="regexp">/ScrollView&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;ScrollView style=&#123;styles.listTab&#125; horizontal&gt; </div><div class="line">      &#123;<span class="keyword">this</span>.level.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</div><div class="line">        <span class="keyword">return</span> (</div><div class="line">          <span class="xml"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>=<span class="string">&#123;styles.tabTextContainer&#125;</span> <span class="attr">key</span>=<span class="string">&#123;index&#125;</span>&gt;</span></span></div><div class="line">            <span class="tag">&lt;<span class="name">Text</span>&gt;</span>&#123;item&#125;<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">          <span class="tag">&lt;/<span class="name">View</span>&gt;</span></div><div class="line">          )</div><div class="line">      &#125;)&#125;         </div><div class="line">     &lt;<span class="regexp">/ScrollView&gt;</span></div></pre></td></tr></table></figure>
 </li>
 <li><p>keyboardDismissMode：决定当拖拽时，键盘是否消失</p>
 <ul>
@@ -526,7 +526,7 @@
 </li>
 <li>安装过程中可能出现的问题<ul>
 <li>$ANDROIDNDK 和 $ANDROIDHOME 没有正确设置: <ul>
-<li>解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存<a href="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/在。" target="_blank" rel="external">https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/在。</a></li>
+<li>解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存在。</li>
 </ul>
 </li>
 </ul>
@@ -581,7 +581,7 @@
 <p>像素无关</p>
 <ul>
 <li><p>React Native中的尺寸都是无单位的，表示的是与设备像素密度无关的逻辑像素点</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;View style=&#123; &#123;<span class="attr">width</span>:<span class="number">100</span>,<span class="attr">height</span>:<span class="number">100</span>,<span class="attr">margin</span>:<span class="number">40</span>,<span class="attr">backgroundColor</span>:<span class="string">'gray'</span>&#125;&#125;&gt;</div><div class="line">      &lt;Text style=&#123; &#123;fontSize:16,margin:20&#125;&#125;&gt;尺寸&lt;/Text&gt;</div><div class="line">&lt;<span class="regexp">/View&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;View style=&#123; &#123;<span class="attr">width</span>:<span class="number">100</span>,<span class="attr">height</span>:<span class="number">100</span>,<span class="attr">margin</span>:<span class="number">40</span>,<span class="attr">backgroundColor</span>:<span class="string">'gray'</span>&#125;&#125;&gt;</div><div class="line">      <span class="xml"><span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;</span> &#123;<span class="attr">fontSize:16</span>,<span class="attr">margin:20</span>&#125;&#125;&gt;</span>尺寸<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span></div><div class="line">&lt;<span class="regexp">/View&gt;</span></div></pre></td></tr></table></figure>
 </li>
 <li><p>上面的例子，运行在Android上时，View的长和宽被解释成100dp 其单位是dp，字体被解释成16sp 其单位是sp，运行在iOS上时尺寸单位被解释称了pt，这些单位确保了布局在任何不同dpi的手机屏幕上显示不会发生改变。如果希望获取实际的像素尺寸，则需要使用尺寸 * pixelRatio。<a href="https://facebook.github.io/react-native/docs/pixelratio.html" target="_blank" rel="external">pixelRatio使用</a></p>
 </li>
@@ -1933,19 +1933,19 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">环境搭建</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">ReactNative</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
             
             <div class="clearfix"></div>
