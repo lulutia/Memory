@@ -6,19 +6,27 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
-  <title>JavaScript中的delete一探 | lulutia</title>
+  <title>基于React-Native及Redux的Immutable.js引入 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="核心内容借鉴自下面的网址 delete一般用法：  删除对象的属性  1234var a=&amp;#123;p:21&amp;#125;;console.log(a.p);//21delete a.p;//trueconsole.log(a.p);//undefined  无法删除一般的变量 1234var x=13;console.log(x);//13delete x;//falseconsole.log">
-<meta name="keywords" content="前端,计算机">
+  <meta name="description" content="本文主要介绍了如何对RN项目进行render count的优化，着重介绍了Immutable.js及其如何与Redux和React Native融合。">
+<meta name="keywords" content="React Native,React,optimization">
 <meta property="og:type" content="article">
-<meta property="og:title" content="JavaScript中的delete一探">
-<meta property="og:url" content="http://memory.lulutia.com/2015/10/20/JavaScript-delete/index.html">
+<meta property="og:title" content="基于React-Native及Redux的Immutable.js引入">
+<meta property="og:url" content="http://memory.lulutia.com/2017/07/10/immutableJS/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="核心内容借鉴自下面的网址 delete一般用法：  删除对象的属性  1234var a=&amp;#123;p:21&amp;#125;;console.log(a.p);//21delete a.p;//trueconsole.log(a.p);//undefined  无法删除一般的变量 1234var x=13;console.log(x);//13delete x;//falseconsole.log">
-<meta property="og:updated_time" content="2017-06-07T03:15:45.000Z">
+<meta property="og:description" content="本文主要介绍了如何对RN项目进行render count的优化，着重介绍了Immutable.js及其如何与Redux和React Native融合。">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-oldPref.png?">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png?">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-exampleLayout.png?imageView2/2/w/500/h/500/q/100|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-examplePref.png?">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-setstate.png?">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-share.png">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-after.png?">
+<meta property="og:updated_time" content="2017-07-10T09:06:17.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JavaScript中的delete一探">
-<meta name="twitter:description" content="核心内容借鉴自下面的网址 delete一般用法：  删除对象的属性  1234var a=&amp;#123;p:21&amp;#125;;console.log(a.p);//21delete a.p;//trueconsole.log(a.p);//undefined  无法删除一般的变量 1234var x=13;console.log(x);//13delete x;//falseconsole.log">
+<meta name="twitter:title" content="基于React-Native及Redux的Immutable.js引入">
+<meta name="twitter:description" content="本文主要介绍了如何对RN项目进行render count的优化，着重介绍了Immutable.js及其如何与Redux和React Native融合。">
+<meta name="twitter:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-oldPref.png?">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -158,72 +166,202 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-JavaScript-delete" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-immutableJS" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      JavaScript中的delete一探
+      基于React-Native及Redux的Immutable.js引入
     </h1>
   
 
         
-        <a href="/2015/10/20/JavaScript-delete/" class="archive-article-date">
-  	<time datetime="2015-10-20T04:36:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-20</time>
+        <a href="/2017/07/10/immutableJS/" class="archive-article-date">
+  	<time datetime="2017-07-10T09:06:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-10</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <ul>
-<li>核心内容借鉴自下面的<a href="http://perfectionkills.com/understanding-delete/" target="_blank" rel="external">网址</a></li>
-<li><p>delete一般用法：</p>
+        <p>本文主要介绍了如何对RN项目进行render count的优化，着重介绍了Immutable.js及其如何与Redux和React Native融合。</p>
+<a id="more"></a>
+<h4 id="前菜之背景介绍"><a href="#前菜之背景介绍" class="headerlink" title="前菜之背景介绍"></a>前菜之背景介绍</h4><p>话说某天，楼主吃着火锅唱着歌，逛到了React的Performance Tools版块，心血来潮，放到了手上的项目里面玩了玩，看完后整个人都不太好了，数据如下(我一页屏幕都截不完……)：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-oldPref.png?" alt="性能图"><br>但实际上我所执行的操作仅仅只是为颜色外观打了个分，如下所示：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png?" alt="操作图"></p>
+<p>根据上面的统计数据，初略计算了下，一个打分操作render count为293。一个页面必填5个打分项，如此一来总共render count  &gt;= 1465，其中还排除了用户打分完毕后继续修改的情况。不用我说，大家也能看出这是一个相当不合理的数字。因为就理想状况而言，打分操作最多只影响当前的打分项，一个打分组件五颗星，其具体结构如下所示:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;View key=&#123;i&#125;&gt;</div><div class="line">      <span class="xml"><span class="tag">&lt;<span class="name">TouchableOpacity</span></span></span></div><div class="line">        <span class="attr">style</span>=<span class="string">&#123;&#123;marginTop:</span> <span class="attr">5</span>, <span class="attr">marginRight:</span> <span class="attr">5</span>&#125;&#125;</div><div class="line">        <span class="attr">onPress</span>=<span class="string">&#123;()</span> =&gt;&#123;......&#125;</div><div class="line">        &gt;</div><div class="line">        <span class="tag">&lt;<span class="name">IconFont</span> <span class="attr">name</span>=<span class="string">"star"</span> <span class="attr">size</span>=<span class="string">&#123;StyleSheet.r(22)&#125;</span> <span class="attr">color</span>=<span class="string">&#123;color&#125;/</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">TouchableOpacity</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">View</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>因此直接改变量为3*5=15是比较合理，再加上全局的Navar以及connect等操作，render count达到293也是绝对不合理且，通过分析，我们可以看到有很多数据根本没改变的组件也被重新渲染了的，这部分开销完全是不必要且有相当大的改进空间的。既然如此，我们来改进下吧~</p>
+<p>为了减少环境变量且便于修改与测试，我们基于种子项目来模拟当前的状况。种子项目在React Native官方项目基础上集成了Redux进行数据处理，除此之外还提供了一些基本的工具函数及路由封装。<br>我们构造了两个页面，点击第一个页面的button会跳转到第二个页面，在第二个页面会从服务器端获取数据，渲染成列表形式，除此之外在列表上方有一个button，它会记录点击次数并且展示出来。大概布局如下：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-exampleLayout.png?imageView2/2/w/500/h/500/q/100|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="demo图"></p>
+<p>既然是模拟前文的情况，那我们可以预测点击addCount button后，整个列表应该是被重新渲染了的，虽然他的数据实际上并没有变化，讲道理是不应该重新渲染的。实际结果如下图所示，的确和我们的预测一样，List下的Text render count是不必要的。<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-examplePref.png?" alt="demo性能图"></p>
+<p>这里有一个点要注意，所谓的重新渲染指的是在virtual dom层面的。下图是整个渲染过程开始到结束的主要流程，而本文关心的是下图黄色框中的部分，而重中之重是黄色框中的第三部: 其后代组件执行Update。<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-setstate.png?" alt="渲染过程"></p>
+<p>因为我们采用Redux进行数据处理，每个页面的initailState为一个对象，而从不直接修改state 是Redux 的核心理念之一，所以触发action后reducer返回的是一个新的对象。这一流程相当于执行了setState操作，因此整个页面开始执行dirty的标记，因为是新对象，所以几乎所有与state相关的组件及其后代组件都要执行Update的流程，如果我们不对Update的流程进行特殊定制，则shouldComponentUpdate默认返回true，之后执行render函数。因此，出现了上述中多次不必要render的情况。<br>所以，首要任务是添加shouldComponentUpdate函数进行处理。但是这里会有两个明显的问题：</p>
 <ul>
-<li><p>删除对象的属性 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var a=&#123;p:21&#125;;</div><div class="line">console.log(a.p);//21</div><div class="line">delete a.p;//true</div><div class="line">console.log(a.p);//undefined</div></pre></td></tr></table></figure>
-</li>
-<li><p>无法删除一般的变量</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var x=13;</div><div class="line">console.log(x);//13</div><div class="line">delete x;//false</div><div class="line">console.log(x);//13</div></pre></td></tr></table></figure>
-</li>
-<li><p>无法删除函数 </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var p=function()&#123;&#125;;</div><div class="line">delete p;//false</div><div class="line">typeof(p);//function</div></pre></td></tr></table></figure>
-</li>
+<li>每个页面，甚至每个组件的state，props结构不一样，很难有统一的对比函数</li>
+<li>state，props的结构可能很复杂，一步步的循环迭代对比对性能的消耗可能很大</li>
 </ul>
-</li>
-</ul>
+<p>针对shouldComponentUpdate，React提供了PureRenderMixin的方式来进行处理，但是这种方式其进行的只是浅对比，如果是复杂数据结构的深层次不一样，它也可能返回false。因此只能处理简单的数据结构，或者针对开发者对整个state层次有完全的把握，能够在深层次变化后显示调用this.forceUpdate()的情况。显然与我们的需求不符。此时，本文的主题Immutable.js终于要出场了。</p>
+<h4 id="主菜之Immutable-js介绍"><a href="#主菜之Immutable-js介绍" class="headerlink" title="主菜之Immutable.js介绍"></a>主菜之Immutable.js介绍</h4><p>讨论Immutable.js之前，我们首先看看啥叫Immutable。来，看看维基百科的定义：</p>
+<blockquote>
+<p>In object-oriented and functional programming, an immutable object is an object whose state cannot be modified after it is created.This is in contrast to a mutable object (changeable object), which can be modified after it is created.</p>
+</blockquote>
 <ul>
-<li><p>造成上述表现的原因</p>
+<li><p>需要解决的问题</p>
 <ul>
-<li><p>在ECMAScript中，有三种可执行代码类型：全局代码、函数代码、eval代码。对于以上几种代码都有相应的执行上下文。每个执行上下文又对应有变量对象，<strong>在源代码中声明的变量和方法实际上都是作为属性被加入到与当前上下文相关联的这个对象当中</strong>。</p>
+<li><p>减少复杂性，增加代码的可控性</p>
+<p>  对于immutable object在创建后就再也不能修改了，而mutable object却可以修改，举个很简单的栗子：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> fruit = &#123;<span class="attr">apple</span>: <span class="number">1</span>&#125;;</div><div class="line">friuit.apple = <span class="number">2</span>;</div><div class="line">fruit; <span class="comment">// &#123;apple: 2&#125;</span></div></pre></td></tr></table></figure>
+<p>  上面这种特性在频繁需要修改原对象的时候特别好用，可以节约内存。但是这种灵活性往往以可控性为代价，多处使用中的任意一处修改都会影响所有的使用，比如下面的栗子：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> animal = &#123;<span class="attr">dog</span>: <span class="number">1</span>&#125;;</div><div class="line">changeAnimalCount(animal);</div><div class="line">animal; <span class="comment">// ?</span></div></pre></td></tr></table></figure>
+<p>  经过函数调用后，我们谁都不知道animal变成了啥样 = =。处理这种情况，我们往往需要执行深拷贝，然后在拷贝出的对象上执行操作，这样可以保证数据的可控性，但这个又往往以内存的大量使用为代价。特别不巧的是，我们的项目中还真的有很多地方用到了深拷贝，并且为了这个操作引入了extend库。因此，如何在花费很少的情况下对state的状态做一个很好的记录成为了一个问题。</p>
+</li>
+<li><p>减少UI框架中View层与Model层的耦合</p>
+<p>  在我们进行应用交互时，我们相当关注状态的改变，因为状态的改变意味着我们需要做哪些UI层面的变动，这部分是数据驱动的。简单的说，我们可能实现下面的代码：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> storeData = &#123;<span class="attr">key</span>: <span class="string">'before'</span>&#125;;</div><div class="line">renderUI(storeData);</div><div class="line">getDataFromServer(url, ()=&gt;&#123;</div><div class="line">	renderUI(storeData);</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>  但是上面这种情况造成的问题是，也许和服务器交互后的数据根本没有改变，然而我们要执行UI渲染。或者的确执行了UI渲染，但是我们并不知道是具体的哪块数据进行了变动。因此我们可能改良出下面的代码：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> storeData = &#123;<span class="attr">key</span>: <span class="string">'before'</span>&#125;;</div><div class="line">renderUI(storeData);</div><div class="line"><span class="built_in">Object</span>.observer(storeData, (changes) =&gt; &#123;</div><div class="line">	renderUI(storeData, changes);</div><div class="line">&#125;)</div><div class="line">getDataFromServer(url);</div></pre></td></tr></table></figure>
+<p>  这种情况下，我们通过Object.observer()来对数据进行监听，这样至少我们知道哪些数据进行了变化。但是这种情况下依然有问题，因为Object.observer()执行的只是第一层的比较，因此如果是深层次的变化它依然没法处理。同时，如果数据变化频繁的情况下，它也做了很多的无用功，毕竟我们只关心最后的状态。因此现在的做法基本是使用如下所示的：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> data = &#123;</div><div class="line">	<span class="attr">dirty</span>: <span class="literal">false</span>,</div><div class="line">	<span class="attr">_raw</span>: &#123;<span class="attr">key</span>: <span class="string">'value'</span>&#125;,</div><div class="line">	<span class="attr">get</span>: <span class="function"><span class="keyword">function</span> (<span class="params">key</span>) </span>&#123;</div><div class="line">		...</div><div class="line">	&#125;,</div><div class="line">	<span class="attr">set</span>: <span class="function"><span class="keyword">function</span> (<span class="params">key, newValue</span>) </span>&#123;</div><div class="line">		...</div><div class="line">		this.dirty = <span class="literal">true</span>;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">renderUI</span>(<span class="params">data</span>) </span>&#123;</div><div class="line">	<span class="keyword">if</span> (!data.dirty) &#123;<span class="keyword">return</span>;&#125;</div><div class="line">	data.dirty = <span class="literal">false</span>;</div><div class="line">	...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  但是这种情况如果同时对一个状态进行多种渲染，因为在第一个渲染中已经改变了dirty的状态，这样并不会调用第二个渲染，如下：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">renderTop(data);</div><div class="line">renderBottom(data);</div></pre></td></tr></table></figure>
+<p>  因此，既然每一个render都要执行dirty状态的检测，所以可以建立一个UI框架，将这层检测包裹进去，而不用使用者自己来做。但这样一来Model层和View层就耦合了。因此，如何在不对MV进行强耦合的情况下对数据的变化进行监听成为了一个问题。</p>
+</li>
+<li><p>处理缓存</p>
+<p>  当我们在处理一些消耗很大的操作时，我们可能希望将之前的结果存储起来而不是每一次都重新计算。比如像下面这样：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">expensiveCoperation</span>(<span class="params"></span>) </span>&#123;</div><div class="line">	...</div><div class="line">&#125;</div><div class="line"><span class="keyword">let</span> data = memorize(expensiveCoperation);</div><div class="line"><span class="keyword">let</span> initialData = ...;</div><div class="line">data(initialData);</div></pre></td></tr></table></figure>
+<p>  市面上有很多对于memorize的实现，比如下面这个：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">memorize</span>(<span class="params">fn</span>) </span>&#123;</div><div class="line">	<span class="keyword">let</span> cache = &#123;&#125;;</div><div class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">arg</span>) </span>&#123;</div><div class="line">		<span class="keyword">let</span> hash = arg === <span class="built_in">Object</span>(arg) ? <span class="built_in">JSON</span>.stringify(arg) : currentArg;</div><div class="line">		<span class="keyword">return</span> hash <span class="keyword">in</span> cache ? cache[hash] : (cache[hash] = fn.call(<span class="keyword">this</span>, arg));</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>  但是上面这种实现里面的JSON.stringify()是一个O(n)的操作，当数据量够大时，执行这个函数的操作说不定还没有不执行的快。在具体实现中也许我们可以简化这个操作，只对比前一次的输入和这一次的输入，只关心前一次的结果和这一次的结果。此时我们便可以不必使用JSON.stringify了。实际上React中的shouldComponentUpdate就是只对前一次状态和这一次状态进行对比。但对比时我们其实进行的是值的对比而不是引用的对比。所以缓存性能的提高最后落脚点到如何快速进行值的比较。因此，如何对复杂结构的值进行对比成为了一个问题。</p>
+</li>
+</ul>
+</li>
+<li><p>解决办法</p>
+<p>  针对以上问题，Immutable.js提出了一下几个解决方案：</p>
 <ul>
-<li><p>全局代码时：变量对象是全局对象。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">    var global=33;</div><div class="line">    window.global;//33</div><div class="line">    global===window.global;//true</div><div class="line">    function uu()&#123;&#125;;</div><div class="line">    typeof window.uu;//&quot;function&quot;</div><div class="line">    window.uu===uu;//true</div><div class="line">    ``` </div><div class="line">    * 函数代码：此时有活动对象的概念。**在函数段中，并不是只有显式声明的变量和函数会成为活动对象的属性，对于每个函数中隐式存在的arguments对象（函数的参数列表）也是一样的**。</div><div class="line">    * eval函数：进入eval代码时并不会新建新的变量对象，而是沿用当前的环境。</div><div class="line">* 每一个变量属性都可以有以下任意多个属性: ReadOnly, DontEnum, DontDelete, Internal。在声明变量或者函数时，他们都变成了当前上下文对象的属性，这些属性在创建时 都带有DontDelete标记；但是显式或者隐式的赋值语句所产生的属性并不会带有这个标记。</div><div class="line">  </div><div class="line">```JavaScript:</div><div class="line">var test=1;</div><div class="line">delete test;//false</div><div class="line">test2 = 2;</div><div class="line">delete test2;//true</div><div class="line">```   </div><div class="line">* 一些内建的对象是自动持有DontDelete这个标记的，从而不能被删除，比如函数内的arguments，函数的传入参数以及函数的length属性。</div><div class="line">* 属性标记诸如DontDelete是在这个属性被创建的时候 产生的，之后对该属性的任何赋值都不会改变此属性的标记。</div><div class="line"></div><div class="line">```JavaScript:</div><div class="line">function y()&#123;&#125;;</div><div class="line">delete y;//false</div><div class="line">y=1;</div><div class="line">delete y;//false</div><div class="line">typeof y;//&quot;number&quot;</div></pre></td></tr></table></figure>
+<li><p>持久化结构数据</p>
+<p>所谓持久化结构数据即Persistent data structire，我们来看维基百科的定义：</p>
+<blockquote>
+<p>In computing, a persistent data structure is a data structure that always preserves the previous version of itself when it is modified. Such data structures are effectively immutable, as their operations do not (visibly) update the structure in-place, but instead always yield a new updated structure.</p>
+</blockquote>
+<p>我们如果用时间流的概念来看这个问题，即每一次改变都保存了一个类似快照的东西，之后的改变并不会影响之前的快照。这样我们就能够对state的变化做一个很好的记录，解决了上面的第一个问题。但是你可能会担心这样等于说是进行拷贝，会耗费很多内存，因此请看下面的解决方案。</p>
+</li>
+<li><p>结构共享</p>
+<p>当我们使用一个新的值时，我们希望能够尽量复用老值不变的部分，因为这样意味着少量的copy操作和少量的内存使用。数据结构中的有向无环图可以实现这个需求。但是JS中基本的数据结构Array和Object显然都不是用DAG[Directed Acyclic Graph]实现的。因此Immutable.js等于用Trie自己实现了一套数据结构。基本的思路如下：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-share.png" alt="结构共享"><br>每个节点都有自己的hashCode，因此比较两个对象时，实际就是比较其hashCode，这样就避免了深度遍历。</p>
+</li>
+<li><p>惰性加载</p>
+<p>在Immutable.js中提供了Seq来执行惰性加载。Seq执行最小的工作来对任何方法作出反应。比如：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> oddSquares = Seq([ <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span> ])</div><div class="line">  .filter(<span class="function"><span class="params">x</span> =&gt;</span> x % <span class="number">2</span>)</div><div class="line">  .map(<span class="function"><span class="params">x</span> =&gt;</span> x * x)</div><div class="line">  <span class="built_in">console</span>.log(oddSquares.get(<span class="number">1</span>)); <span class="comment">//9</span></div></pre></td></tr></table></figure>
+<p>上面这个例子filter将只会执行三次，而map只会执行一次。这种特性对于处理大型数据相当有用。</p>
+</li>
+<li><p>其他</p>
+<p>  Immutable的特性意味着它特别适合用于多线程开发，它避免了很多不必要的锁的存在。虽然这点对于现在的JS没啥作用，但谁知道未来呢，毕竟多核已经越来越普遍。</p>
 </li>
 </ul>
 </li>
-<li><p>在eval中声明的变量创建时都不会带有DontDelete标记,在函数内部也一样。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">eval(&apos;var ii=34;&apos;);</div><div class="line">delete ii;//true</div></pre></td></tr></table></figure>
+<li><p>基本API</p>
+<p>  Immutable.js主要提供了下面几种数据类型：</p>
+<ul>
+<li>List：类似Array</li>
+<li>Map：类似Object</li>
+<li>OrderedMap：在Map的基础上根据set顺序进行排序</li>
+<li>Set： 类似ES6中的Set</li>
+<li>OrderedSet：在Set的基础上根据add顺序进行排序</li>
+<li>Stack：有序集合，进行unshift和shift的操作复杂度为O(1)</li>
+<li>Range(start, end, step)：返回Seq.Indexed类型数据的集合</li>
+<li>Repeat(value, times)：返回Seq.Indexed类型的数据集合，重复times生成value值</li>
+<li>Record：；类似ES6中的Class，细节上不同</li>
+<li>Seq：序列</li>
+<li>Iterable：可以被迭代的key，value集合，是其他所有集合的基类</li>
+<li><p>Collection：抽象类，无法直接构建此类型</p>
+<p>其中最常用的是List和Map。</p>
+</li>
+<li><p>常用API：</p>
+<ul>
+<li><p>fromJS(): 最常用的将原生JS数据转换为Immutable数据的转换方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> data = Immutable.from(&#123;<span class="attr">a</span>: &#123;<span class="attr">b</span>: [<span class="number">10</span>, <span class="number">11</span>]&#125;&#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>toJS(): 将Immutable数据转换为原生JS</p>
+</li>
+<li><p>set()</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> originalList = List([ <span class="number">0</span> ]);</div><div class="line"><span class="comment">// List [ 0 ]</span></div><div class="line">originalList.set(<span class="number">1</span>, <span class="number">1</span>);</div><div class="line"><span class="comment">// List [ 0, 1 ]		</span></div><div class="line">List().set(<span class="number">50000</span>, <span class="string">'value'</span>).size;</div><div class="line"><span class="comment">// 50001</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>setIn(): 进行深度赋值</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> list = List([ <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, List([ <span class="number">3</span>, <span class="number">4</span> ])])</div><div class="line">list.setIn([<span class="number">3</span>, <span class="number">0</span>], <span class="number">999</span>);</div><div class="line"><span class="comment">// List [ 0, 1, 2, List [ 999, 4 ] ]</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>get()</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> list = List([ <span class="number">0</span> ]);</div><div class="line"><span class="keyword">let</span> value = list.get(<span class="number">0</span>); <span class="comment">// 0</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>getIn(): 进行深度取值</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> list = List([ <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, List([ <span class="number">3</span>, <span class="number">4</span> ])]);</div><div class="line"><span class="keyword">let</span> value = list.getIn([<span class="number">3</span>, <span class="number">0</span>]); <span class="comment">// 3</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>is(): 进行值对比[对于复杂对象其实是hashCode的对比]</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> map1 = <span class="built_in">Map</span>(&#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">1</span>, <span class="attr">c</span>: <span class="number">1</span> &#125;)</div><div class="line"><span class="keyword">const</span> map2 = <span class="built_in">Map</span>(&#123; <span class="attr">a</span>: <span class="number">1</span>, <span class="attr">b</span>: <span class="number">1</span>, <span class="attr">c</span>: <span class="number">1</span> &#125;)</div><div class="line">assert(map1 !== map2)</div><div class="line">assert(<span class="built_in">Object</span>.is(map1, map2) === <span class="literal">false</span>)</div><div class="line">assert(is(map1, map2) === <span class="literal">true</span>)</div></pre></td></tr></table></figure>
+<p>除了上面这些，Immutable.js基本提供了所有的对应原生操作的方法，具体见<a href="https://facebook.github.io/immutable-js/docs/#/List/getIn" target="_blank" rel="external">这里</a></p>
 </li>
 </ul>
 </li>
-<li><p>在Firebug控制台中的代码最终将通过eval执行，而不是作为全局代码或函数代码。</p>
-</li>
-<li>IE6-8中的问题：<ul>
-<li>通过全局this变量去删除属性(delete this.x)总会出错</li>
-<li>直接删除该属性(delete x)时：<ul>
-<li>如果x是通过全局this赋值产生会(this.x=1)导致错误；</li>
-<li>如果x通过显式声明创建(var x=1)则delete会像我们预料的那样无法删除并返回false；</li>
-<li>如果x通过非声明式赋值创建(x=1)则delete可以正常删除。</li>
 </ul>
 </li>
-<li>原因： “IE的全局变量对象是通过JScript实现，而一般的全局变量是由host实现的。”</li>
+</ul>
+<h4 id="甜点之具体集成到RN-Redux的项目中"><a href="#甜点之具体集成到RN-Redux的项目中" class="headerlink" title="甜点之具体集成到RN+Redux的项目中"></a>甜点之具体集成到RN+Redux的项目中</h4><p>在第一点中我们分析了遇到的优化点，在第二点中我们讲解了能进行优化的工具，现在我们来进行具体的优化。</p>
+<ul>
+<li><p>combineReducers的切换<br>  我们之前combineReducers用的是Redux提供的，但是它只能处理原生JS，所以我们需要引入redux-immutable，它提供的combineReducers可以处理Immutable数据</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> &#123;createStore, applyMiddleware, compose&#125; <span class="keyword">from</span> <span class="string">'redux'</span>;</div><div class="line"><span class="keyword">import</span> &#123;combineReducers&#125; <span class="keyword">from</span> <span class="string">'redux-immutable'</span>;</div><div class="line">...</div><div class="line">export <span class="keyword">default</span> (data = Immutable.Map(&#123;&#125;)) =&gt; &#123;</div><div class="line">  <span class="keyword">const</span> rootReducer = combineReducers(&#123;</div><div class="line">    <span class="attr">route</span>: routeReducer,</div><div class="line">    <span class="attr">modules</span>: combineReducers(reducers)</div><div class="line">  &#125;);</div><div class="line"></div><div class="line">  <span class="keyword">return</span> createStore(rootReducer, data, middleware);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+</li>
+<li><p>每个Reducer的初始化数据也应该采用Immutable数据</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> initialState = Immutable.Map(&#123;</div><div class="line">  <span class="attr">dataList</span>: Immutable.List([]),</div><div class="line">  <span class="attr">count1</span>: <span class="number">0</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>与服务端数据的交互在第获取一时间转换为Immutable数据，在发送第一时间转化为原生数据</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> fetch(url).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</div><div class="line">     <span class="keyword">return</span> res.json();</div><div class="line">   &#125;, (er) =&gt; &#123;<span class="built_in">console</span>.log(er);&#125;).then(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</div><div class="line">     data = Immutable.fromJS(data || &#123;&#125;);</div><div class="line">     dispatch(&#123;</div><div class="line">       <span class="attr">type</span>: GETDATA_END,</div><div class="line">       <span class="attr">payload</span>: &#123;</div><div class="line">         <span class="attr">dataList</span>: data.get(<span class="string">'data'</span>)</div><div class="line">       &#125;</div><div class="line">     &#125;);</div><div class="line">   &#125;, (error) =&gt; &#123;</div><div class="line">     <span class="built_in">console</span>.log(error);</div><div class="line">     dispatch(&#123;</div><div class="line">       <span class="attr">type</span>: GETDATA_BEGIN</div><div class="line">     &#125;);</div><div class="line">   &#125;);</div></pre></td></tr></table></figure>
+<p>  这里需要注意以下两点：</p>
+<ul>
+<li>如果使用安卓模拟器，且使用localhost的数据，需要直接填写localhost的ip地址。因为模拟器有自己的localhost ip，如果直接用localhost就指向了它提供的地址，而不是本机的地址了</li>
+<li><p>如果使用iOS模拟器，其请求的是http协议的地址，需要在info.plist开启对http的支持，如下：</p>
+  <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;</div><div class="line">    &lt;dict&gt;</div><div class="line">      &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;</div><div class="line">      &lt;true/&gt;</div><div class="line">     &lt;/dict&gt;</div></pre></td></tr></table></figure>
+</li>
 </ul>
 </li>
-<li>对于宿主对象而言，delete操作的结果是不可预料的。因为宿主对象根据不同浏览器的实现允许有不同的行为，这其中包括了delete。</li>
-<li>strict mode采用了更主动并且描述性的方法，而不是简单的忽略无效的删除操作。(比如平常删除一个不存在的变量会return true;但使用严格模式后会报错。)</li>
+<li><p>因为Persistent data structire，Reducer返回的数据不用新建一个对象了</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[GETDATA_END]: <span class="function">(<span class="params">state, action</span>) =&gt;</span> &#123;</div><div class="line">   <span class="keyword">const</span> &#123;dataList&#125; = action.payload;</div><div class="line">   <span class="keyword">return</span> state.set(<span class="string">'dataList'</span>, dataList);</div><div class="line"> &#125;,</div></pre></td></tr></table></figure>
+</li>
+<li><p>shouldComponentUpdate可以进行统一处理了</p>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">shouldComponentUpdate(nextProps, nextState) &#123;</div><div class="line">  <span class="keyword">const</span> thisProps = <span class="keyword">this</span>.props || &#123;&#125;;</div><div class="line">  <span class="keyword">const</span> thisState = <span class="keyword">this</span>.state || &#123;&#125;;</div><div class="line">  nextState = nextState || &#123;&#125;;</div><div class="line">  nextProps = nextProps || &#123;&#125;;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(thisProps).length !== <span class="built_in">Object</span>.keys(nextProps).length ||</div><div class="line">    <span class="built_in">Object</span>.keys(thisState).length !== <span class="built_in">Object</span>.keys(nextState).length) &#123;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> nextProps) &#123;</div><div class="line">    <span class="keyword">if</span> (!Immutable.is(thisProps[key], nextProps[key])) &#123;</div><div class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> nextState) &#123;</div><div class="line">    <span class="keyword">if</span> (!Immutable.is(thisState[key], nextState[key])) &#123;</div><div class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>函数的传递方式需要注意</p>
+<p>  如果每次render时都是重新声明的函数，则其对比会有问题，因为is()内部对函数的对比是基于ValueOf的，所以将下面的第一种方式改为第二种方式：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;TouchableOpacity onPress=&#123;() =&gt; <span class="keyword">this</span>.addCount()&#125; style=&#123;Style.btnContainer&#125;&gt;</div><div class="line">     <span class="xml"><span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;Style.btnWord&#125;</span>&gt;</span>addCount<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span></div><div class="line"> &lt;<span class="regexp">/TouchableOpacity&gt;</span></div></pre></td></tr></table></figure>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;TouchableOpacity onPress=&#123;<span class="keyword">this</span>.addCount&#125; style=&#123;Style.btnContainer&#125;&gt;</div><div class="line">      <span class="xml"><span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;Style.btnWord&#125;</span>&gt;</span>addCount<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span></div><div class="line">  &lt;<span class="regexp">/TouchableOpacity&gt;</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>经过上面这些改造后，我们的demo文件Render count如下所示，很好，楼主又可以欢快的吃火锅啦：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-after.png?" alt="优化之后"></p>
+<h4 id="酒水之利弊介绍"><a href="#酒水之利弊介绍" class="headerlink" title="酒水之利弊介绍"></a>酒水之利弊介绍</h4><ul>
+<li>优<ul>
+<li>能便利的进行时间溯洄，便于状态的把控与调试</li>
+<li>结构共享，节约内存</li>
+<li>并发安全</li>
+<li>能抽象出统一的对比函数</li>
+<li>Model与View耦合度不高</li>
+</ul>
+</li>
+<li>缺<ul>
+<li>有学习成本</li>
+<li>容易与原生函数混淆，并且原生函数一旦重写可能会导致问题</li>
+<li>资源大小增加</li>
+<li>跨页面数据同步方式会有变动，之前页面间进行引用传递，在B页面进行的修改会自动呈现到A页面，但是现在是Persistent data structire，因此B页面的改动A页面无感，需要特殊的触发机制来进行状态同步</li>
+<li>因为并非原生的数据结构，所以像解构这种用法需要引入特殊的库后才能使用</li>
+</ul>
+</li>
+</ul>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ul>
+<li><a href="https://www.youtube.com/watch?v=I7IdS-PbEgI&amp;feature=youtu.be" target="_blank" rel="external">React.js Conf 2015 - Immutable Data and React</a></li>
+<li><a href="https://facebook.github.io/react/docs/optimizing-performance.html" target="_blank" rel="external">Optimizing Performance</a></li>
+<li><a href="http://facebook.github.io/immutable-js/" target="_blank" rel="external">Immutable.js</a></li>
+<li><a href="https://juejin.im/post/5948985ea0bb9f006bed7472" target="_blank" rel="external">Immutable.js 以及在 react+redux 项目中的实践</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/20295971?columnSlug=purerender" target="_blank" rel="external">Immutable 详解及 React 中实践</a></li>
+<li><a href="http://stylechen.com/react-and-immutable.html" target="_blank" rel="external">从 React 的组件更新谈 Immutable 的应用</a></li>
 </ul>
 
       
@@ -259,11 +397,15 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">React Native</a>
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">React</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">optimization</a>
         		</li>
       		
 		</ul>
@@ -275,7 +417,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/technology/" class="article-tag-list-link color1">technology</a>
+        			<a href="/categories/lulutia/" class="article-tag-list-link color3">lulutia</a>
         		</li>
       		
 		</ul>
@@ -330,7 +472,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="http://s.jiathis.com/qrcode.php?url=http://memory.lulutia.com/2015/10/20/JavaScript-delete/" alt="微信分享二维码">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://memory.lulutia.com/2017/07/10/immutableJS/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -344,18 +486,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2015/10/21/ES6-2/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          ES6 learning 二
-        
-      </div>
-    </a>
   
-  
-    <a href="/2015/10/15/memory1/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">面试回忆360</div>
+    <a href="/2017/07/06/reactnative02/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">React Native 学习系列二</div>
       <i class="icon-circle-right"></i>
     </a>
   
