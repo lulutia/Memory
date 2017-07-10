@@ -13,7 +13,7 @@ tags:
 话说某天，楼主吃着火锅唱着歌，逛到了React的Performance Tools版块，心血来潮，放到了手上的项目里面玩了玩，看完后整个人都不太好了，数据如下(我一页屏幕都截不完......)：
 ![性能图](http://okzzg7ifm.bkt.clouddn.com/immutable-oldPref.png?)
 但实际上我所执行的操作仅仅只是为颜色外观打了个分，如下所示：
-![操作图](http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png?)
+![操作图](http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png)
 
 根据上面的统计数据，初略计算了下，一个打分操作render count为293。一个页面必填5个打分项，如此一来总共render count  >= 1465，其中还排除了用户打分完毕后继续修改的情况。不用我说，大家也能看出这是一个相当不合理的数字。因为就理想状况而言，打分操作最多只影响当前的打分项，一个打分组件五颗星，其具体结构如下所示:
 
