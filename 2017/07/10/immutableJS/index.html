@@ -16,13 +16,13 @@
 <meta property="og:site_name" content="lulutia">
 <meta property="og:description" content="本文主要介绍了如何对RN项目进行render count的优化，着重介绍了Immutable.js及其如何与Redux和React Native融合。">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-oldPref.png?">
-<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png?">
+<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-exampleLayout.png?imageView2/2/w/500/h/500/q/100|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-examplePref.png?">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-setstate.png?">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-share.png">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/immutable-after.png?">
-<meta property="og:updated_time" content="2017-07-10T09:06:17.000Z">
+<meta property="og:updated_time" content="2017-07-10T12:04:45.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于React-Native及Redux的Immutable.js引入">
 <meta name="twitter:description" content="本文主要介绍了如何对RN项目进行render count的优化，着重介绍了Immutable.js及其如何与Redux和React Native融合。">
@@ -188,7 +188,7 @@
       
         <p>本文主要介绍了如何对RN项目进行render count的优化，着重介绍了Immutable.js及其如何与Redux和React Native融合。</p>
 <a id="more"></a>
-<h4 id="前菜之背景介绍"><a href="#前菜之背景介绍" class="headerlink" title="前菜之背景介绍"></a>前菜之背景介绍</h4><p>话说某天，楼主吃着火锅唱着歌，逛到了React的Performance Tools版块，心血来潮，放到了手上的项目里面玩了玩，看完后整个人都不太好了，数据如下(我一页屏幕都截不完……)：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-oldPref.png?" alt="性能图"><br>但实际上我所执行的操作仅仅只是为颜色外观打了个分，如下所示：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png?" alt="操作图"></p>
+<h4 id="前菜之背景介绍"><a href="#前菜之背景介绍" class="headerlink" title="前菜之背景介绍"></a>前菜之背景介绍</h4><p>话说某天，楼主吃着火锅唱着歌，逛到了React的Performance Tools版块，心血来潮，放到了手上的项目里面玩了玩，看完后整个人都不太好了，数据如下(我一页屏幕都截不完……)：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-oldPref.png?" alt="性能图"><br>但实际上我所执行的操作仅仅只是为颜色外观打了个分，如下所示：<br><img src="http://okzzg7ifm.bkt.clouddn.com/immutable-coperation.png" alt="操作图"></p>
 <p>根据上面的统计数据，初略计算了下，一个打分操作render count为293。一个页面必填5个打分项，如此一来总共render count  &gt;= 1465，其中还排除了用户打分完毕后继续修改的情况。不用我说，大家也能看出这是一个相当不合理的数字。因为就理想状况而言，打分操作最多只影响当前的打分项，一个打分组件五颗星，其具体结构如下所示:</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;View key=&#123;i&#125;&gt;</div><div class="line">      <span class="xml"><span class="tag">&lt;<span class="name">TouchableOpacity</span></span></span></div><div class="line">        <span class="attr">style</span>=<span class="string">&#123;&#123;marginTop:</span> <span class="attr">5</span>, <span class="attr">marginRight:</span> <span class="attr">5</span>&#125;&#125;</div><div class="line">        <span class="attr">onPress</span>=<span class="string">&#123;()</span> =&gt;&#123;......&#125;</div><div class="line">        &gt;</div><div class="line">        <span class="tag">&lt;<span class="name">IconFont</span> <span class="attr">name</span>=<span class="string">"star"</span> <span class="attr">size</span>=<span class="string">&#123;StyleSheet.r(22)&#125;</span> <span class="attr">color</span>=<span class="string">&#123;color&#125;/</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">TouchableOpacity</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">View</span>&gt;</span></div></pre></td></tr></table></figure>
 <p>因此直接改变量为3*5=15是比较合理，再加上全局的Navar以及connect等操作，render count达到293也是绝对不合理且，通过分析，我们可以看到有很多数据根本没改变的组件也被重新渲染了的，这部分开销完全是不必要且有相当大的改进空间的。既然如此，我们来改进下吧~</p>
@@ -612,10 +612,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -625,6 +621,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
               </li>
              
               <li class="article-tag-list-item">
