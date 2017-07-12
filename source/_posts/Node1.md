@@ -8,6 +8,8 @@ tags: [前端,计算机]
 * [Node入门](http://www.nodebeginner.org/index-zh-cn.html)
 * 深入浅出Node.js
 
+<!-- more -->
+
 Node入门部分
 目标：
 

@@ -22,7 +22,8 @@ Environment Prepare
         // Your ES6 code
         </script>
     ~~~
-     
+ 
+<!-- more -->    
      
 * Traceur
     

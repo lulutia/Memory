@@ -8,6 +8,8 @@ tags: [环境搭建,计算机]
 * 安装Node，去[node官网](https://nodejs.org/)根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成在里面了。
 * 安装git，我用的是git的客户端[SourceTree](https://www.sourcetreeapp.com/)，选择很多，怎样顺手怎样来。
 
+<!-- more -->
+
 github部分
 [**github**](https://github.com/)是一个开源代码库以及版本控制系统。
 

@@ -5,6 +5,9 @@ comments: true
 tags: [前端,计算机,算法]
 ---
 找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。
+
+<!-- more -->
+
 Add Two Numbers
 * https://leetcode.com/problems/add-two-numbers/
 * You are given two linked lists representing two non-negative numbers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.

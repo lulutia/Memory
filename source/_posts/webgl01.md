@@ -5,6 +5,9 @@ tags: [前端,计算机]
 ---
 背景介绍
 * WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]
+
+<!-- more -->
+
 * 具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。
 * OpenGL2.0开始支持的可编程着色器方法被OpenGL ES2.0继承，成为了WebGL1.0标准的核心部分。而着色器方法或称为着色器，是使用一种类似C的编程语言实现精美的视觉效果。而编写着色器的语言称为着色器语言，WebGL使用OpenGL ES着色器语言，亦即GLSLES。
 * WebGL规范的建立由Khronos(也负责OpenGL规范的更新和标准化)建立的WebGL工作小组负责。2011年发布了WebGL规范的第一个版本。[WebGL2.0](https://www.khronos.org/registry/webgl/specs/latest/2.0/)处于[Editor's Draft](http://stackoverflow.com/questions/6692762/what-is-the-difference-between-a-w3c-working-draft-and-an-editors-draft)状态，它主要提供与OpenGL3.0新特性的对应，现阶段它并不与WebGL1.0完全向下兼容。

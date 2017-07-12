@@ -11,6 +11,8 @@ tags: [前端,计算机,算法]
 * 字符串生成数组:split();数组的字符串表示:join()/toString()
 * sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：
 
+<!-- more -->
+
 ~~~
 function compare(num1,num2){
     return num1 - num2;

@@ -8,6 +8,9 @@ tags: [前端,计算机]
 * 首先你要先安装yeoman，`npm install -g yo bower grunt-cli gulp`。
 * generator是一个Node.js的模块。
 * 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。
+
+<!-- more -->
+
 * `npm init`来建立一个package.json。
 
     ```

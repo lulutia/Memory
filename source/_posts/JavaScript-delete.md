@@ -6,6 +6,9 @@ tags: [前端,计算机]
 ---
 
 * 核心内容借鉴自下面的[网址](http://perfectionkills.com/understanding-delete/)
+
+<!-- more -->
+
 * delete一般用法：
     * 删除对象的属性 
         

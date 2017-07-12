@@ -9,6 +9,9 @@ tags: [前端,计算机,ReactNative]
 * 时间: React.js Conf 2015 上发布，9月推出Android版本
 * 使用范围: 用于开发**iOS和Android**原生应用
 * 设计理念: 既拥有Native的**用户体验**、又保留React的**开发效率**
+
+<!-- more -->
+
 * 产生原因:
   * Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画
   * Native开发成本高

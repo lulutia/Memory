@@ -96,10 +96,6 @@ deploy:
   repository: https://github.com/lulutia/Memory.git
   branch: gh-pages
 
-#Miscellaneous
-google_analytics: 'UA-65435838-1'
-
-
 jsonContent:
     meta: false
     pages: false
