@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
   <title>yeoman建立脚手架 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="首先你要先安装yeoman，npm install -g yo bower grunt-cli gulp。 generator是一个Node.js的模块。 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。 npm init来建立一个package.json。   123456789101">
+  <meta name="description" content="首先你要先安装yeoman，npm install -g yo bower grunt-cli gulp。 generator是一个Node.js的模块。 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。">
 <meta name="keywords" content="前端,计算机">
 <meta property="og:type" content="article">
 <meta property="og:title" content="yeoman建立脚手架">
 <meta property="og:url" content="http://memory.lulutia.com/2015/11/03/yeoman建立脚手架/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="首先你要先安装yeoman，npm install -g yo bower grunt-cli gulp。 generator是一个Node.js的模块。 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。 npm init来建立一个package.json。   123456789101">
-<meta property="og:updated_time" content="2017-06-07T03:15:45.000Z">
+<meta property="og:description" content="首先你要先安装yeoman，npm install -g yo bower grunt-cli gulp。 generator是一个Node.js的模块。 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。">
+<meta property="og:updated_time" content="2017-07-12T04:47:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="yeoman建立脚手架">
-<meta name="twitter:description" content="首先你要先安装yeoman，npm install -g yo bower grunt-cli gulp。 generator是一个Node.js的模块。 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。 npm init来建立一个package.json。   123456789101">
+<meta name="twitter:description" content="首先你要先安装yeoman，npm install -g yo bower grunt-cli gulp。 generator是一个Node.js的模块。 建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -208,6 +208,9 @@ ga('send', 'pageview');
 <li>首先你要先安装yeoman，<code>npm install -g yo bower grunt-cli gulp</code>。</li>
 <li>generator是一个Node.js的模块。</li>
 <li>建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。</li>
+</ul>
+<a id="more"></a>
+<ul>
 <li><p><code>npm init</code>来建立一个package.json。</p>
   <figure class="highlight stata"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">    &#123;</div><div class="line">  <span class="string">"name"</span>: <span class="string">"generator-lulutia-react"</span>,<span class="comment">//必须generator开头</span></div><div class="line">  <span class="string">"version"</span>: <span class="string">"0.0.1"</span>,</div><div class="line">  <span class="string">"description"</span>: <span class="string">"the bone to build a app"</span>,</div><div class="line">  <span class="string">"files"</span>: [</div><div class="line">    <span class="string">"app"</span>,</div><div class="line">    <span class="string">"router"</span></div><div class="line">  ],<span class="comment">//必须是你的generator用到的文件构成的数组</span></div><div class="line">  <span class="string">"main"</span>: <span class="string">"index.js"</span>,</div><div class="line">  <span class="string">"scripts"</span>: &#123;</div><div class="line">    <span class="string">"test"</span>: <span class="string">"echo \"</span><span class="keyword">Error</span>: <span class="keyword">no</span> <span class="keyword">test</span> specified\<span class="string">" &amp;&amp; exit 1"</span></div><div class="line">  &#125;,</div><div class="line">  <span class="string">"keywords"</span>: [</div><div class="line">    <span class="string">"yeoman-generator"</span><span class="comment">//必须有这条</span></div><div class="line">  ],</div><div class="line">  <span class="string">"author"</span>: <span class="string">"lulutia"</span>,</div><div class="line">  <span class="string">"license"</span>: <span class="string">"MIT"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
@@ -262,8 +265,8 @@ ga('send', 'pageview');
           </a>
         </div>
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -496,6 +499,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -505,14 +516,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">

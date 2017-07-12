@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
   <title>(数据结构与算法JavaScript描述)读书笔记 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="数组  判断是否数组：Array.isArray(sth); []创建数组的效率比Array构造函数高; 浅复制 VS 深复制； 字符串生成数组:split();数组的字符串表示:join()/toString() sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：  12345function compare(num1,num2)&amp;#12">
+  <meta name="description" content="数组  判断是否数组：Array.isArray(sth); []创建数组的效率比Array构造函数高; 浅复制 VS 深复制； 字符串生成数组:split();数组的字符串表示:join()/toString() sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：">
 <meta name="keywords" content="前端,计算机,算法">
 <meta property="og:type" content="article">
 <meta property="og:title" content="(数据结构与算法JavaScript描述)读书笔记">
 <meta property="og:url" content="http://memory.lulutia.com/2015/10/13/note-structure01/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="数组  判断是否数组：Array.isArray(sth); []创建数组的效率比Array构造函数高; 浅复制 VS 深复制； 字符串生成数组:split();数组的字符串表示:join()/toString() sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：  12345function compare(num1,num2)&amp;#12">
-<meta property="og:updated_time" content="2017-06-07T03:15:45.000Z">
+<meta property="og:description" content="数组  判断是否数组：Array.isArray(sth); []创建数组的效率比Array构造函数高; 浅复制 VS 深复制； 字符串生成数组:split();数组的字符串表示:join()/toString() sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：">
+<meta property="og:updated_time" content="2017-07-12T04:46:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="(数据结构与算法JavaScript描述)读书笔记">
-<meta name="twitter:description" content="数组  判断是否数组：Array.isArray(sth); []创建数组的效率比Array构造函数高; 浅复制 VS 深复制； 字符串生成数组:split();数组的字符串表示:join()/toString() sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：  12345function compare(num1,num2)&amp;#12">
+<meta name="twitter:description" content="数组  判断是否数组：Array.isArray(sth); []创建数组的效率比Array构造函数高; 浅复制 VS 深复制； 字符串生成数组:split();数组的字符串表示:join()/toString() sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -212,6 +212,7 @@ ga('send', 'pageview');
 <li>字符串生成数组:split();数组的字符串表示:join()/toString()</li>
 <li>sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：</li>
 </ul>
+<a id="more"></a>
 <figure class="highlight actionscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">compare</span><span class="params">(num1,num2)</span></span>&#123;</div><div class="line">    <span class="keyword">return</span> num1 - num2;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> nums = [<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">88</span>];</div><div class="line">nums.sort(compare);</div></pre></td></tr></table></figure>
 <ul>
 <li>迭代器方法: forEach();every();some();reduce()–累加；reduceRight();map();filter()–返回一个新数组，该数组包含应用该函数后结果为true的<strong>元素</strong>;</li>
@@ -258,8 +259,8 @@ ga('send', 'pageview');
           </a>
         </div>
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -496,6 +497,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -505,14 +514,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">

@@ -8,13 +8,13 @@
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
   <title>WEBGL系列之二维操作 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="背景介绍  WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API] 具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。 OpenGL2.0开始支持">
+  <meta name="description" content="背景介绍  WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]">
 <meta name="keywords" content="前端,计算机">
 <meta property="og:type" content="article">
 <meta property="og:title" content="WEBGL系列之二维操作">
 <meta property="og:url" content="http://memory.lulutia.com/2017/06/07/webgl01/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="背景介绍  WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API] 具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。 OpenGL2.0开始支持">
+<meta property="og:description" content="背景介绍  WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/01.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/02.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/03.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
@@ -25,10 +25,10 @@
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/08.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/09.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/10.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
-<meta property="og:updated_time" content="2017-06-07T06:36:11.000Z">
+<meta property="og:updated_time" content="2017-07-12T04:47:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="WEBGL系列之二维操作">
-<meta name="twitter:description" content="背景介绍  WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API] 具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。 OpenGL2.0开始支持">
+<meta name="twitter:description" content="背景介绍  WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]">
 <meta name="twitter:image" content="http://okzzg7ifm.bkt.clouddn.com/01.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
@@ -218,6 +218,9 @@ ga('send', 'pageview');
         <p>背景介绍</p>
 <ul>
 <li>WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]</li>
+</ul>
+<a id="more"></a>
+<ul>
 <li>具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。</li>
 <li>OpenGL2.0开始支持的可编程着色器方法被OpenGL ES2.0继承，成为了WebGL1.0标准的核心部分。而着色器方法或称为着色器，是使用一种类似C的编程语言实现精美的视觉效果。而编写着色器的语言称为着色器语言，WebGL使用OpenGL ES着色器语言，亦即GLSLES。</li>
 <li>WebGL规范的建立由Khronos(也负责OpenGL规范的更新和标准化)建立的WebGL工作小组负责。2011年发布了WebGL规范的第一个版本。<a href="https://www.khronos.org/registry/webgl/specs/latest/2.0/" target="_blank" rel="external">WebGL2.0</a>处于<a href="http://stackoverflow.com/questions/6692762/what-is-the-difference-between-a-w3c-working-draft-and-an-editors-draft" target="_blank" rel="external">Editor’s Draft</a>状态，它主要提供与OpenGL3.0新特性的对应，现阶段它并不与WebGL1.0完全向下兼容。</li>
@@ -425,8 +428,8 @@ ga('send', 'pageview');
           </a>
         </div>
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -659,6 +662,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -668,14 +679,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">

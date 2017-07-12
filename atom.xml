@@ -223,22 +223,22 @@
     <link href="http://memory.lulutia.com/2017/07/06/reactnative02/"/>
     <id>http://memory.lulutia.com/2017/07/06/reactnative02/</id>
     <published>2017-07-06T08:58:30.000Z</published>
-    <updated>2017-07-06T09:46:29.000Z</updated>
+    <updated>2017-07-12T04:47:16.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="状态管理"><a href="#状态管理" class="headerlink" title="状态管理"></a>状态管理</h3><ul>
-<li><p>历史情况</p>
-<ul>
+<li>历史情况<ul>
 <li>最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程</li>
-<li>人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑</li>
-<li>数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发生时，只有那些确实需要变化的进行变化。这种方式对事件变更本身会进行一层处理，导致需要按照特定的API进行处理</li>
-<li>脏检测: 创建了值的观察器，一旦应用中发生变化，就检测这个观察器里的值是否与之前的值相同，如果不同就重新渲染这个值到UI。这种方式因为没有告诉框架是否变了以及什么地方变化了，所以只能通过外部来检查，比如有一种方法就是一旦交互产生，就重新把所有观察器跑一遍。这种方式遇见UI比较复杂或者重绘经常性发生时就很可能产生性能问题</li>
-<li><p>虚拟DOM: 思想上与服务器端渲染类似。只要状态发生变化，就全部重新渲染一次。但是其不同的地方在于他不是在真正DOM上执行这个操作，而是渲染到虚拟DOM，即一个轻量的纯javaScript的对象结构，里面是简单对象和数组来表达真实的DOM对象。之后再通过一个特殊的过程根据这个虚拟DOM来创建真实DOM。因此当一个值发生变化时，会通过对比新生成的虚拟DOM与之前的虚拟DOM而找出涉及DOM的变化，之后将变化反应在真正的DOM上。这种方式不用跟踪变动，减少了昂贵的DOM操作，这部分的详细了解推荐通过<a href="https://github.com/Matt-Esch/virtual-dom#dom-model" target="_blank" rel="external">virtual-dom</a>这个项目来进行分析，总的来说流程如下:</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/virtualdom.png" alt="virtualdom"></p>
-</li>
 </ul>
 </li>
 </ul>
-<h3 id="JSX"><a href="#JSX" class="headerlink" title="JSX"></a>JSX</h3><ul>
+<a id="more"></a>
+<pre><code>* 人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑
+* 数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发生时，只有那些确实需要变化的进行变化。这种方式对事件变更本身会进行一层处理，导致需要按照特定的API进行处理
+* 脏检测: 创建了值的观察器，一旦应用中发生变化，就检测这个观察器里的值是否与之前的值相同，如果不同就重新渲染这个值到UI。这种方式因为没有告诉框架是否变了以及什么地方变化了，所以只能通过外部来检查，比如有一种方法就是一旦交互产生，就重新把所有观察器跑一遍。这种方式遇见UI比较复杂或者重绘经常性发生时就很可能产生性能问题
+* 虚拟DOM: 思想上与服务器端渲染类似。只要状态发生变化，就全部重新渲染一次。但是其不同的地方在于他不是在真正DOM上执行这个操作，而是渲染到虚拟DOM，即一个轻量的纯javaScript的对象结构，里面是简单对象和数组来表达真实的DOM对象。之后再通过一个特殊的过程根据这个虚拟DOM来创建真实DOM。因此当一个值发生变化时，会通过对比新生成的虚拟DOM与之前的虚拟DOM而找出涉及DOM的变化，之后将变化反应在真正的DOM上。这种方式不用跟踪变动，减少了昂贵的DOM操作，这部分的详细了解推荐通过[virtual-dom](https://github.com/Matt-Esch/virtual-dom#dom-model)这个项目来进行分析，总的来说流程如下:
+
+    ![virtualdom](http://okzzg7ifm.bkt.clouddn.com/virtualdom.png)
+</code></pre><h3 id="JSX"><a href="#JSX" class="headerlink" title="JSX"></a>JSX</h3><ul>
 <li><p>什么是JSX</p>
 <blockquote>
 <p>It is called JSX, and it is a syntax extension to JavaScript. We recommend using it with React to describe what the UI should look like. JSX may remind you of a template language, but it comes with the full power of JavaScript.JSX produces React “elements”.</p>
@@ -462,9 +462,11 @@
     <summary type="html">
     
       &lt;h3 id=&quot;状态管理&quot;&gt;&lt;a href=&quot;#状态管理&quot; class=&quot;headerlink&quot; title=&quot;状态管理&quot;&gt;&lt;/a&gt;状态管理&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;历史情况&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面
+&lt;li&gt;历史情况&lt;ul&gt;
+&lt;li&gt;最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -484,13 +486,16 @@
     <link href="http://memory.lulutia.com/2017/07/06/reactnative01/"/>
     <id>http://memory.lulutia.com/2017/07/06/reactnative01/</id>
     <published>2017-07-06T07:11:10.000Z</published>
-    <updated>2017-07-06T10:20:44.000Z</updated>
+    <updated>2017-07-12T04:47:02.000Z</updated>
     
     <content type="html"><![CDATA[<h4 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h4><ul>
 <li>创造者: Facebook</li>
 <li>时间: React.js Conf 2015 上发布，9月推出Android版本</li>
 <li>使用范围: 用于开发<strong>iOS和Android</strong>原生应用</li>
 <li>设计理念: 既拥有Native的<strong>用户体验</strong>、又保留React的<strong>开发效率</strong></li>
+</ul>
+<a id="more"></a>
+<ul>
 <li>产生原因:<ul>
 <li>Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画</li>
 <li>Native开发成本高</li>
@@ -683,7 +688,10 @@
     
       &lt;h4 id=&quot;背景介绍&quot;&gt;&lt;a href=&quot;#背景介绍&quot; class=&quot;headerlink&quot; title=&quot;背景介绍&quot;&gt;&lt;/a&gt;背景介绍&lt;/h4&gt;&lt;ul&gt;
 &lt;li&gt;创造者: Facebook&lt;/li&gt;
-&lt;li&gt;时间: React.js Conf 2015 上发布，9月推出An
+&lt;li&gt;时间: React.js Conf 2015 上发布，9月推出Android版本&lt;/li&gt;
+&lt;li&gt;使用范围: 用于开发&lt;strong&gt;iOS和Android&lt;/strong&gt;原生应用&lt;/li&gt;
+&lt;li&gt;设计理念: 既拥有Native的&lt;strong&gt;用户体验&lt;/strong&gt;、又保留React的&lt;strong&gt;开发效率&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -703,11 +711,14 @@
     <link href="http://memory.lulutia.com/2017/06/07/webgl01/"/>
     <id>http://memory.lulutia.com/2017/06/07/webgl01/</id>
     <published>2017-06-07T03:15:45.000Z</published>
-    <updated>2017-06-07T06:36:11.000Z</updated>
+    <updated>2017-07-12T04:47:23.000Z</updated>
     
     <content type="html"><![CDATA[<p>背景介绍</p>
 <ul>
 <li>WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]</li>
+</ul>
+<a id="more"></a>
+<ul>
 <li>具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。</li>
 <li>OpenGL2.0开始支持的可编程着色器方法被OpenGL ES2.0继承，成为了WebGL1.0标准的核心部分。而着色器方法或称为着色器，是使用一种类似C的编程语言实现精美的视觉效果。而编写着色器的语言称为着色器语言，WebGL使用OpenGL ES着色器语言，亦即GLSLES。</li>
 <li>WebGL规范的建立由Khronos(也负责OpenGL规范的更新和标准化)建立的WebGL工作小组负责。2011年发布了WebGL规范的第一个版本。<a href="https://www.khronos.org/registry/webgl/specs/latest/2.0/" target="_blank" rel="external">WebGL2.0</a>处于<a href="http://stackoverflow.com/questions/6692762/what-is-the-difference-between-a-w3c-working-draft-and-an-editors-draft" target="_blank" rel="external">Editor’s Draft</a>状态，它主要提供与OpenGL3.0新特性的对应，现阶段它并不与WebGL1.0完全向下兼容。</li>
@@ -897,7 +908,7 @@
       &lt;p&gt;背景介绍&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]&lt;/li&gt;
-&lt;li&gt;具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智
+&lt;/ul&gt;
     
     </summary>
     
@@ -915,10 +926,11 @@
     <link href="http://memory.lulutia.com/2017/01/08/2017HELLO/"/>
     <id>http://memory.lulutia.com/2017/01/08/2017HELLO/</id>
     <published>2017-01-08T12:51:32.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:44:46.000Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/assets/img/2017.jpg" alt=""></p>
 <p>又一年匆匆走过，这一年说长不长说短不短，但的的确确发生了好多好多事情。先来篇流水帐总结。</p>
+<a id="more"></a>
 <p>被老爹说了n久的驾照终于到手了，并且拿到的第二天就被老爹像拎兔子一样拎出去开了70多公里。</p>
 <p>和老爸因为一件现在显而易见已经完全想不起来的事情起了争执，一气之下把齐腰长发剪成了个短的不能再短的发型，完美开启了假小子模式。</p>
 <p>回学校后顺利结束了答辩，在等资料处理的漫长的一个月里拉着大鸟去日本走了一遭。在这只有零星早樱的季节吃了超级好吃的美食，看了超级棒的风景，遇见了超级有爱的人，也算满足了小时候的心愿。意大利和日本这两个我在小学毕业写在同学录 最想去的国家 一栏的国家都GET。</p>
@@ -938,7 +950,6 @@
     
       &lt;p&gt;&lt;img src=&quot;/assets/img/2017.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 &lt;p&gt;又一年匆匆走过，这一年说长不长说短不短，但的的确确发生了好多好多事情。先来篇流水帐总结。&lt;/p&gt;
-&lt;p&gt;被老爹说了n久的驾照终于到手了，并且拿到的第二天就被老爹像拎兔子一样拎出去开
     
     </summary>
     
@@ -954,12 +965,15 @@
     <link href="http://memory.lulutia.com/2015/11/03/yeoman%E5%BB%BA%E7%AB%8B%E8%84%9A%E6%89%8B%E6%9E%B6/"/>
     <id>http://memory.lulutia.com/2015/11/03/yeoman建立脚手架/</id>
     <published>2015-11-03T14:10:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:47:29.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>首先你要先安装yeoman，<code>npm install -g yo bower grunt-cli gulp</code>。</li>
 <li>generator是一个Node.js的模块。</li>
 <li>建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。</li>
+</ul>
+<a id="more"></a>
+<ul>
 <li><p><code>npm init</code>来建立一个package.json。</p>
   <figure class="highlight stata"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">    &#123;</div><div class="line">  <span class="string">"name"</span>: <span class="string">"generator-lulutia-react"</span>,<span class="comment">//必须generator开头</span></div><div class="line">  <span class="string">"version"</span>: <span class="string">"0.0.1"</span>,</div><div class="line">  <span class="string">"description"</span>: <span class="string">"the bone to build a app"</span>,</div><div class="line">  <span class="string">"files"</span>: [</div><div class="line">    <span class="string">"app"</span>,</div><div class="line">    <span class="string">"router"</span></div><div class="line">  ],<span class="comment">//必须是你的generator用到的文件构成的数组</span></div><div class="line">  <span class="string">"main"</span>: <span class="string">"index.js"</span>,</div><div class="line">  <span class="string">"scripts"</span>: &#123;</div><div class="line">    <span class="string">"test"</span>: <span class="string">"echo \"</span><span class="keyword">Error</span>: <span class="keyword">no</span> <span class="keyword">test</span> specified\<span class="string">" &amp;&amp; exit 1"</span></div><div class="line">  &#125;,</div><div class="line">  <span class="string">"keywords"</span>: [</div><div class="line">    <span class="string">"yeoman-generator"</span><span class="comment">//必须有这条</span></div><div class="line">  ],</div><div class="line">  <span class="string">"author"</span>: <span class="string">"lulutia"</span>,</div><div class="line">  <span class="string">"license"</span>: <span class="string">"MIT"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 </li>
@@ -996,7 +1010,8 @@
       &lt;ul&gt;
 &lt;li&gt;首先你要先安装yeoman，&lt;code&gt;npm install -g yo bower grunt-cli gulp&lt;/code&gt;。&lt;/li&gt;
 &lt;li&gt;generator是一个Node.js的模块。&lt;/li&gt;
-&lt;li&gt;建立一个写generator的文件，必须命名
+&lt;li&gt;建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1014,7 +1029,7 @@
     <link href="http://memory.lulutia.com/2015/11/02/ES6-5/"/>
     <id>http://memory.lulutia.com/2015/11/02/ES6-5/</id>
     <published>2015-11-02T13:36:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:45:33.000Z</updated>
     
     <content type="html"><![CDATA[<p>异步操作和Async函数</p>
 <ul>
@@ -1025,6 +1040,9 @@
 <li>Promise对象</li>
 </ul>
 </li>
+</ul>
+<a id="more"></a>
+<ul>
 <li>其他：Generator函数，Thunk函数。可以用thunkify模块，结合Generator函数，封装一个run函数实现自动化流程管理。co模块(使用co的前提条件是，Generator函数的yield命令后面，只能是Thunk函数或Promise对象)。async函数，async函数就是Generator函数的语法糖，它的自动执行器不需要用户自己来实现。</li>
 <li>感觉上async最好用：</li>
 </ul>
@@ -1118,7 +1136,7 @@
 &lt;li&gt;Promise对象&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;其他：Generator
+&lt;/ul&gt;
     
     </summary>
     
@@ -1136,7 +1154,7 @@
     <link href="http://memory.lulutia.com/2015/10/23/ES6-4/"/>
     <id>http://memory.lulutia.com/2015/10/23/ES6-4/</id>
     <published>2015-10-23T12:22:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:45:24.000Z</updated>
     
     <content type="html"><![CDATA[<p>Iterator和for..of循环</p>
 <ul>
@@ -1146,6 +1164,9 @@
 <li>三是ES6创造了一种新的遍历命令for…of循环，Iterator接口主要供for…of消费。</li>
 </ul>
 </li>
+</ul>
+<a id="more"></a>
+<ul>
 <li>在ES6中，有三类数据结构原生具备Iterator接口：数组、某些类似数组的对象、Set和Map结构。调用Symbol.iterator方法，就会得到当前数据结构默认的遍历器生成函数。</li>
 <li>字符串是一个类似数组的对象，也原生具有Iterator接口。</li>
 <li>JavaScript原有的for…in循环，只能获得对象的键名，不能直接获取键值。ES6提供for…of循环，允许遍历获得键值。Set结构遍历时，返回的是一个值，而Map结构遍历时，返回的是一个数组，该数组的两个成员分别为当前Map成员的键名和键值。</li>
@@ -1180,7 +1201,10 @@
 &lt;li&gt;Iterator的作用有三个：&lt;ul&gt;
 &lt;li&gt;一是为各种数据结构，提供一个统一的、简便的访问接口；&lt;/li&gt;
 &lt;li&gt;二是使得数据结构的成员能够按某种次序排列；&lt;/li&gt;
-&lt;li&gt;三是ES6创造了一种新的遍历
+&lt;li&gt;三是ES6创造了一种新的遍历命令for…of循环，Iterator接口主要供for…of消费。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1198,12 +1222,15 @@
     <link href="http://memory.lulutia.com/2015/10/22/ES6-3/"/>
     <id>http://memory.lulutia.com/2015/10/22/ES6-3/</id>
     <published>2015-10-22T02:09:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:45:12.000Z</updated>
     
     <content type="html"><![CDATA[<p>对象的扩展</p>
 <ul>
 <li>ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。</li>
 <li>ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。<strong>注意，属性名表达式与简洁表示法，不能同时使用，会报错。</strong></li>
+</ul>
+<a id="more"></a>
+<ul>
 <li>Object.is用来比较两个值是否严格相等。它与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于自身。</li>
 <li>Object.assign方法用来将源对象（source）的所有可枚举属性，复制到目标对象（target）。Object.assign只拷贝自身属性，不可枚举的属性（enumerable为false）和继承的属性不会被拷贝。</li>
 <li>对象的每个属性都有一个描述对象（Descriptor），用来控制该属性的行为。Object.getOwnPropertyDescriptor方法可以获取该属性的描述对象。</li>
@@ -1246,7 +1273,8 @@
       &lt;p&gt;对象的扩展&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。&lt;/li&gt;
-&lt;li&gt;ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。&lt;strong&gt;注意，属性名表
+&lt;li&gt;ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。&lt;strong&gt;注意，属性名表达式与简洁表示法，不能同时使用，会报错。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1264,12 +1292,13 @@
     <link href="http://memory.lulutia.com/2015/10/21/ES6-2/"/>
     <id>http://memory.lulutia.com/2015/10/21/ES6-2/</id>
     <published>2015-10-21T14:16:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:45:04.000Z</updated>
     
     <content type="html"><![CDATA[<p>字符串的扩展</p>
 <ul>
 <li>JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。</li>
 </ul>
+<a id="more"></a>
 <figure class="highlight awk"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="string">"\u&#123;20BB7&#125;"</span>    <span class="regexp">//</span> <span class="string">"𠮷"</span></div></pre></td></tr></table></figure>
 <ul>
 <li>JavaScript内部，字符以UTF-16的格式储存，每个字符固定为2个字节。对于那些需要4个字节储存的字符（Unicode码点大于0xFFFF的字符），JavaScript会认为它们是两个字符。charAt方法无法读取字符，charCodeAt方法只能分别返回前两个字节和后两个字节的值。ES6提供了codePointAt方法，能够正确处理4个字节储存的字符，返回一个字符的码点。它的逆过程通过String.fromCodePoint实现，弥补了String.fromCharCode的溢出问题。</li>
@@ -1343,7 +1372,6 @@
 &lt;ul&gt;
 &lt;li&gt;JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;figure class=&quot;hig
     
     </summary>
     
@@ -1361,10 +1389,13 @@
     <link href="http://memory.lulutia.com/2015/10/20/JavaScript-delete/"/>
     <id>http://memory.lulutia.com/2015/10/20/JavaScript-delete/</id>
     <published>2015-10-20T04:36:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:46:12.000Z</updated>
     
     <content type="html"><![CDATA[<ul>
 <li>核心内容借鉴自下面的<a href="http://perfectionkills.com/understanding-delete/" target="_blank" rel="external">网址</a></li>
+</ul>
+<a id="more"></a>
+<ul>
 <li><p>delete一般用法：</p>
 <ul>
 <li><p>删除对象的属性 </p>
@@ -1416,7 +1447,7 @@
     
       &lt;ul&gt;
 &lt;li&gt;核心内容借鉴自下面的&lt;a href=&quot;http://perfectionkills.com/understanding-delete/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;网址&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;delete一般用法：&lt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1434,9 +1465,10 @@
     <link href="http://memory.lulutia.com/2015/10/15/memory1/"/>
     <id>http://memory.lulutia.com/2015/10/15/memory1/</id>
     <published>2015-10-15T12:38:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:46:39.000Z</updated>
     
     <content type="html"><![CDATA[<p>  一大早就跑南京去面360，完全高铁当公交的节奏……但是，我穷啊＝＝。总的来说面的特别的不好，还不是自己弱，怪谁啊，稍微纪录下吧。</p>
+<a id="more"></a>
 <p>  <strong>岗位：web前端工程师</strong></p>
 <ul>
 <li>笔试题还记得吗？</li>
@@ -1477,10 +1509,6 @@
     <summary type="html">
     
       &lt;p&gt;  一大早就跑南京去面360，完全高铁当公交的节奏……但是，我穷啊＝＝。总的来说面的特别的不好，还不是自己弱，怪谁啊，稍微纪录下吧。&lt;/p&gt;
-&lt;p&gt;  &lt;strong&gt;岗位：web前端工程师&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;笔试题还记得吗？&lt;/li&gt;
-&lt;li&gt;会
     
     </summary>
     
@@ -1500,7 +1528,7 @@
     <link href="http://memory.lulutia.com/2015/10/13/note-structure01/"/>
     <id>http://memory.lulutia.com/2015/10/13/note-structure01/</id>
     <published>2015-10-13T08:06:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:46:54.000Z</updated>
     
     <content type="html"><![CDATA[<p>数组</p>
 <ul>
@@ -1510,6 +1538,7 @@
 <li>字符串生成数组:split();数组的字符串表示:join()/toString()</li>
 <li>sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：</li>
 </ul>
+<a id="more"></a>
 <figure class="highlight actionscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">compare</span><span class="params">(num1,num2)</span></span>&#123;</div><div class="line">    <span class="keyword">return</span> num1 - num2;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> nums = [<span class="number">3</span>,<span class="number">2</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">88</span>];</div><div class="line">nums.sort(compare);</div></pre></td></tr></table></figure>
 <ul>
 <li>迭代器方法: forEach();every();some();reduce()–累加；reduceRight();map();filter()–返回一个新数组，该数组包含应用该函数后结果为true的<strong>元素</strong>;</li>
@@ -1540,7 +1569,9 @@
 &lt;li&gt;判断是否数组：Array.isArray(sth);&lt;/li&gt;
 &lt;li&gt;[]创建数组的效率比Array构造函数高;&lt;/li&gt;
 &lt;li&gt;浅复制 VS 深复制；&lt;/li&gt;
-&lt;li&gt;字符串生成数组:split();数组的字符串表示:join()/t
+&lt;li&gt;字符串生成数组:split();数组的字符串表示:join()/toString()&lt;/li&gt;
+&lt;li&gt;sort()是按照字典顺序对元素进行排序的，因此它假定元素都是字符串类型的，按照数字大小进行排序的一般如下：&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1560,13 +1591,14 @@
     <link href="http://memory.lulutia.com/2015/10/12/leetcode2/"/>
     <id>http://memory.lulutia.com/2015/10/12/leetcode2/</id>
     <published>2015-10-12T10:09:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:46:30.000Z</updated>
     
     <content type="html"><![CDATA[<p>其他见part1<br>Merge Two Sorted Lists</p>
 <ul>
 <li><a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank" rel="external">https://leetcode.com/problems/merge-two-sorted-lists/</a></li>
 <li>Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.</li>
 </ul>
+<a id="more"></a>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Definition for singly-linked list.</div><div class="line"> * function ListNode(val) &#123;</div><div class="line"> *     this.val = val;</div><div class="line"> *     this.next = null;</div><div class="line"> * &#125;</div><div class="line"> */</div><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;ListNode&#125; l1</div><div class="line"> * @param &#123;ListNode&#125; l2</div><div class="line"> * @return &#123;ListNode&#125;</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> mergeTwoLists = function(l1, l2) &#123;</div><div class="line">    <span class="keyword">var</span> resultNode = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">    <span class="keyword">var</span> result = resultNode;</div><div class="line">    <span class="keyword">if</span>(l1===<span class="literal">null</span>&amp;&amp;l2===<span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">while</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">if</span>(l1===<span class="literal">null</span>)&#123;</div><div class="line">            result.<span class="keyword">val</span> = l2.<span class="keyword">val</span>;</div><div class="line">            l2 = l2.next;</div><div class="line">            <span class="keyword">if</span>(l2!==<span class="literal">null</span>)&#123;</div><div class="line">            result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">            result = result.next;&#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(l2===<span class="literal">null</span>)&#123;</div><div class="line">            result.<span class="keyword">val</span> = l1.<span class="keyword">val</span>;</div><div class="line">            l1 = l1.next;</div><div class="line">            <span class="keyword">if</span>(l1!==<span class="literal">null</span>)&#123;</div><div class="line">            result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">            result = result.next;&#125;</div><div class="line">            </div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            <span class="keyword">if</span>(l1.<span class="keyword">val</span>&lt;=l2.<span class="keyword">val</span>)&#123;</div><div class="line">                result.<span class="keyword">val</span> = l1.<span class="keyword">val</span>;</div><div class="line">                l1 = l1.next;</div><div class="line">                <span class="keyword">if</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">                result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">                result = result.next;&#125;</div><div class="line">                </div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span>&#123;</div><div class="line">                result.<span class="keyword">val</span> = l2.<span class="keyword">val</span>;</div><div class="line">                l2 = l2.next;</div><div class="line">                <span class="keyword">if</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">                result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">                result = result.next;&#125;</div><div class="line">                </div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> resultNode;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
 <p>Remove Duplicates from Sorted Array</p>
 <ul>
@@ -1658,7 +1690,9 @@
     
       &lt;p&gt;其他见part1&lt;br&gt;Merge Two Sorted Lists&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://leetcode.com/problems/merge-two-sorted-lists/&quot; target=&quot;_blank&quot; rel=&quot;exte
+&lt;li&gt;&lt;a href=&quot;https://leetcode.com/problems/merge-two-sorted-lists/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;https://leetcode.com/problems/merge-two-sorted-lists/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1678,7 +1712,7 @@
     <link href="http://memory.lulutia.com/2015/10/11/ES6/"/>
     <id>http://memory.lulutia.com/2015/10/11/ES6/</id>
     <published>2015-10-11T14:38:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:45:44.000Z</updated>
     
     <content type="html"><![CDATA[<p>Environment Prepare</p>
 <ul>
@@ -1698,6 +1732,7 @@
 </ul>
 </li>
 </ul>
+<a id="more"></a>    
 <ul>
 <li><p>Traceur</p>
   <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">    <span class="comment">&lt;!-- 加载Traceur编译器 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://google.github.io/traceur-compiler/bin/traceur.js"</span></span></div><div class="line">        <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;<span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="comment">&lt;!-- 将Traceur编译器用于网页 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://google.github.io/traceur-compiler/src/bootstrap.js"</span></span></div><div class="line">        <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;<span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="comment">&lt;!-- 打开实验选项，否则有些特性可能编译不成功 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="actionscript"></span></div><div class="line">        traceur.options.experimental = <span class="literal">true</span>;</div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"module"</span>&gt;</span><span class="actionscript"></span></div><div class="line">  <span class="comment">//Your ES6 code</span></div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
@@ -1756,7 +1791,18 @@
 &lt;ul&gt;
 &lt;li&gt;node –harmony&lt;/li&gt;
 &lt;li&gt;node –v8-options | grep harmony&lt;/li&gt;
-&lt;li&gt;npm install –globa
+&lt;li&gt;npm install –global babel&lt;/li&gt;
+&lt;li&gt;babel-node&lt;/li&gt;
+&lt;li&gt;babel-node es6.js&lt;/li&gt;
+&lt;li&gt;babel es6.js -o es5.js&lt;/li&gt;
+&lt;li&gt;babel -d build-dir source-dir&lt;/li&gt;
+&lt;li&gt;babel -d build-dir source-dir -s&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;use Bable in browser:&lt;/p&gt;
+&lt;figure class=&quot;highlight xml&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt; &lt;span class=&quot;attr&quot;&gt;src&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;node_modules/babel-core/browser.js&quot;&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;undefined&quot;&gt;&lt;/span&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt; &lt;span class=&quot;attr&quot;&gt;type&lt;/span&gt;=&lt;span class=&quot;string&quot;&gt;&quot;text/babel&quot;&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;actionscript&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;// Your ES6 code&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&lt;span class=&quot;tag&quot;&gt;&amp;lt;/&lt;span class=&quot;name&quot;&gt;script&lt;/span&gt;&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1774,9 +1820,11 @@
     <link href="http://memory.lulutia.com/2015/10/11/leetcode/"/>
     <id>http://memory.lulutia.com/2015/10/11/leetcode/</id>
     <published>2015-10-11T10:22:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:46:17.000Z</updated>
     
-    <content type="html"><![CDATA[<p>找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。<br>Add Two Numbers</p>
+    <content type="html"><![CDATA[<p>找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。</p>
+<a id="more"></a>
+<p>Add Two Numbers</p>
 <ul>
 <li><a href="https://leetcode.com/problems/add-two-numbers/" target="_blank" rel="external">https://leetcode.com/problems/add-two-numbers/</a></li>
 <li>You are given two linked lists representing two non-negative numbers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.<ul>
@@ -1842,9 +1890,7 @@
     
     <summary type="html">
     
-      &lt;p&gt;找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。&lt;br&gt;Add Two Numbers&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https://leetcode.co
+      &lt;p&gt;找工作找的心伤，碰上今年这个动荡的互联网就业年份，刷题安抚下情绪＝＝,然后发现n久之前刷过的几道都过期了，看不到当时的解决了……算了，这次还是存个档吧。&lt;/p&gt;
     
     </summary>
     
@@ -1864,13 +1910,14 @@
     <link href="http://memory.lulutia.com/2015/10/11/Node1/"/>
     <id>http://memory.lulutia.com/2015/10/11/Node1/</id>
     <published>2015-10-11T10:21:00.000Z</published>
-    <updated>2017-06-07T03:15:45.000Z</updated>
+    <updated>2017-07-12T04:46:44.000Z</updated>
     
     <content type="html"><![CDATA[<p>资料准备部分</p>
 <ul>
 <li><a href="http://www.nodebeginner.org/index-zh-cn.html" target="_blank" rel="external">Node入门</a></li>
 <li>深入浅出Node.js</li>
 </ul>
+<a id="more"></a>
 <p>Node入门部分<br>目标：</p>
 <ul>
 <li>用户通过浏览器使用此应用。</li>
@@ -1900,7 +1947,8 @@
       &lt;p&gt;资料准备部分&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;http://www.nodebeginner.org/index-zh-cn.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Node入门&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;深入浅出Node.js
+&lt;li&gt;深入浅出Node.js&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     
@@ -1918,13 +1966,14 @@
     <link href="http://memory.lulutia.com/2015/09/11/hello-world/"/>
     <id>http://memory.lulutia.com/2015/09/11/hello-world/</id>
     <published>2015-09-11T11:22:00.000Z</published>
-    <updated>2017-06-07T03:26:56.000Z</updated>
+    <updated>2017-07-12T04:45:50.000Z</updated>
     
     <content type="html"><![CDATA[<p>环境准备部分</p>
 <ul>
 <li>安装Node，去<a href="https://nodejs.org/" target="_blank" rel="external">node官网</a>根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成在里面了。</li>
 <li>安装git，我用的是git的客户端<a href="https://www.sourcetreeapp.com/" target="_blank" rel="external">SourceTree</a>，选择很多，怎样顺手怎样来。</li>
 </ul>
+<a id="more"></a>
 <p>github部分<br><a href="https://github.com/" target="_blank" rel="external"><strong>github</strong></a>是一个开源代码库以及版本控制系统。</p>
 <ul>
 <li>申请一个GitHub的账号，路径点击上面链接。</li>
@@ -1986,7 +2035,9 @@
     
       &lt;p&gt;环境准备部分&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;安装Node，去&lt;a href=&quot;https://nodejs.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;node官网&lt;/a&gt;根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成
+&lt;li&gt;安装Node，去&lt;a href=&quot;https://nodejs.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;node官网&lt;/a&gt;根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成在里面了。&lt;/li&gt;
+&lt;li&gt;安装git，我用的是git的客户端&lt;a href=&quot;https://www.sourcetreeapp.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;SourceTree&lt;/a&gt;，选择很多，怎样顺手怎样来。&lt;/li&gt;
+&lt;/ul&gt;
     
     </summary>
     

@@ -211,8 +211,8 @@ ga('send', 'pageview');
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -290,243 +290,19 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="状态管理"><a href="#状态管理" class="headerlink" title="状态管理"></a>状态管理</h3><ul>
-<li><p>历史情况</p>
-<ul>
+<li>历史情况<ul>
 <li>最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程</li>
-<li>人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑</li>
-<li>数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发生时，只有那些确实需要变化的进行变化。这种方式对事件变更本身会进行一层处理，导致需要按照特定的API进行处理</li>
-<li>脏检测: 创建了值的观察器，一旦应用中发生变化，就检测这个观察器里的值是否与之前的值相同，如果不同就重新渲染这个值到UI。这种方式因为没有告诉框架是否变了以及什么地方变化了，所以只能通过外部来检查，比如有一种方法就是一旦交互产生，就重新把所有观察器跑一遍。这种方式遇见UI比较复杂或者重绘经常性发生时就很可能产生性能问题</li>
-<li><p>虚拟DOM: 思想上与服务器端渲染类似。只要状态发生变化，就全部重新渲染一次。但是其不同的地方在于他不是在真正DOM上执行这个操作，而是渲染到虚拟DOM，即一个轻量的纯javaScript的对象结构，里面是简单对象和数组来表达真实的DOM对象。之后再通过一个特殊的过程根据这个虚拟DOM来创建真实DOM。因此当一个值发生变化时，会通过对比新生成的虚拟DOM与之前的虚拟DOM而找出涉及DOM的变化，之后将变化反应在真正的DOM上。这种方式不用跟踪变动，减少了昂贵的DOM操作，这部分的详细了解推荐通过<a href="https://github.com/Matt-Esch/virtual-dom#dom-model" target="_blank" rel="external">virtual-dom</a>这个项目来进行分析，总的来说流程如下:</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/virtualdom.png" alt="virtualdom"></p>
-</li>
 </ul>
 </li>
 </ul>
-<h3 id="JSX"><a href="#JSX" class="headerlink" title="JSX"></a>JSX</h3><ul>
-<li><p>什么是JSX</p>
-<blockquote>
-<p>It is called JSX, and it is a syntax extension to JavaScript. We recommend using it with React to describe what the UI should look like. JSX may remind you of a template language, but it comes with the full power of JavaScript.JSX produces React “elements”.</p>
-</blockquote>
-<ul>
-<li>我们可以看见两个关键点：<ol>
-<li>它是JS的语法扩展(我们可以理解我为它就是一个比较高级的语法糖)</li>
-<li>与模板语言不一样，它能利用JS自带的语法和特性。因此基本会写JS就能写JSX，学习成本低，并且能利用JS本身的语法</li>
-<li>React基于Virtual DOM创造的JSX，JSX创造的是React element，它不是真正的DOM，因此也意味着在没有真正DOM的情况下，它也能模拟DOM的行为(React-Native中实际也没有真正的DOM)</li>
-</ol>
-</li>
-<li><p>具体行为</p>
-<ul>
-<li><p>以react举例下面两段代码完全一致：</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> p1 = React.createElement(<span class="string">'p'</span>, <span class="literal">null</span>, <span class="string">'my test'</span>)</div><div class="line"><span class="keyword">var</span> root = React.createElement(<span class="string">'div'</span>, &#123; <span class="attr">className</span>: <span class="string">'root-div'</span> &#125;, p1);</div></pre></td></tr></table></figure>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> root = (</div><div class="line">	<span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">'root-div'</span>&gt;</span></span></div><div class="line">		<span class="tag">&lt;<span class="name">p</span>&gt;</span>my test<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">)</div></pre></td></tr></table></figure>
-</li>
-<li><p>JSX之后会被专门的解释器解释为JS(在打包阶段就完成了，因此不会有性能上的问题)再执行</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>JSX语法</p>
-<ul>
-<li><p>在JSX中你可以使用{}来包裹JS表达式，下面以RN来举例</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&#123;refundDetailData.return.returnPics &amp;&amp; <span class="xml"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>=<span class="string">&#123;[Style.basicLayout,</span> <span class="attr">Style.image</span>]&#125;&gt;</span></span></div><div class="line">   	<span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;[Style.textColor,</span> <span class="attr">Style.navTitle</span>]&#125;&gt;</span>图片信息:<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">   	<span class="tag">&lt;<span class="name">ImageShow</span> <span class="attr">picUrls</span>=<span class="string">&#123;refundDetailData.return.returnPics&#125;/</span>&gt;</span></div><div class="line"> 	<span class="tag">&lt;/<span class="name">View</span>&gt;</span>&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>JSX本身也是一种表达式，因此可以在if语句，for循环等各种场合中使用</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">dataList.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> (</div><div class="line">  <span class="xml"><span class="tag">&lt;<span class="name">TouchableHighlight</span> <span class="attr">key</span>=<span class="string">&#123;index&#125;</span>&gt;</span></span></div><div class="line">    <span class="tag">&lt;<span class="name">View</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">Text</span>&gt;</span>&#123;item.contactName&#125;<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">Text</span>&gt;</span>&#123;item.contactTel&#125;<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">View</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">TouchableHighlight</span>&gt;</span></div><div class="line">));</div></pre></td></tr></table></figure>
-</li>
-<li><p>JSX可以定义属性，一般每个组件都会接受一组属性(props)</p>
-<ul>
-<li>属性的名字可以自定义</li>
-<li>属性的值能够是变量，当属性值是变量时需要通过{}包裹起来，此时注意如果在这个大括号外层用双引号包裹，则此时整条语句会作为字符串进行解析，而不是变量了</li>
-<li>虽然JSX与HTML有很多类似处，但是其最后还是编译为JS的，因此，在React DOM中的属性名是遵循驼峰命名法的</li>
-<li><p>当忽略属性的值时，JSX会按照true来对待它。而不使用属性时，其对应的值与组件实现内部默认值有关</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="comment">/*下面两条代码实现的效果一样*/</span>&#125;</div><div class="line">&lt;Input type=<span class="string">"button"</span> disabled /&gt;;</div><div class="line">&lt;Input type="button" disabled=&#123;true&#125; /&gt;;</div><div class="line"></div><div class="line">&#123;/*下面两条代码实现的效果一样*/&#125;</div><div class="line">&lt;Input type="button" /&gt;;</div><div class="line">&lt;Input type="button" disabled=&#123;false&#125; /&gt;;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>JSX标签能够包含子元素就如HTML一样，而且其子元素也可以运用JS的语法进行构建</p>
-</li>
-<li><p>JSX中的注释就如JS类似，但是需要注意当在子元素中进行注释时，需要用{}将注释包裹起来</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;Nav&gt;</div><div class="line">   &#123;<span class="comment">/* child comment, put &#123;&#125; around */</span>&#125;</div><div class="line">   &lt;Person</div><div class="line">     <span class="comment">/* multi</span></div><div class="line">        line</div><div class="line">        comment */</div><div class="line">     name=&#123;<span class="built_in">window</span>.isLoggedIn ? <span class="built_in">window</span>.name : <span class="string">''</span>&#125; <span class="comment">// end of line comment</span></div><div class="line">   /&gt;</div><div class="line"> <span class="xml"><span class="tag">&lt;/<span class="name">Nav</span>&gt;</span></span></div></pre></td></tr></table></figure>
-</li>
-<li><p>JSX中的事件处理是直接绑定在组件上的，下面以RN为例</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;TouchableHighlight style=&#123;Style.tabBtn&#125; underlayColor=&#123;Colors.yellowLighten&#125;onPress=&#123;<span class="keyword">this</span>.goToReturnList&#125;&gt;</div><div class="line">  <span class="xml"><span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;Style.tabBtnText&#125;</span>&gt;</span>退货单<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span></div><div class="line">&lt;<span class="regexp">/TouchableHighlight&gt;</span></div></pre></td></tr></table></figure>
-<ul>
-<li><p>相比于使用下面这种方式，界面元素和业务逻辑的耦合会更加明显</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">'#my-button'</span>).on(<span class="string">'click'</span>, <span class="keyword">this</span>.checkAndSubmit.bind(<span class="keyword">this</span>));</div></pre></td></tr></table></figure>
-</li>
-<li><p>在JSX中，需要注意事件名依然按照驼峰命名法来进行，而大括号中就是事件触发时返回的事件处理函数。JSX中绑定的事件自动进行了解绑处理，当对应的DOM不存在时，其绑定的事件就自动解绑了。</p>
-</li>
-<li>React有一个模拟事件系统。它并不会将事件绑定到真正的节点上，当React启动时，他开始在顶层用一个单独的事件监听器来监听所有的事件。当一个组件加载或者移除时，它绑定的事件将在一个内置的映射上被添加或者移除。当事件真正触发时，React知道如何运用这个映射来dispatch这个事件。</li>
-<li>虽然整个事件系统由React来管理了，但是其API和使用方法与原生事件一致。因此做到了浏览器的兼容。</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h3><ul>
-<li>在React中，组件只是一种状态机，整个UI的渲染可以算做是状态驱动的。你更新一个组件的状态，然后根据新的状态渲染UI，React会以一种最效率的方式来更新DOM</li>
-<li>大多数组件只需要根据传入的props里面的数据进行渲染，属性是在组件初始化之后就从父级组件带入到组件内部。我们无法在使用的过程中对组件的属性进行修改。但是当需要对用户输入，时间的流逝，服务端请求作出反应时，需要用state来进行状态记录，state是实际上组件中使用的数据，它可以被修改</li>
-<li>在React中，通过调用setState(data, callback)来告诉它数据变动了，这个方法将data合并进this.state，之后告诉组件状态变动了需要进行重新渲染，callback会在重新渲染完毕后被调用。注意setState()这个方法是异步的，同步的多个setState方法只会触发一次实际render</li>
-<li><p>组件在实例化之后就开始了它的生命周期过程。它的整个生命周期主要由以下几个部分组成:</p>
-<ul>
-<li><p>getDefaultProps():在组件类创建的时候调用<strong>一次</strong>，然后返回值被缓存下来, 它返回的任何复杂对象用于设置默认的props, 并且这些将会在实例间共享，而不是每个实例拥有一份拷贝。注意只能在子组件或组件树上调用setProps。别调用this.setProps或者直接修改this.props。可以通propTypes对props的类型进行验证</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> propTypes = &#123;</div><div class="line">   <span class="attr">data</span>: PropTypes.object,</div><div class="line">   <span class="attr">pickerNameStyle</span>: Text.propTypes.style</div><div class="line">  &#125;;</div></pre></td></tr></table></figure>
-</li>
-<li><p>getInitialState():在组件挂载之前调用<strong>一次</strong>。返回值将会作为 this.state的初始值。这个方法执行时已经可以访问组件的props。注意state是每个组件自带的，而props是所有实例共享的</p>
-</li>
-<li>componentWillMount():在初始化渲染执行之前立刻调用，且只调用一次，这是渲染前最后修改state的机会</li>
-<li>render():render方法返回的结果并不是真正的DOM元素，而是一个虚拟的表现，类似于一个DOM tree的结构的对象。它是唯一一个必须的方法。在这个方法中，会检测this.props和this.state，返回一个单子级组件,当然也可以返回null或者false。render函数不应该修改state,操作DOM或者与浏览器交互</li>
-<li><p>componentDidMount():在初始化渲染执行之后立刻调用一次,在生命周期中的这个时间点，组件拥有一个DOM展现[即虚拟DOM构建完毕]，你可以通过this.getDOMNode()来获取相应DOM节点。当需要从组件获取真实DOM的节点，可以使用ref属性。注意在RN中，是先调用子组件的componentDidMount()，然后调用父组件的函数。这个函数之后，就进入了稳定运行状态，等待事件触发</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">......</div><div class="line">return &lt;canvas ref=<span class="string">'mainCanvas'</span>&gt;</div><div class="line">......</div><div class="line">componentDidMount: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">var</span> canvas = <span class="keyword">this</span>.refs.mainCanvas.getDOMNode();</div><div class="line">    <span class="comment">//可以访问到 Canvas 节点</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>componentWillReceiveProps():用此函数可以作为react在props传入之后，render()渲染之前更新state的机会,新的props是传入的,老的props可以通过this.props来获取。注意在该函数中调用this.setState()将不会引起二次渲染</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">componentWillReceiveProps: <span class="function"><span class="keyword">function</span>(<span class="params">nextProps</span>) </span>&#123;</div><div class="line">	<span class="keyword">this</span>.setState(&#123;</div><div class="line">	    <span class="attr">likesIncreasing</span>: nextProps.likeCount &gt; <span class="keyword">this</span>.props.likeCount</div><div class="line">	&#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>shouldComponentUpdate():在接收到新的props或者state,将要渲染之前调用。如果shouldComponentUpdate返回false,则render()将不会执行,直到下一次state改变。(通过此函数可以提高性能)</p>
-</li>
-<li>componentWillUpdate():和componentWillMount类似,在组件接收到了新的props或者state即将进行重新渲染前调用,注意你不能在该方法中使用this.setState()。如果需要更新state来响应某个prop的改变,请使用componentWillReceiveProps。紧接着这个函数，就会调用render()来更新界面了</li>
-<li>componentDidUpdate():和componentDidMount类似,使用该方法可以在组件更新之后操作DOM元素</li>
-<li><p>componentWillUnmount():当组件从DOM中移除的时候立刻调用来完成所有的清理和销毁工作,在conponentDidMount中添加的任务都需要再该方法中撤销,如创建的定时器或事件监听器</p>
-<p><img src="http://okzzg7ifm.bkt.clouddn.com/reactlife.png" alt="virtualdom"></p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="运行组件UI-example"><a href="#运行组件UI-example" class="headerlink" title="运行组件UI example"></a>运行组件UI example</h3><ul>
-<li>运行官方案例(即在虚拟机上查看RN各个组件的实际效果)<ul>
-<li><a href="https://github.com/facebook/react-native#examples" target="_blank" rel="external">运行方法</a></li>
-<li>运行过程中可能出现的问题<ul>
-<li>What went wrong: Execution failed for task ‘:ReactAndroid:buildReactNdkLib’. <ul>
-<li><a href="http://stackoverflow.com/questions/36209774/unable-to-run-react-native-uiexplorer-example-project" target="_blank" rel="external">解决办法</a></li>
-</ul>
-</li>
-<li>安卓新项目起不来<ul>
-<li>解决办法: 注意下是不是老项目的shell还在运行，需要重新编译链接一次</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="官方组件举例"><a href="#官方组件举例" class="headerlink" title="官方组件举例"></a>官方组件举例</h3><ul>
-<li><p>ScrollView</p>
-<ul>
-<li>ScrollView是一个普通的可滚动容器，它能包含多个组件和View。</li>
-<li>ScrollView能纵向滚动也能横向滚动</li>
-<li>ScrollView一般用来展示限制尺寸的少量东西。因为所有ScrollView里面的元素和组件都会被渲染，不管它当前是否展示在屏幕上。</li>
-<li>ScrollView必须有一个确定的高度才能正常工作，因为滚动的本质就是将一系列不确定高度的子组件装进一个确定高度的容器</li>
-<li><p>属性</p>
-<ul>
-<li>contentContainerStyle：传入的样式属性，其作为样式会应用在包裹所有子元素的内容元素容器上</li>
-<li><p>horizontal：确定横向还是纵向滚动，默认为false，即默认纵向滚动</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;ScrollView style=&#123;styles.listTab&#125; horizontal&gt; </div><div class="line">      &#123;<span class="keyword">this</span>.level.map(<span class="function">(<span class="params">item, index</span>) =&gt;</span> &#123;</div><div class="line">        <span class="keyword">return</span> (</div><div class="line">          <span class="xml"><span class="tag">&lt;<span class="name">View</span> <span class="attr">style</span>=<span class="string">&#123;styles.tabTextContainer&#125;</span> <span class="attr">key</span>=<span class="string">&#123;index&#125;</span>&gt;</span></span></div><div class="line">            <span class="tag">&lt;<span class="name">Text</span>&gt;</span>&#123;item&#125;<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></div><div class="line">          <span class="tag">&lt;/<span class="name">View</span>&gt;</span></div><div class="line">          )</div><div class="line">      &#125;)&#125;         </div><div class="line">     &lt;<span class="regexp">/ScrollView&gt;</span></div></pre></td></tr></table></figure>
-</li>
-<li><p>keyboardDismissMode：决定当拖拽时，键盘是否消失</p>
-<ul>
-<li>none：默认，拖拽不会让键盘消失</li>
-<li>on-drag：当拖拽开始时，键盘消失</li>
-<li>interactive：安卓上不支持，键盘伴随拖拽操作同步地消失，并且如果往上滑动会恢复键盘</li>
-</ul>
-</li>
-<li>keyboardShouldPersistTaps：决定当点击时，键盘是否可见。这个属性特别重要。比如ScrollView里面有很多输入框时，我们希望点击输入框是输入框本身拿到事件，而键盘并不会在切换时进行关闭再打开的操作。<ul>
-<li>never：默认，当点击文本输入框之外时，如果键盘是打开的则关闭键盘。当这个发生时，子元素将不会接收到点击事件</li>
-<li>always：键盘将不会自动关闭，并且scroll view不会捕捉到点击事件，但是子元素能够捕捉到点击事件</li>
-<li>handle：键盘将不会自动关闭当点击是由子元素触发的</li>
-<li>false：用never替代</li>
-<li>true：用always替代</li>
-</ul>
-</li>
-<li><p>onContentSizeChange：当滚动视图的内容尺寸大小发生变化的时候调用</p>
-  <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">this.level = ['我常买', '热卖', '一级类目', '鸡腿系列', '海鲜系列', '鸭制品系列'];</div><div class="line">...</div><div class="line">&lt;TouchableHighlight onPress=&#123;() =&gt; &#123;this.level.pop(); this.forceUpdate();&#125;&#125;&gt;</div><div class="line">     &lt;View style=&#123;styles.button&#125; &gt;</div><div class="line">       &lt;Text style=&#123;styles.add&#125;&gt;+&lt;/Text&gt;</div><div class="line">     &lt;/View&gt;</div><div class="line">   &lt;/TouchableHighlight&gt;</div><div class="line">   ...</div><div class="line">   &lt;ScrollView style=&#123;styles.listTab&#125; horizontal onContentSizeChange=&#123;(contentWidth, contentHeight) =&gt; &#123;console.debug(contentWidth, contentHeight);&#125;&#125;&gt; </div><div class="line">      &#123;this.level.map((item, index) =&gt; &#123;</div><div class="line">        return (</div><div class="line">          &lt;View style=&#123;styles.tabTextContainer&#125; key=&#123;index&#125;&gt;</div><div class="line">            &lt;Text&gt;&#123;item&#125;&lt;/Text&gt;</div><div class="line">          &lt;/View&gt;</div><div class="line">          )</div><div class="line">      &#125;)&#125;         </div><div class="line">      &lt;/ScrollView&gt;</div></pre></td></tr></table></figure>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/contentSizechange.png" alt="life"></p>
-</li>
-<li>onScroll：该方法在滚动的时候每frame(帧)调用一次，调用的频率可以用scrollEventThrottle属性来控制。当滚动到边界后无法触发</li>
-<li>refreshControl：一个refreshControl组件，主要在下拉刷新时使用</li>
-<li>pagingEnabled：默认false，当为true时，scroll view会停留在其尺寸的倍数的位置。这个能够被用在在横向翻页。具体表现就是，超过Scroll View尺寸一点时页面会自动会回退回去，超过很多但是尚未到达其尺寸两倍的位置，则会向前到达其两倍尺寸的位置，之后如此类推</li>
-<li>removeClippedSubviews：默认为true，在ScrollView视图之外的子视图(该视图的overflow属性值必须要为hidden)会被暂时移除，该设置可以提高滚动的性能</li>
-<li>scrollEnabled：默认true，当为false时，内容不会滚动</li>
-<li>showsHorizontalScrollIndicator：默认true，当为true时，横向滚动会展示滑条</li>
-<li>showsVerticalScrollIndicator：默认true，当为true时，纵向滚动会展示滑条</li>
-</ul>
-</li>
-<li>仅Android支持的属性:<ul>
-<li>endFillColor：当滚动内容没填充满Scroll View时设定填充不满的区域</li>
-<li>scrollPerfTag：在Scroll View上记录滚动性能的标签</li>
-</ul>
-</li>
-<li>仅iOS支持的属性:<ul>
-<li>alwaysBounceHorizontal：横向弹簧效果，当horizontal ={true}默认是true，horizontal={false}默认是false</li>
-<li>alwaysBounceVertical：纵向弹簧效果，当horizontal ={true}默认是false，horizontal={false}默认是true</li>
-<li>automaticallyAdjustContentInsets：默认true，自动调节内容内偏移，控制是否自动调节内容内偏移以便于一个navigation bar或者tab bar或者toolbar不挡住Scrollview中的内容</li>
-<li>bounces：默认true，控制水平方向与垂直方向的弹簧效果，优先级比alwaysBounce* 属性高</li>
-<li>bouncesZoom：控制拉近与缩小超过限制时是否有弹性动画，当为true时有</li>
-<li>canCancelContentTouches：默认true，控制ScrollView是否可以拖动，如果为false不能拖动</li>
-<li>centerContent：默认false，为true时如果ScrollView中内容小于ScrollView的边界，则它们自动居中，超过边界时无效</li>
-<li>contentInset：内部内容距离ScrollView边界的内偏移量，默认为{top: 0, left: 0, bottom: 0, right: 0}</li>
-<li>contentOffset：用来手动设置起始滚动偏移量。默认为 {x: 0,y: 0} </li>
-<li>decelerationRate：指定手指抬起减速速率<ul>
-<li>normal: 0.998，为默认</li>
-<li>fast: 0.99</li>
-<li>也可以指定一个浮点数，确定减速快慢</li>
-</ul>
-</li>
-<li>directionalLockEnabled：默认false，为true时控制只有一个方向可以滚动当拖拽</li>
-<li>indicatorStyle：指示器样式，default与black相同，black与白色背景搭配，white与黑色背景搭配</li>
-<li>maximumZoomScale：默认是1.0，放大的最大系数</li>
-<li>minimumZoomScale：默认是1.0，缩小的最大系数</li>
-<li>onScrollAnimationEnd：滚动动画完成后触发</li>
-<li>scrollEventThrottle：控制滚动时滚动事件触发频率</li>
-<li>scrollIndicatorInsets： {top: number, left: number, bottom: number, right: number}，指定指示器内偏移量，应与contentInset值相同，默认{0, 0, 0, 0}</li>
-<li>scrollsToTop：默认true，默认true时，Scroll View滚动到顶部当状态条被点击时</li>
-<li>snapToAlignment：当snapToInterval指定时，这个属性定义这个停驻点相对于Scroll View的关系。<ul>
-<li>start (默认) 会将停驻点对齐在左侧（水平）或顶部（垂直）</li>
-<li>center 会将停驻点对齐到中间</li>
-<li>end 会将停驻点对齐到右侧（水平）或底部（垂直）</li>
-</ul>
-</li>
-<li>snapToInterval：当指定时，会导致Scroll View停留在这个参数的倍数的位置。这个属性一般与snapToAlignment一起用</li>
-<li>stickyHeaderIndices：子元素索引构成的数组，用来指定滚动时这些元素停靠到界面的顶部，比如传递stickyHeaderIndices={[0]}将让第一个子元素固定到Scroll View的顶部。当horizontal={true}时，这个属性不支持</li>
-<li>zoomScale：当前Scroll View内容的缩放比例</li>
-</ul>
-</li>
-<li>方法<ul>
-<li>scrollTo()：例如scrollTo({x: 0; y: 0; animated: true})，滚动到指定的x, y偏移处。第三个参数为是否启用平滑滚动动画</li>
-<li>scrollToEnd()：如果是纵向的滚动，则滚动到底部，如果是横向，则滚动到右部</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="官方API举例"><a href="#官方API举例" class="headerlink" title="官方API举例"></a>官方API举例</h3><ul>
-<li><p>BackHandler</p>
-<ul>
-<li><p>监听硬件的back键操作。如果没有任何监听函数，或者监听函数的返回值不是true，则会调用默认的back键功能来退出应用</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">this</span>.backAndroidListener = BackHandler.addEventListener(<span class="string">'hardwareBackPress'</span>, () =&gt; &#123;</div><div class="line">	<span class="keyword">if</span> (navigator.getCurrentRoutes().length &gt; <span class="number">1</span>) &#123;</div><div class="line">		navigator.pop();</div><div class="line">		<span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="keyword">this</span>.onExitApp();</div><div class="line">   &#125;);</div></pre></td></tr></table></figure>
-</li>
-<li><p>方法：</p>
-<ul>
-<li>exitApp：当你在监听里面无法立刻判断是否要退出，比如你需要获取异步操作执行成功后再调用，此时可以用这个函数来退出</li>
-<li>addEventListener：绑定监听函数</li>
-<li>removeEventListener：移除监听函数</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
-<li><a href="http://teropa.info/blog/2015/03/02/change-and-its-detection-in-javascript-frameworks.html" target="_blank" rel="external">Change And Its Detection In JavaScript Frameworks</a></li>
-<li><a href="http://www.race604.com/react-native-component-lifecycle/" target="_blank" rel="external">React Native 中组件的生命周期</a></li>
-<li><a href="https://davidwalsh.name/event-delegate" target="_blank" rel="external">How JavaScript Event Delegation Works</a></li>
-<li><a href="http://www.infoq.com/cn/articles/react-jsx-and-component" target="_blank" rel="external">深入浅出React（三）：理解JSX和组件</a></li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2017/07/06/reactnative02/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -608,198 +384,15 @@ ga('send', 'pageview');
 <li>时间: React.js Conf 2015 上发布，9月推出Android版本</li>
 <li>使用范围: 用于开发<strong>iOS和Android</strong>原生应用</li>
 <li>设计理念: 既拥有Native的<strong>用户体验</strong>、又保留React的<strong>开发效率</strong></li>
-<li>产生原因:<ul>
-<li>Native的原生控件有更好的体验，有更好的手势识别，有更合适的线程模型，能实现更精细的动画</li>
-<li>Native开发成本高</li>
 </ul>
-</li>
-<li>发展趋势: 开源不到1周github上star破万</li>
-<li>基本特点:<ul>
-<li>Learn once, write anywhere<ul>
-<li>用React.js抽象操作系统的原生UI组件，继而代替DOM元素来渲染</li>
-</ul>
-</li>
-<li>具备流畅和反应灵敏的优势<ul>
-<li>在后台，React Native运行在主线程之外，而在另一个专门的后台线程里运行JavaScript引擎，两个线程之间通过异步消息协议来通信。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>对应技术栈<ul>
-<li>JSX vs HTML</li>
-<li>CSS-layout vs css</li>
-<li>ECMAScript 6 vs ECMAScript 5</li>
-<li>React Native View vs DOM</li>
-</ul>
-</li>
-</ul>
-<h4 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h4><ul>
-<li>按照React Native官方文档搭建环境<ul>
-<li><a href="http://facebook.github.io/react-native/docs/getting-started.html" target="_blank" rel="external">英文版</a>搭建流程</li>
-<li><a href="http://reactnative.cn/docs/0.46/getting-started.html" target="_blank" rel="external">中文版</a>搭建流程</li>
-<li>模拟器推荐使用<a href="https://www.genymotion.com/" target="_blank" rel="external">Genymotion</a>。</li>
-</ul>
-</li>
-<li>安装过程中可能出现的问题<ul>
-<li>$ANDROIDNDK 和 $ANDROIDHOME 没有正确设置: <ul>
-<li>解决办法：vi .bashrc和.bash_profile 加上 /usr/local/opt/android-ndk和/usr/local/opt/android-sdk,并且source一下这两个文件，然后eoch下上述两个变量是否已经存在。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="http://reactnative.cn/docs/0.41/running-on-device-android.html#content" target="_blank" rel="external">真机调试</a><ul>
-<li>注意iOS系统真机调试需要有开发者账号</li>
-<li>可能有些机型无法用这种方式进行(比如小米4C)，可以手动安装</li>
-</ul>
-</li>
-</ul>
-<h4 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h4><ul>
-<li>文件结构</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/structure.png" alt="文件结构"></p>
-<ul>
-<li>代码结构<ul>
-<li>7-13: 引入需要用到的模块</li>
-<li>15-32: 本组件的渲染逻辑</li>
-<li>34-51: 样式定义</li>
-<li>53: AppRegistry是JS运行所有React Native应用的入口，应用的根组件应当通过AppRegistry.registerComponent方法注册自己，然后原生系统才可以加载应用的代码包并且在启动完成之后通过调用AppRegistry.runApplication来真正运行应用</li>
-<li>样式定义可以单独提出作为一个模块，甚至组件的具体实现也可以和应用注册分离开来</li>
-</ul>
-</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/code.png" alt="文件结构"></p>
-<h4 id="样式"><a href="#样式" class="headerlink" title="样式"></a>样式</h4><ul>
-<li>React Native中用JS来写样式</li>
-<li>所有的核心组件都接受名为style的属性。这些样式名基本上是遵循了web上的CSS的命名，只是按照JS的语法要求使用了驼峰命名法</li>
-<li>style属性可以是一个普通的JavaScript对象，也可以是一个数组，在数组中位置居后的样式对象比居前的优先级更高</li>
-<li><a href="http://reactnative.cn/docs/0.41/text.html#style" target="_blank" rel="external">Text样式</a></li>
-<li><a href="http://reactnative.cn/docs/0.41/view.html#style" target="_blank" rel="external">View样式</a></li>
-<li>最简单的调试方法: 当错误的书写了样式属性时，应用会抛出一个warning，在这个warning里面会列出当前元素所有可使用的样式</li>
-<li>实际开发中组件的样式会越来越复杂，官方建议使用StyleSheet.create来集中定义组件的样式。StyleSheet提供了一种类似CSS样式表的抽象，相比于plain object，其主要有以下优势<ul>
-<li>代码质量:<ul>
-<li>移除了render里面的具体样式内容，使代码组织更加合理</li>
-<li>给样式命名可以对render函数中的原始组件进行一种作用标记</li>
-</ul>
-</li>
-<li>性能角度:<ul>
-<li>创建一个样式表，就可以使得我们后续更容易通过ID来引用样式，而不是每次都创建一个新的对象</li>
-<li>它还使得样式只会在JavaScript和原生之间传递一次，随后的过程都可以只传递一个ID(现在还没实现)</li>
-</ul>
-</li>
-<li>因此，如果我们直接打印styles.xxx，我们只会得到一个number，要使用StyleSheet.flatten(styles.xxx)才能得到具体内容</li>
-</ul>
-</li>
-</ul>
-<h4 id="Flex布局"><a href="#Flex布局" class="headerlink" title="Flex布局"></a>Flex布局</h4><ul>
-<li>在React Native中布局采用的是FleBox(弹性框)进行布局</li>
-<li>Flex布局主要思想是让容器有能力让其子项目能够改变其宽度、高度(甚至顺序)，以最佳方式填充可用空间(主要是为了适应所有类型的显示设备和屏幕大小)</li>
-</ul>
-<p>像素无关</p>
-<ul>
-<li><p>React Native中的尺寸都是无单位的，表示的是与设备像素密度无关的逻辑像素点</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;View style=&#123; &#123;<span class="attr">width</span>:<span class="number">100</span>,<span class="attr">height</span>:<span class="number">100</span>,<span class="attr">margin</span>:<span class="number">40</span>,<span class="attr">backgroundColor</span>:<span class="string">'gray'</span>&#125;&#125;&gt;</div><div class="line">      <span class="xml"><span class="tag">&lt;<span class="name">Text</span> <span class="attr">style</span>=<span class="string">&#123;</span> &#123;<span class="attr">fontSize:16</span>,<span class="attr">margin:20</span>&#125;&#125;&gt;</span>尺寸<span class="tag">&lt;/<span class="name">Text</span>&gt;</span></span></div><div class="line">&lt;<span class="regexp">/View&gt;</span></div></pre></td></tr></table></figure>
-</li>
-<li><p>上面的例子，运行在Android上时，View的长和宽被解释成100dp 其单位是dp，字体被解释成16sp 其单位是sp，运行在iOS上时尺寸单位被解释称了pt，这些单位确保了布局在任何不同dpi的手机屏幕上显示不会发生改变。如果希望获取实际的像素尺寸，则需要使用尺寸 * pixelRatio。<a href="https://facebook.github.io/react-native/docs/pixelratio.html" target="_blank" rel="external">pixelRatio使用</a></p>
-</li>
-</ul>
-<p>React Native中的FlexBox 和Web CSS中的FlexBox不全相同</p>
-<ul>
-<li>flexDirection: React Native中默认为flexDirection:’column’，在Web CSS中默认为flex-direction:’row’</li>
-<li>alignItems: React Native中默认为alignItems:’stretch’，在Web CSS中默认align-items:’flex-start’</li>
-<li>flexWrap: React Native中没有wrap-reverse，在Web CSS中有</li>
-<li>flex: 相比Web CSS的flex接受多参数，如:flex: 2 2 10%;，但在 React Native中flex只接受一个参数</li>
-<li>不支持属性：align-content，flex-flow等</li>
-</ul>
-<p>Flex基本知识[基于RN]<br>  <img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/flex.png" alt="flex基本概念"></p>
-<ul>
-<li><p>父容器属性</p>
-<ul>
-<li>flexDirection属性定义了父视图中的子元素沿横轴或侧轴方片的排列方式，默认为column: ‘row’, ‘column’,’row-reverse’,’column-reverse’</li>
-</ul>
-<p><img src="http://okzzg7ifm.bkt.clouddn.com/flexdirection.png" alt="flexDirection"></p>
-<ul>
-<li>flexWrap属性定义了子元素在父视图内是否允许多行排列，默认为nowrap: ‘wrap’, ‘nowrap’</li>
-</ul>
-<p><img src="http://okzzg7ifm.bkt.clouddn.com/wrap.png" alt="flexWrap"></p>
-<ul>
-<li>justifyContent属性定义了浏览器如何分配顺着父容器主轴的弹性（flex）元素之间及其周围的空间，默认为flex-start: ‘flex-start’, ‘flex-end’, ‘center’, ‘space-between’, ‘space-around’</li>
-</ul>
-<p><img src="http://okzzg7ifm.bkt.clouddn.com/justifyContent.png" alt="justifyContent"></p>
-<ul>
-<li>alignItems属性以与justify-content相同的方式在侧轴方向上将当前行上的弹性元素对齐，默认为stretch: ‘flex-start’, ‘flex-end’, ‘center’, ‘stretch’。这里需要注意，当选择stretch时，侧轴上的元素不能有固定的size，否则无效</li>
-</ul>
-<p><img src="http://okzzg7ifm.bkt.clouddn.com/alignItems.png" alt="alignItems"></p>
-</li>
-<li><p>子容器属性</p>
-<ul>
-<li>alignSelf决定了元素在父元素的次轴方向的排列方式（此样式设置在子元素上），其值会覆盖父元素的alignItems的值，默认auto: ‘auto’, ‘flex-start’, ‘flex-end’, ‘center’, ‘stretch’</li>
-</ul>
-</li>
-<li><p>flex 属性定义了一个可伸缩元素的能力，默认为0</p>
-</li>
-<li>视图边框: border[Bottom/Top/Left/Right]Width，borderColor等</li>
-<li>尺寸: width，height</li>
-<li>外边距: margin[Bottom/Top/Left/Right/Horizontal/Vertical]等</li>
-<li>内边距: padding[Bottom/Top/Left/Right/Horizontal/Vertical]等</li>
-<li>边缘: left，right，top，bottom等</li>
-<li>定位: absolute，relative</li>
-<li><a href="https://reactnative.cn/docs/0.39/layout-props.html" target="_blank" rel="external">更多参考</a></li>
-</ul>
-<p>图片布局</p>
-<ul>
-<li><p>图片有一个stretchMode. 通过Image.resizeMode访问，其主要有以下几种模式(默认采用cover模式):</p>
-<ul>
-<li>cover: 在保持图片宽高比的前提下缩放图片，直到宽度和高度都大于等于容器视图的尺寸（如果容器有padding内衬的话，则相应减去）。这样图片完全覆盖甚至超出容器，容器中不留任何空白</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/cover.png" alt="cover"></p>
-<ul>
-<li>contain: 在保持图片宽高比的前提下缩放图片，直到宽度和高度都小于等于容器视图的尺寸（如果容器有padding内衬的话，则相应减去）。这样图片完全被包裹在容器中，容器中可能留有空白</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/contain.png" alt="contain"></p>
-<ul>
-<li>stretch: 拉伸图片且不维持宽高比，直到宽高都刚好填满容器</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/stretch.png" alt="stretch"></p>
-<ul>
-<li>repeat: 重复平铺图片直到填满容器。图片会维持原始尺寸。仅iOS可用，android使用会报错</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/repeat.png" alt="repeat"></p>
-<ul>
-<li>center: 居中不拉伸</li>
-</ul>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/center.png" alt="center"></p>
-</li>
-</ul>
-<p>文本元素  </p>
-<ul>
-<li>文本可嵌套</li>
-<li><p><text>元素在布局上不同于其它组件：在Text内部的元素不再使用flexbox布局，而是采用文本布局。这意味着<text>内部的元素不再是一个个矩形，而可能会在行末进行折叠</text></text></p>
-<p><img src="https://raw.githubusercontent.com/lulutia/images/master/ReactNative/one/text.png" alt="center"></p>
-</li>
-<li><p>你必须把你的文本节点放在<text>组件内。你不能直接在<view>下放置一段文本</view></text></p>
-</li>
-<li>不能直接设置一整颗子树的默认样式。使用一个一致的文本和尺寸的推荐方式是创建一个包含相关样式的组件MyAppText，然后在你的App中反复使用它</li>
-<li>文本标签的子树还是可以继承的，继承父元素的样式</li>
-<li>通过numberOfLines={}可以实现文字截断效果</li>
-<li>注意ios和android的默认文字样式是不一样的，主要是fontSize和color的不同。</li>
-</ul>
-<p>参考</p>
-<ul>
-<li><a href="https://code.facebook.com/posts/1014532261909640/react-native-bringing-modern-web-techniques-to-mobile/" target="_blank" rel="external">React Native: Bringing modern web techniques to mobile</a></li>
-<li><a href="http://www.jianshu.com/p/1e990aac7836" target="_blank" rel="external">基于Facebook Buck改造Android构建系统之初体验</a></li>
-<li><a href="https://github.com/amfe/article/issues/32" target="_blank" rel="external">flow——A static type checker for javascript</a></li>
-<li><a href="https://git-scm.com/book/zh/v1/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-Git%E5%B1%9E%E6%80%A7" target="_blank" rel="external">自定义 Git - Git属性</a></li>
-<li><a href="http://reactnative.cn/docs/0.36/appregistry.html" target="_blank" rel="external">AppRegistry</a></li>
-<li><a href="https://github.com/crazycodeboy/RNStudyNotes/blob/master/React%20Native%E5%B8%83%E5%B1%80/React%20Native%E5%B8%83%E5%B1%80%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97/React%20Native%E5%B8%83%E5%B1%80%E8%AF%A6%E7%BB%86%E6%8C%87%E5%8D%97.md" target="_blank" rel="external">React Native布局详细指南</a></li>
-<li><a href="http://weibo.com/1712131295/CoRnElNkZ?ref=collection&amp;type=comment#_rnd1486356368337" target="_blank" rel="external">flex布局示意图</a></li>
-<li><a href="https://segmentfault.com/a/1190000002658374" target="_blank" rel="external">react-native 之布局篇</a></li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2017/07/06/reactnative01/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -879,194 +472,15 @@ ga('send', 'pageview');
         <p>背景介绍</p>
 <ul>
 <li>WebGL的技术规范继承自免费和开源的OpenGL标准[是用于渲染2D、3D矢量图形的跨语言、跨平台的API]</li>
-<li>具体的说，WebGL是从OpenGL的一个特殊版本OpenGL ES中派生出来的，后者专用于嵌入式计算机，智能手机，家用游戏机等设备。它从OpenGL中移除了许多陈旧无用的旧特性，这使得它在保持轻量级的同时，仍具有足够的能力来渲染出精美的三维图形。</li>
-<li>OpenGL2.0开始支持的可编程着色器方法被OpenGL ES2.0继承，成为了WebGL1.0标准的核心部分。而着色器方法或称为着色器，是使用一种类似C的编程语言实现精美的视觉效果。而编写着色器的语言称为着色器语言，WebGL使用OpenGL ES着色器语言，亦即GLSLES。</li>
-<li>WebGL规范的建立由Khronos(也负责OpenGL规范的更新和标准化)建立的WebGL工作小组负责。2011年发布了WebGL规范的第一个版本。<a href="https://www.khronos.org/registry/webgl/specs/latest/2.0/" target="_blank" rel="external">WebGL2.0</a>处于<a href="http://stackoverflow.com/questions/6692762/what-is-the-difference-between-a-w3c-working-draft-and-an-editors-draft" target="_blank" rel="external">Editor’s Draft</a>状态，它主要提供与OpenGL3.0新特性的对应，现阶段它并不与WebGL1.0完全向下兼容。</li>
 </ul>
-<p>基本概念<br>  WebGL主要是用于渲染2D、3D矢量图形。在进入它的使用细节之前，我们先分析下它到底做了件什么事以及其执行的顺序。<br>  如果你有过一点三模建模方面的经验的话，你就会知道，所有的三维模型都是由点，线，三角形构成的。譬如下面这只超级出名的bunny兔子。模型的精细程度与其面片的数量直接相关，当面片数量足够多时，人类的视觉是无法分辨三角形的。<br>  同理，如果我们打开WebGL的绘图API，我们就会发现，它处理的也是点，线，三角形。那么它是如何由这些最基础的东西构建出整个世界的呢。其实，它主要执行了三方面的操作：</p>
-<ul>
-<li>获取顶点坐标<ul>
-<li>简单图形，可以显示定义</li>
-<li>复杂图形，一般会在三维软件导出模型时一同导出</li>
-<li>顶点坐标会写入缓冲中等待使用</li>
-</ul>
-</li>
-<li><p>进行图元装配：即将顶点根据primitive(原始的连接关系）还原成网格结构</p>
-<ul>
-<li>在WebGL中，为了使用者对顶点的位置有足够的控制权，提供了一个顶点着色器的东西。它是用上面提到的opengl es编写的，然后以字符串的形式嵌入在js文件中的，在程序开始运行前就已经设置好了</li>
-<li><p>顶点着色器中主要对点的特性进行处理，比如进行坐标的转换等，然后由GPU执行图元装配。此处是以单个点为单位执行的操作，有多少个点，这段程序就会执行多少次</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> VSHADER_SOURCE = </div><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_Position = vec4(0.0, 0.0, 0.0, 1.0);\n'</span> + <span class="comment">//设置坐标，必须</span></div><div class="line"><span class="string">'gl_PointSize = 10.0;\n'</span> + <span class="comment">// 设置尺寸，非必需，默认1.0</span></div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>进行光栅化：将图转化为一个个栅格组成的图象</p>
-<ul>
-<li>上面一部生成了模型的网格形态，但是要呈现实际的模型还需要“着色”，这部分WebGL也为我们提供了片元着色器来进行控制。</li>
-<li><p>片元着色器主要进行材质，颜色的处理等，它会进行逐片元处理过程，片元这边可大概理解为像素(图像的单元)</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"> 	<span class="keyword">var</span> FSHADER_SOURCE = </div><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n'</span> + <span class="comment">// 设置颜色</span></div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-</ul>
-<p> 下面图示为整体流程:</p>
-<p> <img src="http://okzzg7ifm.bkt.clouddn.com/01.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="整体流程"><br>GLSE中的数据类型</p>
-<ul>
-<li>基本类型<ul>
-<li>float: 表示浮点数</li>
-<li>int： 整型 </li>
-<li>bool： 布尔类型</li>
-<li>齐次坐标: (x, y, z, w) 等价于三维坐标 (x/w, y/w, z/w)，w必需大于等于0，齐次坐标的存在，使得用矩阵乘法来描述顶点变换称为可能，三维图形系统在计算过程中，通常使用齐次坐标来表示顶点的三维坐标，这样能够提高处理三维数据的效率</li>
-</ul>
-</li>
-<li>矢量和矩阵<ul>
-<li>vec4: 表示由四个浮点数组成的矢量，类似有 vec2,vec3,ivec2,ivec3,ivec4,bvec2,bvec3,bvec4</li>
-<li>mat2: 表示2<em>2的浮点数元素的矩阵，类似有 mat3,mat4, 注意<em>*列主序</em></em></li>
-</ul>
-</li>
-<li>结构体<br>  使用struct，将已存在的类型聚合到一起，就可以定义为结构体</li>
-<li>数组<br>  只支持一维数组，而且数组对象不支持pop()和push()等操作</li>
-<li>取样器(纹理)：必须通过该类型变量访问纹理，两种基本的取样器类型如下<ul>
-<li>sampler2D</li>
-<li>samplerCube</li>
-<li>注意：取样器变量只能是uniform变量，或者需要访问纹理的函数</li>
-</ul>
-</li>
-<li>函数</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">返回类型函数名(type0, arg0, type1, arg1, ...typen, argn) &#123;</div><div class="line">	函数计算</div><div class="line">	<span class="keyword">return</span> 返回值</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<ul>
-<li>存储限定字<ul>
-<li>const: 不可变</li>
-<li>attribute: 只能出现在顶点着色器中，只能被声明为全局变量，被用来表示逐点的信息</li>
-<li>uniform：可以用在顶点和片元着色器中，必须是全局变量，uniform变量是只读的，它可以是数组和结构体之外的任意类型，它包含了“一致”[即非逐顶点／片元的]的数据</li>
-<li>varying: 必须全局，从顶点着色器向片元着色器传输数据，在两个着色器中必须同名同类型</li>
-</ul>
-</li>
-<li>精度限定字<ul>
-<li>highp: 高精度</li>
-<li>mediump: 中精度</li>
-<li>lowp: 低精度</li>
-<li>可以使用关键字precision来声明着色器的默认精度，这行代码必须在顶点着色器或片元着色器的顶部，格式为<strong>precision 精度限定字 类型名称</strong></li>
-<li>注意：片元着色器中的float类型没有默认精度，需要手动指定，否则会出现编译错误</li>
-</ul>
-</li>
-<li>预处理指令<br>  预处理指令用来在真正编译之前对代码进行预处理，都以#开始</li>
-</ul>
-<p>核心思想</p>
-<ul>
-<li><p><a href="http://lulutia.com/webgldemo/01/" target="_blank" rel="external">获取WebGL上下文</a>：<br><img src="http://okzzg7ifm.bkt.clouddn.com/02.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="获取上下文"></p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">'example'</span>);</div><div class="line"><span class="keyword">var</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</div><div class="line">ctx.fillStyle = <span class="string">'rgba(0, 0, 255, 1.0)'</span>;</div></pre></td></tr></table></figure>
-</li>
-<li><p><a href="http://lulutia.com/webgldemo/03/" target="_blank" rel="external">初始化着色器</a>：<br>  详细见具体API 1-13部分，具体流程如下:</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/03.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="初始化着色器"></p>
-</li>
-<li><p><a href="http://lulutia.com/webgldemo/02/" target="_blank" rel="external">设置canvas背景色并清除canvas</a>：</p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 设定背景色，一旦指定了背景色后，背景色就会常驻WebGL系统，在下一次再调用这个函数前不会改变</span></div><div class="line">gl.clearColor(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>); <span class="comment">//见API 15</span></div><div class="line"></div><div class="line"><span class="comment">// 用背景色清空canvas绘图区域，此方法继承自OpenGL，基于多基本缓冲区模型清空绘图区域，实际上是在清空颜色缓冲区，类似的还有 gl.DEPTH_BUFFER_BIT,gl.STENCIL_BUFFER_BIT</span></div><div class="line">gl.clear(gl.COLOR_BUFFER_BIT); <span class="comment">// 见API16</span></div></pre></td></tr></table></figure>
-</li>
-<li><p>右手坐标系是WebGL默认的坐标系统</p>
-</li>
-<li><p><a href="http://lulutia.com/webgldemo/04/" target="_blank" rel="external">JS与着色器之间传输数据(以attribute举例)</a><br>  详细见具体API 17-20部分，具体流程如下: <a href="http://lulutia.com/webgldemo/05/" target="_blank" rel="external">动态传输例子点我</a>, <a href="http://lulutia.com/webgldemo/06/" target="_blank" rel="external">点我</a></p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/04.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="js vs 着色器"></p>
-</li>
-<li><p><a href="http://lulutia.com/webgldemo/07/" target="_blank" rel="external">缓冲区对象</a><br>  WebGL提供了<strong>缓冲区对象</strong>，它可以一次性的向着色器传入多个顶点的数据。使用缓冲区对象向顶点着色器传入多个顶点数据的步骤如下:<br>  详细见具体API 21-25部分，注意<strong>可以创建多个缓冲区对象</strong></p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/05.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="缓冲区对象"></p>
-</li>
-<li><p><a href="http://lulutia.com/webgldemo/08/" target="_blank" rel="external">WebGL可绘制的基本图形</a>，主要运用于API 14，<a href="http://lulutia.com/webgldemo/09/" target="_blank" rel="external">对比例子点我</a><br>  WebGL可以绘制gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN 七种，它们的绘制顺序如下：</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/06.png?imageView2/2/w/900/h/500/q/75%7Cwatermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10%7Cimageslim" alt="基本图形"></p>
-</li>
-<li><p>移动、旋转、缩放</p>
-<ul>
-<li><p>对于<a href="http://lulutia.com/webgldemo/10/" target="_blank" rel="external">平移</a>而言，就是对顶点的每个分量加上其在对应轴上平移的距离, 因此就是在顶点着色器中对原有的position加上移动的position即可</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">newX = oldX + moveX;</div><div class="line">newY = oldY + moveY;</div><div class="line">newZ = oldZ + moveZ;</div></pre></td></tr></table></figure>
-</li>
-<li><p>对于<a href="http://lulutia.com/webgldemo/11/" target="_blank" rel="external">旋转</a>而言，有公式如下[绕Z轴旋转]，因此将顶点着色器中的坐标换为下面的计算即可：<strong>注意JS内置的Math.cos()和Math.sin()接受的是弧度制，而并非角度</strong></p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">newX = oldX * cosβ - oldY * sinβ</div><div class="line">newY = oldX * sinβ + oldY * cosβ</div><div class="line">newZ = oldZ</div></pre></td></tr></table></figure>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="string">'void main() &#123;\n'</span> +</div><div class="line"><span class="string">'gl_Position.x = a_Position.x * u_CosB - a_Position.y * u_SinB;\n'</span> + <span class="comment">//设置坐标，必须</span></div><div class="line"><span class="string">'gl_Position.y = a_Position.x * u_SinB + a_Position.y * u_CosB;\n'</span> +</div><div class="line"><span class="string">'gl_Position.z = a_Position.z;\n'</span> + </div><div class="line"><span class="string">'gl_Position.w = 1.0;\n'</span> +</div><div class="line"><span class="string">'&#125;\n'</span>;</div></pre></td></tr></table></figure>
-</li>
-<li><p>当情况复杂起来后，需要进行<a href="http://lulutia.com/webgldemo/12/" target="_blank" rel="external">矩阵变换</a>，比如根据上面可以得到平移矩阵，旋转矩阵和缩放矩阵如下：之后将它与坐标相乘即可得到变换后的坐标,因为<a href="http://lulutia.com/webgldemo/13/" target="_blank" rel="external">矩阵计算比较复杂</a>，一般情况下都使用封装好的矩阵操作库进行计算</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/07.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="矩阵"></p>
-  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gl_Position = u_xformMatrix * a_Position ;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p><a href="http://lulutia.com/webgldemo/14/" target="_blank" rel="external">动画</a></p>
-<ul>
-<li>根据不同时间确定不同的状态</li>
-<li>在每次绘制前，清除上次绘制的内容，并绘制相应状态下的图形</li>
-<li>调用requestAnimationFrame(fn)进行持续绘制</li>
-</ul>
-</li>
-<li><p>颜色<br>之前的所有例子我们都是直接设定了颜色值并传入片元着色器，其颜色值是统一的不变的，但是实际中，我们可能会对不同的点着色不同，因此顶点着色器与片元着色器之间应该有某种联系</p>
-<ul>
-<li>实际在顶点着色器与片元着色器中主要执行了两个步骤：<ul>
-<li>图形装配过程：将孤立的顶点坐标装配成几何图形</li>
-<li><a href="http://lulutia.com/webgldemo/15/" target="_blank" rel="external">光栅化</a>过程：将装配好的几何图形转化为片元</li>
-</ul>
-</li>
-<li>光栅化过程中生成的片元都是带有坐标信息的，调用片元着色器时这些坐标信息也随着片元传了进来，可以通过片元着色器中的内置变量来访问片元的坐标</li>
-<li>在WebGL中，<strong>如果顶点着色器与片元着色器中有类型和命名都相同的varying变量，那么顶点着色器赋给该变量的值就会自动被传入片元着色器</strong>，但是，片元着色器中的v_Color变量和顶点着色器中的v_Color实际并不是一回事，顶点着色器中的v_Color变量在传入片元着色器之前经过了内插过程，所以称为varying</li>
-<li><p><a href="http://lulutia.com/webgldemo/16/" target="_blank" rel="external">整个颜色的处理过程如下</a>：</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/08.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="颜色处理"></p>
-</li>
-</ul>
-</li>
-<li><p><a href="http://lulutia.com/webgldemo/17/" target="_blank" rel="external">纹理</a><br>  真实世界中的颜色变化是相当细粒度的，我们如果全部通过自己定义来做则会陷入无休止的工作中，因此在三维图形学中，纹理映射就成为了一项关键技术。所谓纹理映射，就是将一张图像映射到一个几何图形的表面上去，它根据纹理图像，为之前光栅化后的每个片元涂上合适的颜色，其中组成纹理图像的像素称为纹素，其具体流程如下：</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/09.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="纹理处理"></p>
-<ul>
-<li>在执行纹理映射的过程中，会涉及到纹理坐标，WebGL系统中的纹理坐标是二维的，使用st坐标系统。其坐标值与图像自身的尺寸无关，左下角的坐标为(0.0, 0.0), 右下角为(1.0, 0.0), 右上角为(1.0, 1.0), 左上角为(0.0, 1.0)。纹理映射需要顶点着色器和片元着色器的配合，首先在顶点着色器中为每个顶点指定纹理坐标，然后在片元着色器中根据每个片元的纹理坐标从纹理图像中抽取纹理像素颜色。</li>
-<li><p>详细流程见API 27-32，具体代码处理流程如下：在GLSE中运用texture2D(sample2D, sampler, vec2, coord): 来从sample指定的纹理上获取coord指定的纹理坐标处的像素颜色, <a href="http://lulutia.com/webgldemo/18/" target="_blank" rel="external">修改纹理坐标和映射方式点我</a>, <a href="http://lulutia.com/webgldemo/19/" target="_blank" rel="external">多重纹理点我</a></p>
-<p><img src="http://okzzg7ifm.bkt.clouddn.com/10.png?imageView2/2/w/900/h/400/q/75|watermark/2/text/bHVsdXRpYQ==/font/5a6L5L2T/fontsize/240/fill/IzAwMDAwMA==/dissolve/20/gravity/SouthEast/dx/10/dy/10|imageslim" alt="纹理代码处理"></p>
-</li>
-</ul>
-</li>
-</ul>
-<p>具体API<br><strong>注：文中demo根据WebGL编程指南demo改编而来</strong></p>
-<ol>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createShader" target="_blank" rel="external">gl.createShader(type)</a>: 创建由type指定的着色器对象，type的值分别为gl.VERTEX_SHADER表示顶点着色器 gl.FRAGMENT_SHADER表示片元着色器</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/shaderSource" target="_blank" rel="external">gl.shaderSource(shader, source)</a>: 将source指定的字符串形式的代码传入shader指定着色器，如果之前已经向shader传入过代码了，旧的代码将会被替换掉</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/compileShader" target="_blank" rel="external">gl.compileShader(shader)</a>: 编译shader指定的着色器中的源代码</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderParameter" target="_blank" rel="external">gl.getShaderParameter(shader, pname)</a>: 获取shader指定的着色器中，pname指定的参数信息pname: 指定待获取参数的类型，可以是gl.SHADER_TYPE gl.DELETE_STATUS或者gl.COMPILE_STATUS，根据pname的不同，返回不同的值</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getShaderInfoLog" target="_blank" rel="external">gl.getShaderInfoLog(shader)</a>: 获取shader指定的着色器的信息日志</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/deleteShader" target="_blank" rel="external">gl.deleteShader(shader)</a>: 如果不需要这个着色器，可以用gl.deleteShader()函数来删除着色器，注意，如果着色器对象还在使用，那么deleteShader()并不会立刻删除着色器而是要等到程序对象不再使用该着色器后，才将其删除</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createProgram" target="_blank" rel="external">gl.createProgram()</a>: 创建程序对象</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/attachShader" target="_blank" rel="external">gl.attachShader(program, shader)</a>: 将shader指定的着色器对象分配给program指定的程序对象，着色器在附给程序对象前，并不一定要为其指定代码或进行编译(也就是说，把空的着色器附给程序对象也是可以的)</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/linkProgram" target="_blank" rel="external">gl.linkProgram(program)</a>: 连接program指定的程序对象中的着色器进行这一步的目的是确保：<ul>
-<li>顶点着色器和片元着色器的varying变量同名同类型，且一一对应</li>
-<li>顶点着色器对每个varying变量赋了值</li>
-<li>顶点着色器和片元着色器中的同名uniform变量也是同类型的</li>
-<li>着色器中的attribute变量，uniform变量和varying变量的个数没有超过着色器的上限</li>
-</ul>
-</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramParameter" target="_blank" rel="external">gl.getProgramParameter(program, pname)</a>: 获取pname指定的程序对象中pname指定的参数信息。返回值随着pname的不同而不同pname：gl.DELETE_STATUS gl.LINK_STATUS gl.VALIDATE_STATUS gl.ATTACHED_SHADERS gl.ACTIVE_ATTRIBUTES gl.ACTIVE_UNIFORMS, 根据pname的不同，返回值不同, 程序对象即使连接成功了，也有可能运行失败，比如没有为取样器分配纹理单元。这些错误是在运行阶段而不是连接阶段产生的</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getProgramInfoLog" target="_blank" rel="external">gl.getProgramInfoLog(program)</a>: 获取program指定的程序对象的信息日志</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/deleteProgram" target="_blank" rel="external">gl.deleteProgram(program)</a>: 删除程序对象</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/useProgram" target="_blank" rel="external">gl.useProgram(program)</a>: 告知WebGL系统绘制时使用program指定的程序对象</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawArrays" target="_blank" rel="external">gl.drawArrays(mode, first, count)</a>: 按照mode参数指定的方式绘制图形(gl.POINTS, gl.LINES, gl.LINE_STRIP, gl.LINE_LOOP, gl.TRIANGLES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN), first: 指定从哪个顶点开始绘制 整型, count: 指定绘制多少个点 整型</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clearColor" target="_blank" rel="external">gl.clearColor(red, green, blue, alpha)</a>: 确定当清除颜色buffer时使用的颜色</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/clear" target="_blank" rel="external">gl.clear(mask)</a>: 指定被清除的buffer，可能的值gl.COLOR_BUFFER_BIT，gl.DEPTH_BUFFER_BIT，gl.STENCIL_BUFFER_BIT </li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getAttribLocation" target="_blank" rel="external">gl.getAttribLocation(program, name)</a>: 获取由name参数指定的attribute变量的存储地址, program: 指定包含顶点着色器和片元着色器的着色器程序对象, name: 指定想要获取其存储地址的attribute变量的名称</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttrib" target="_blank" rel="external">gl.vertexAttrib3f(location, v0, v1, v2)</a>: 将数据(v0, v1, v2)传给由location参数指定的attribute变量, gl.vertexAttribXf是一系列同族函数，其中X可以为1，2，3，4，无论哪一个，第四个值都为1.0，其他未填位填充0.0, gl.vertexAttribXv是其矢量版本，接受类型化数组, gl.vertexAttrib 基础函数名 x 参数个数 v参数类型 还能够有gl.vertexAttrib[123]f这种用法</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getUniformLocation" target="_blank" rel="external">gl.getUniformLocation(program, name)</a>: 与API17类似</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/uniform" target="_blank" rel="external">gl.uniform[1234][fi]<a href="">v</a></a>: 与API18类似 </li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createBuffer" target="_blank" rel="external">gl.createBuffer()</a>: 创建缓冲区对象, 这一步的结果是WebGL系统中多了一个新创建出来的缓冲区对象</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindBuffer" target="_blank" rel="external">gl.bindBuffer(target, buffer)</a>: 允许使用buffer表示的缓冲区对象并将其绑定到target表示的目标上，target: gl.ARRAY_BUFFER 表示缓冲区对象中包含了顶点的数据，gl.ELEMENT_ARRAY_BUFFER表示缓冲区对象中包含了顶点的索引值，buffer: 指定之前由gl.createBuffer()返回的待绑定的缓冲区对象将缓冲区对象绑定到目标。这个目标表示缓冲区对象的用途, 我们不能直接向缓冲区写入数据，而只能向目标写入数据，所以要向缓冲区写入数据，必须先绑定。</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData" target="_blank" rel="external">gl.bufferData(target, ArrayBufferView srcData, usage)</a>: 这个API在WebGL1.0和2.0上有所不同，具体见规范。总的来说是开辟存储空间，向绑定在target上的缓冲区对象写入数据data</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer" target="_blank" rel="external">gl.vertexAttribPointer(index, size, type, normalized, stride, offset)</a>: 将绑定到target的缓冲区对象分配给由location指定的attribute变量, size: 指定缓冲区中每个顶点的分量个数(1-4), type: 指定数据格式 [gl.UNSIGNED_BYTE, gl.SHORT, gl.UNSIGNED_SHORT, gl.INT, gl.UNSIGNED_INT, gl.FLOAT], normalized: 传入true, false表明是否将非浮点数的数据归一化到[0, 1]或[-1, 1]区间, stride: 指定相邻两个顶点间的字节数，默认0, offset: 指定缓冲区对象中的偏移量(以字节为单位)</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/enableVertexAttribArray" target="_blank" rel="external">gl.enableVertexAttribArray(index)</a>: 开启index指定的attribute变量，链接变量与分配给它的缓冲区对象，使顶点着色器能够访问缓冲区内的数据</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/uniformMatrix" target="_blank" rel="external">gl.uniformMatrix[234]x[234]fv(location, transpose, array…)</a>: 将array表示的n*n矩阵分配给由location指定的uniform变量，transpose在WebGL中必须指定为false</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/createTexture" target="_blank" rel="external">gl.createTexture()</a>: 创建纹理对象以存储纹理图像</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/pixelStorei" target="_blank" rel="external">gl.pixelStorei(pname, param)</a>: 使用pname和param指定的方式处理加载得到的图片, pname:gl.UNPACK_FLIP_Y_WEBGL: 对图像进行Y轴反转，默认为false; gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL: 将图像RGB颜色值的每一个分量乘以A，默认为false, param: 指定非0(true)或0(false)，必须为整数。使用原因：WebGL纹理坐标系统中t轴的方向和PNG,BMP,JPG等格式图片的坐标系统的Y轴方向是相反的，所以要对纹理图像进行Y轴反转</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/activeTexture" target="_blank" rel="external">gl.activeTexture(texture)</a>: 激活texture指定的纹理单元</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindTexture" target="_blank" rel="external">gl.bindTexture(target, texture)</a>: 开启texture指定的纹理对象，并将其绑定到target上, 如果已经激活了某个纹理单元，则纹理对象也会绑定到这个纹理单元上; target: gl.TEXTURE_2D  gl.TEXTURE_CUBE_MAP;<br>在WebGL中，没法直接操作纹理对象，必须通过将纹理对象绑定到纹理单元上，然后通过操作纹理单元来操作纹理对象</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texParameter" target="_blank" rel="external">gl.texParameter<a href="target, pname, param">fi</a></a>: 将param的值赋给绑定到目标的纹理对象的pname参数上, 具体参数见规定，通常可以不用调用，使用默认值就可以了</li>
-<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D" target="_blank" rel="external">gl.texImage2D(target, level, internalformat, format, type, image)</a>: 将image指定的图像分配给绑定到目标上的纹理对象</li>
-</ol>
-
+        
+          <a class="article-more-a" href="/2017/06/07/webgl01/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -1141,25 +555,14 @@ ga('send', 'pageview');
       
         <p><img src="/assets/img/2017.jpg" alt=""></p>
 <p>又一年匆匆走过，这一年说长不长说短不短，但的的确确发生了好多好多事情。先来篇流水帐总结。</p>
-<p>被老爹说了n久的驾照终于到手了，并且拿到的第二天就被老爹像拎兔子一样拎出去开了70多公里。</p>
-<p>和老爸因为一件现在显而易见已经完全想不起来的事情起了争执，一气之下把齐腰长发剪成了个短的不能再短的发型，完美开启了假小子模式。</p>
-<p>回学校后顺利结束了答辩，在等资料处理的漫长的一个月里拉着大鸟去日本走了一遭。在这只有零星早樱的季节吃了超级好吃的美食，看了超级棒的风景，遇见了超级有爱的人，也算满足了小时候的心愿。意大利和日本这两个我在小学毕业写在同学录 最想去的国家 一栏的国家都GET。</p>
-<p>之后被老哥约着去菲律宾潜水，计划之外的拿到了初级潜水执照，看到了不一样的风景却依然没有学会游泳，泪目。</p>
-<p>4月，繁忙的一个月。拽着啊呜和麦子在陌生的帝都陪我找房子，感受就是贵贵贵……尘埃落定后去广州见了下快五年没见的小燕子～虽然这么久没见平时也没啥联系，但原来的感觉在见面的那刻还是回来了。之后作死的和啊呜去了柬埔寨，三天暴走，看过了千年的文明，也晒的跟块煤炭一样了……</p>
-<p>终于的终于还是入职了，然后就入了RN大坑，痛并快乐着的痛快啊。同事都特别好，毕竟年纪差的不多，玩到一块儿没障碍。去了没看见草的草原，漂了比想象中短的水道，爬了只能看见雾霾的山，为了烤鱼来回三四个小时 ｜ 果然吃货技能点的太高。</p>
-<p>有些时候会觉得自己好挫，但貌似这个事情急也没用，只能一步一个脚印来。</p>
-<p>七月和麦子看了仙剑一的舞台剧，感觉已经记不起上次看舞台剧是多久了，总之其现在的先进程度还是远远超过了我的预期的（也许是我期待值真心太低了</p>
-<p>本来约好和科儿的中秋青岛游因为啊呜的突然到来而取消了，不过来了场说走就走的旅行去了趟兰卡威……人生中第二次进警察局，同时深深的体会到自驾的重要性……</p>
-<p>国庆先去上海见了科儿，接着和两只萌萌的室友一起从杭州去了趟越南，对于给小费的事情咱都完美的坚持了我们的底线，棒棒的，120个赞。这趟旅游重要的不是去哪里而是和谁去～</p>
-<p>16年的最后，集结了浩浩荡荡十多号人一起去东北跨年！零点时刻，我们五只吃着毛肚喝着酒或饮料，就这样毫无防备的被拖入了2017。</p>
-<p>你好啊，2017。</p>
-<p>PS：自己挖的一大堆坑还是希望能在2017填一填哈，啥日语啊，啥乌克丽丽啊，啥天文观测啊，啥无人机啊 （好吧，发现缺钱是硬伤，好好工作好好赚钱，好好和我爱的人和爱我的人一起过好每一天～</p>
-
+        
+          <a class="article-more-a" href="/2017/01/08/2017HELLO/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -1232,41 +635,15 @@ ga('send', 'pageview');
 <li>首先你要先安装yeoman，<code>npm install -g yo bower grunt-cli gulp</code>。</li>
 <li>generator是一个Node.js的模块。</li>
 <li>建立一个写generator的文件，必须命名为generator-name(name是自己取)。比如我建立一个generator-lulutia-react。</li>
-<li><p><code>npm init</code>来建立一个package.json。</p>
-  <figure class="highlight stata"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">    &#123;</div><div class="line">  <span class="string">"name"</span>: <span class="string">"generator-lulutia-react"</span>,<span class="comment">//必须generator开头</span></div><div class="line">  <span class="string">"version"</span>: <span class="string">"0.0.1"</span>,</div><div class="line">  <span class="string">"description"</span>: <span class="string">"the bone to build a app"</span>,</div><div class="line">  <span class="string">"files"</span>: [</div><div class="line">    <span class="string">"app"</span>,</div><div class="line">    <span class="string">"router"</span></div><div class="line">  ],<span class="comment">//必须是你的generator用到的文件构成的数组</span></div><div class="line">  <span class="string">"main"</span>: <span class="string">"index.js"</span>,</div><div class="line">  <span class="string">"scripts"</span>: &#123;</div><div class="line">    <span class="string">"test"</span>: <span class="string">"echo \"</span><span class="keyword">Error</span>: <span class="keyword">no</span> <span class="keyword">test</span> specified\<span class="string">" &amp;&amp; exit 1"</span></div><div class="line">  &#125;,</div><div class="line">  <span class="string">"keywords"</span>: [</div><div class="line">    <span class="string">"yeoman-generator"</span><span class="comment">//必须有这条</span></div><div class="line">  ],</div><div class="line">  <span class="string">"author"</span>: <span class="string">"lulutia"</span>,</div><div class="line">  <span class="string">"license"</span>: <span class="string">"MIT"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p><code>npm install yeoman-generator --save</code>//yeoman的依赖必须是最新的</p>
-</li>
-<li>默认执行<code>yo name</code>时执行的是app内的内容，<code>yo name:subcommand</code>执行的是其他文件夹里的内容。</li>
-<li>yeoman提供两种组织方式来，其一是:<code>./</code>,其二是:<code>generators/</code>，注意第二种方式的package.json内的files要相应修改。</li>
-<li><p>根据提供的基本结构来写自己的脚手架内容</p>
-  <figure class="highlight qml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> generators = <span class="built_in">require</span>(<span class="string">'yeoman-generator'</span>);</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = yeoman.generators.Base.extend(</div><div class="line">&#123;</div><div class="line"><span class="comment">// The name `constructor` is important here</span></div><div class="line"><span class="attribute">constructor</span>: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line"><span class="comment">// Calling the super constructor is important so our generator is correctly set up</span></div><div class="line">generators.Base.apply(<span class="keyword">this</span>, <span class="built_in">arguments</span>);</div><div class="line"></div><div class="line"><span class="comment">// Next, add your custom code</span></div><div class="line"><span class="keyword">this</span>.option(<span class="string">'coffee'</span>); <span class="comment">// This method adds support for a `--coffee` flag</span></div><div class="line">&#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-</li>
-<li><p>我这里用了几个库，Prompts:主要掌管generator与用户的交互</p>
-  <figure class="highlight actionscript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">module.exports = yeoman.generators.Base.extend(&#123;</div><div class="line">prompting: <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>&#123;</div><div class="line"><span class="keyword">var</span> done = <span class="keyword">this</span>.async();</div><div class="line"><span class="keyword">this</span>.prompt(&#123;</div><div class="line">  type    : <span class="string">'input'</span>,</div><div class="line">  name    : <span class="string">'name'</span>,</div><div class="line">  message : <span class="string">'Your project name'</span>,</div><div class="line">  <span class="keyword">default</span> : <span class="keyword">this</span>.appname <span class="comment">// Default to current folder name</span></div><div class="line">&#125;, <span class="function"><span class="keyword">function</span> <span class="params">(answers)</span> </span>&#123;</div><div class="line">  <span class="keyword">this</span>.log(answers.name);</div><div class="line">  done();</div><div class="line">&#125;.bind(<span class="keyword">this</span>));</div><div class="line">&#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
-</li>
-<li><p>writing里面用mkdirp建立基本骨架。在app内部建立templates文件夹，通过里面的文件的拷贝建立结构。</p>
-  <figure class="highlight kotlin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mkdirp(<span class="string">"assets/style"</span>);</div><div class="line">mkdirp(<span class="string">"build"</span>);</div><div class="line">   </div><div class="line">  <span class="keyword">this</span>.fs.copy(</div><div class="line">          <span class="keyword">this</span>.templatePath(<span class="string">'coffeelint.json'</span>),</div><div class="line">          <span class="keyword">this</span>.destinationPath(<span class="string">'coffeelint.json'</span>)</div><div class="line">        );</div></pre></td></tr></table></figure>
-</li>
-<li><p><code>generator.installDependencies()</code>安装依赖.</p>
-</li>
-<li>在generator-name/文件夹下运行<code>npm link</code>可以使generator在本地可用。</li>
 </ul>
-<p>意料之外的问题</p>
-<ul>
-<li>yeoman安装的时候表示node和npm的版本都落后了，然后npm这个命令就无法用了……简直了＝＝然后想用brew安装下，结果忘记brew没更新，各种更新无效。</li>
-<li>直接用<code>curl -L https://www.npmjs.com/install.sh | sh</code>加上sudo也有问题，还是报权限错误。</li>
-<li>决定可以用bower，但强迫症患者觉得这样不完美。可以直接重新下node，但觉得代价太大。</li>
-<li>用了比较粗暴的方法，去npm 的github上下载了sh，然后<code>sudo sh /Users/muriel/Downloads/install.sh</code>来安装。完了顺便把brew更新下,把没升级的软件升级了<code>brew update;brew upgrade;brew cleanup</code>。</li>
-<li>然后又出来一个问题，<code>npm install</code>按照package.json来安装但是目录结构有问题，原来npm的3开始决定采用扁平化处理，所以之前的代码为了适应这个改变必须要做一些改变。</li>
-</ul>
-<p><a href="https://github.com/lulutia/generator-lulutia-react" target="_blank" rel="external">具体代码</a></p>
-
+        
+          <a class="article-more-a" href="/2015/11/03/yeoman建立脚手架/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -1348,92 +725,15 @@ ga('send', 'pageview');
 <li>Promise对象</li>
 </ul>
 </li>
-<li>其他：Generator函数，Thunk函数。可以用thunkify模块，结合Generator函数，封装一个run函数实现自动化流程管理。co模块(使用co的前提条件是，Generator函数的yield命令后面，只能是Thunk函数或Promise对象)。async函数，async函数就是Generator函数的语法糖，它的自动执行器不需要用户自己来实现。</li>
-<li>感觉上async最好用：</li>
 </ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">chainAnimationsAsync</span>(<span class="params">elem, animations</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> ret = <span class="literal">null</span>;</div><div class="line">  <span class="keyword">try</span> &#123;</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> anim <span class="keyword">of</span> animations) &#123;</div><div class="line">      ret = <span class="keyword">await</span> anim(elem);</div><div class="line">    &#125;</div><div class="line">  &#125; <span class="keyword">catch</span>(e) &#123;</div><div class="line">    <span class="comment">/* 忽略错误，继续执行 */</span></div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> ret;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>Class</p>
-<ul>
-<li>类的内部所有定义的方法，都是不可枚举的（enumerable）。</li>
-<li>constructor方法是类的默认方法，通过new命令生成对象实例时，自动调用该方法。constructor方法默认返回实例对象（即this），完全可以指定返回另外一个对象。</li>
-<li>实例的属性除非显式定义在其本身（即定义在this对象上），否则都是定义在原型上（即定义在class上）。</li>
-<li>Class表达式：采用Class表达式，可以写出立即执行的Class。</li>
-</ul>
-<figure class="highlight monkey"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> MyClass = <span class="class"><span class="keyword">class</span> <span class="title">Me</span> &#123;</span></div><div class="line">  getClassName() &#123;</div><div class="line">    <span class="keyword">return</span> Me.name;</div><div class="line">  &#125;</div><div class="line">&#125;;//需要注意的是，这个类的名字是MyClass而不是Me，Me只在<span class="class"><span class="keyword">Class</span>的内部代码可用，指代当前类。</span></div></pre></td></tr></table></figure>
-<ul>
-<li>Class不存在变量提升。</li>
-<li>继承：<code>class ColorPoint extends Point {}</code><ul>
-<li>super关键字，指代父类的实例(即父类的this对象)。<strong>子类必须在constructor方法中调用super方法，否则新建实例时会报错。这是因为子类没有自己的this对象，而是继承父类的this对象，然后对其进行加工。如果不调用super方法，子类就得不到this对象</strong>。ES5的继承，实质是先创造子类的实例对象this，然后再将父类的方法添加到this上面（Parent.apply(this)）。ES6的继承机制完全不同，实质是先创造父类的实例对象this（所以必须先调用super方法），然后再用子类的构造函数修改this。</li>
-<li>子类的<strong>proto</strong>属性，表示构造函数的继承，总是指向父类。子类prototype属性的<strong>proto</strong>属性，表示方法的继承，总是指向父类的prototype属性。这两条继承链，可以这样理解：作为一个对象，子类（B）的原型（<strong>proto</strong>属性）是父类（A）；作为一个构造函数，子类（B）的原型（prototype属性）是父类的实例。</li>
-<li>Object.getPrototypeOf方法可以用来从子类上获取父类。</li>
-<li>子类实例的<strong>proto</strong>属性的<strong>proto</strong>属性，指向父类实例的<strong>proto</strong>属性。也就是说，子类的原型的原型，是父类的原型。通过子类实例的<strong>proto</strong>.<strong>proto</strong>属性，可以修改父类实例的行为。</li>
-<li>ES6允许继承原生构造函数定义子类，因为ES6是先新建父类的实例对象this，然后再用子类的构造函数修饰this，使得父类的所有行为都可以继承。</li>
-<li>存值函数和取值函数是设置在属性的descriptor对象上的。</li>
-<li>父类的静态方法，可以被子类继承。</li>
-</ul>
-</li>
-<li>类相当于实例的原型，所有在类中定义的方法，都会被实例继承。如果在一个方法前，加上static关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。</li>
-<li>静态属性指的是Class本身的属性，即Class.propname，而不是定义在实例对象（this）上的属性。ES6明确规定，Class内部只有静态方法，没有静态属性。</li>
-<li>ES6为new命令引入了一个new.target属性，（在构造函数中）返回new命令作用于的那个构造函数。子类继承父类时，new.target会返回子类。</li>
-<li>Mixin模式指的是，将多个类的接口“混入”（mix in）另一个类。</li>
-</ul>
-<p>修饰器</p>
-<ul>
-<li>修饰器对类的行为的改变，是代码编译时发生的，而不是在运行时。这意味着，修饰器能在编译阶段运行代码。</li>
-</ul>
-<figure class="highlight dart"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@decorator</span></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;&#125;</div><div class="line"></div><div class="line"><span class="comment">// 等同于</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;&#125;</div><div class="line">A = decorator(A) || A;</div></pre></td></tr></table></figure>
-<ul>
-<li>修饰器不仅可以修饰类，还可以修饰类的属性。修饰器有注释的作用。</li>
-<li>由于存在函数提升，使得修饰器不能用于函数。</li>
-<li>一些常用的库：core-decorators.js, traits-decorator…</li>
-</ul>
-<p>Module</p>
-<ul>
-<li>模块功能主要由两个命令构成：export和import。export命令用于规定模块的对外接口，import命令用于输入其他模块提供的功能。</li>
-<li>export语句输出的值是动态绑定，绑定其所在的模块。</li>
-<li>ES6支持多重加载，即所加载的模块中又加载其他模块。</li>
-<li>import命令具有提升效果，会提升到整个模块的头部，首先执行。</li>
-<li>除了指定加载某个输出值，还可以使用整体加载，即用星号（*）指定一个对象，所有输出值都加载在这个对象上面。</li>
-<li>module命令可以取代import语句，达到整体输入模块的作用。module命令后面跟一个变量，表示输入的模块定义在该变量上。</li>
-<li><strong>export default命令，为模块指定默认输出。</strong>使用export default时，对应的import语句不需要使用大括号；不使用export default时，对应的import语句需要使用大括号。一个模块只能有一个默认输出，因此export deault命令只能使用一次。</li>
-<li>模块之间也可以继承。</li>
-<li>一些常用的库：ES6 module transpiler, SystemJS</li>
-</ul>
-<p>编程风格</p>
-<ul>
-<li>let取代var</li>
-<li>在let和const之间，建议优先使用const，let表示的变量，只应出现在单线程运行的代码中，不能是多线程共享的。</li>
-<li>严格模式</li>
-<li>静态字符串一律使用单引号或反引号，不使用双引号。动态字符串使用反引号。</li>
-<li>使用数组成员对变量赋值，优先使用解构赋值。</li>
-<li>函数的参数如果是对象的成员，优先使用解构赋值。</li>
-<li>如果函数返回多个值，优先使用对象的解构赋值，而不是数组的解构赋值。这样便于以后添加返回值，以及更改返回值的顺序。</li>
-<li>单行定义的对象，最后一个成员不以逗号结尾。多行定义的对象，最后一个成员以逗号结尾。</li>
-<li>对象尽量静态化，一旦定义，就不得随意添加新的属性。如果添加属性不可避免，要使用Object.assign方法。</li>
-<li>如果对象的属性名是动态的，可以在创造对象的时候，使用属性表达式定义。</li>
-<li>对象的属性和方法，尽量采用简洁表达法，这样易于描述和书写。</li>
-<li>使用扩展运算符（…）拷贝数组。</li>
-<li>使用Array.from方法，将类似数组的对象转为数组。</li>
-<li>立即执行函数可以写成箭头函数的形式。</li>
-<li>那些需要使用函数表达式的场合，尽量用箭头函数代替。</li>
-<li>箭头函数取代Function.prototype.bind，不应再用self/_this/that绑定 this。</li>
-<li>所有配置项都应该集中在一个对象，放在最后一个参数，布尔值不可以直接作为参数。</li>
-<li>不要在函数体内使用arguments变量，使用rest运算符（…）代替。因为rest运算符显式表明你想要获取参数，而且arguments是一个类似数组的对象，而rest运算符可以提供一个真正的数组。</li>
-<li>使用默认值语法设置函数参数的默认值。</li>
-<li>注意区分Object和Map，只有模拟实体对象时，才使用Object。如果只是需要key:value的数据结构，使用Map。因为Map有内建的遍历机制。</li>
-<li>总是用class，取代需要prototype操作。</li>
-<li>使用extends实现继承，因为这样更简单，不会有破坏instanceof运算的危险。</li>
-<li>Module语法是JavaScript模块的标准写法，坚持使用这种写法。使用import取代require。</li>
-<li>使用export取代module.exports。</li>
-<li>不要在模块输入中使用通配符。因为这样可以确保你的模块之中，有一个默认输出（export default）。</li>
-<li>如果模块默认输出一个函数，函数名的首字母应该小写。如果模块默认输出一个对象，对象名的首字母应该大写。</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2015/11/02/ES6-5/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -1514,37 +814,15 @@ ga('send', 'pageview');
 <li>三是ES6创造了一种新的遍历命令for…of循环，Iterator接口主要供for…of消费。</li>
 </ul>
 </li>
-<li>在ES6中，有三类数据结构原生具备Iterator接口：数组、某些类似数组的对象、Set和Map结构。调用Symbol.iterator方法，就会得到当前数据结构默认的遍历器生成函数。</li>
-<li>字符串是一个类似数组的对象，也原生具有Iterator接口。</li>
-<li>JavaScript原有的for…in循环，只能获得对象的键名，不能直接获取键值。ES6提供for…of循环，允许遍历获得键值。Set结构遍历时，返回的是一个值，而Map结构遍历时，返回的是一个数组，该数组的两个成员分别为当前Map成员的键名和键值。</li>
-<li>对于字符串来说，for…of循环还有一个特点，就是会正确识别32位UTF-16字符。</li>
-<li>对于普通的对象，for…of结构不能直接使用，会报错，必须部署了iterator接口后才能使用。一种解决方法是，使用Object.keys方法将对象的键名生成一个数组，然后遍历这个数组。另一个方法是使用Generator函数将对象重新包装一下。</li>
-<li>for…in循环主要是为遍历对象而设计的，不适用于遍历数组。</li>
 </ul>
-<p>Generator函数</p>
-<ul>
-<li>Generator函数是ES6提供的一种异步编程解决方案,Generator函数除了状态机，还是一个遍历器对象生成函数。返回的遍历器对象，可以依次遍历Generator函数内部的每一个状态。</li>
-<li>Generator函数是一个普通函数，但是有两个特征。一是，function命令与函数名之间有一个星号；二是，函数体内部使用yield语句，定义不同的内部状态。调用Generator函数后，该函数并不执行，返回的也不是函数运行结果，而是一个指向内部状态的指针对象，每次调用next方法，内部指针就从函数头部或上一次停下来的地方开始执行，直到遇到下一个yield语句（或return语句）为止。换言之，Generator函数是分段执行的，yield语句是暂停执行的标记，而next方法可以恢复执行。yield语句不能用在普通函数中，否则会报错。yield语句如果用在一个表达式之中，必须放在圆括号里面。yield语句用作函数参数或赋值表达式的右边，可以不加括号。for…of循环可以自动遍历Generator函数，且此时不再需要调用next方法。这里需要注意，一旦next方法的返回对象的done属性为true，for…of循环就会中止，且不包含该返回对象。</li>
-<li>如果Generator函数内部没有部署try…catch代码块，那么throw方法抛出的错误，将被外部try…catch代码块捕获。如果Generator函数内部部署了try…catch代码块，那么遍历器的throw方法抛出的错误，不影响下一次遍历，否则遍历直接终止。但是，如果使用throw命令抛出错误，不会影响遍历器状态。</li>
-<li>如果Generator函数内部有try…finally代码块，那么return方法会推迟到finally代码块执行完再执行。</li>
-<li>yield*语句，用来在一个Generator函数里面执行另一个Generator函数。</li>
-<li>可以并行执行、交换执行权的线程（或函数），就称为协程。如果将Generator函数当作协程，完全可以将多个需要互相协作的任务写成Generator函数，它们之间使用yield语句交换控制权。</li>
-</ul>
-<p>Promise对象</p>
-<ul>
-<li>所谓Promise，就是一个对象，用来传递异步操作的消息。它代表了某个未来才会知道结果的事件（通常是一个异步操作），并且这个事件提供统一的API，可供进一步处理。</li>
-<li>Promise对象代表一个异步操作，有三种状态：Pending（进行中）、Resolved（已完成，又称Fulfilled）和Rejected（已失败）。</li>
-<li>Promise对象的状态改变，只有两种可能：从Pending变为Resolved和从Pending变为Rejected。只要这两种情况发生，状态就凝固了，不会再变了，会一直保持这个结果。</li>
-<li>Promise也有一些缺点。首先，无法取消Promise，一旦新建它就会立即执行，无法中途取消。其次，如果不设置回调函数，Promise内部抛出的错误，不会反应到外部。第三，当处于Pending状态时，无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）。</li>
-<li>Promise实例具有then方法，也就是说，then方法是定义在原型对象,then方法返回的是一个新的Promise实例（注意，不是原来那个Promise实例）。因此可以采用链式写法，即then方法后面再调用另一个then方法。采用链式的then，可以指定一组按照次序调用的回调函数。</li>
-<li>Promise.prototype.catch方法是.then(null, rejection)的别名，用于指定发生错误时的回调函数。Promise在resolve语句后面，再抛出错误，不会被捕获，等于没有抛出。Promise对象的错误具有“冒泡”性质，会一直向后传递，直到被捕获为止。也就是说，错误总是会被下一个catch语句捕获。</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2015/10/23/ES6-4/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -1621,47 +899,15 @@ ga('send', 'pageview');
 <ul>
 <li>ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。</li>
 <li>ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。<strong>注意，属性名表达式与简洁表示法，不能同时使用，会报错。</strong></li>
-<li>Object.is用来比较两个值是否严格相等。它与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于自身。</li>
-<li>Object.assign方法用来将源对象（source）的所有可枚举属性，复制到目标对象（target）。Object.assign只拷贝自身属性，不可枚举的属性（enumerable为false）和继承的属性不会被拷贝。</li>
-<li>对象的每个属性都有一个描述对象（Descriptor），用来控制该属性的行为。Object.getOwnPropertyDescriptor方法可以获取该属性的描述对象。</li>
-<li><strong>proto</strong>属性（前后各两个下划线），用来读取或设置当前对象的prototype对象。</li>
-<li>Object.observe()，Object.unobserve()。</li>
-<li>目前，ES7有一个提案，将rest参数/扩展运算符（…）引入对象。</li>
 </ul>
-<p>Symbol</p>
-<ul>
-<li>ES6引入了一种新的原始数据类型Symbol，表示独一无二的值。</li>
-<li>Symbol值通过Symbol函数生成。这就是说，对象的属性名现在可以有两种类型，一种是原来就有的字符串，另一种就是新增的Symbol类型。凡是属性名属于Symbol类型，就都是独一无二的，可以保证不会与其他属性名产生冲突。<code>let s=Symbol();</code>。</li>
-<li>Symbol值不能与其他类型的值进行运算，会报错。但是，Symbol值可以显式转为字符串。</li>
-<li>注意，Symbol值作为对象属性名时，不能用点运算符。同理，在对象的内部，使用Symbol值定义属性时，Symbol值必须放在方括号之中。</li>
-<li>Symbol作为属性名，该属性不会出现在for…in、for…of循环中，也不会被Object.keys()、Object.getOwnPropertyNames()返回。但是，它也不是私有属性，有一个Object.getOwnPropertySymbols方法，可以获取指定对象的所有Symbol属性名。Reflect.ownKeys方法可以返回所有类型的键名，包括常规键名和Symbol键名。</li>
-<li>Symbol.for方法接受一个字符串作为参数，然后搜索有没有以该参数作为名称的Symbol值。如果有，就返回这个Symbol值，否则就新建并返回一个以该字符串为名称的Symbol值。Symbol.keyFor方法返回一个已登记的Symbol类型值的key。</li>
-<li>Symbol.hasInstance, Symbol.isConcatSpreadable,Symbol.replace,Symbol.search,Symbol.split,Symbol.iterator,Symbol.toPrimitive,Symbol.toStringTag,Symbol.unscopables</li>
-</ul>
-<p>Proxy和Reflect</p>
-<ul>
-<li>Proxy可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。</li>
-<li>Reflect对象与Proxy对象一样，也是ES6为了操作对象而提供的新API。将Object对象的一些明显属于语言层面的方法，放到Reflect对象上。</li>
-</ul>
-<p>Set Map</p>
-<ul>
-<li>Set,它类似于数组，但是成员的值都是唯一的，没有重复的值。Set内部判断两个值是否不同，使用的算法类似于精确相等运算符（===），这意味着，两个对象总是不相等的。</li>
-<li>Array.from方法可以将Set结构转为数组。</li>
-<li>由于Set结构没有键名，只有键值（或者说键名和键值是同一个值），所以key方法和value方法的行为完全一致。</li>
-<li>WeakSet结构与Set类似，也是不重复的值的集合。但是，它与Set有两个区别。首先，WeakSet的成员只能是对象，而不能是其他类型的值。其次，WeakSet中的对象都是弱引用，即垃圾回收机制不考虑WeakSet对该对象的引用，也就是说，如果其他对象都不再引用该对象，那么垃圾回收机制会自动回收该对象所占用的内存，不考虑该对象还存在于WeakSet之中。这个特点意味着，无法引用WeakSet的成员，因此WeakSet是不可遍历的。</li>
-<li>ES6提供了Map数据结构。它类似于对象，也是键值对的集合，但是“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键。</li>
-<li>作为构造函数，Map也可以接受一个数组作为参数。该数组的成员是一个个表示键值对的数组。</li>
-<li>Map的键实际上是跟内存地址绑定的，只要内存地址不一样，就视为两个键。这就解决了同名属性碰撞（clash）的问题，我们扩展别人的库的时候，如果使用对象作为键名，就不用担心自己的属性与原作者的属性同名。</li>
-<li>set方法返回的是Map本身，因此可以采用链式写法。</li>
-<li>WeakMap结构与Map结构基本类似，唯一的区别是它只接受对象作为键名（null除外），不接受其他类型的值作为键名，而且键名所指向的对象，不计入垃圾回收机制。</li>
-<li>WeakMap与Map在API上的区别主要是两个，一是没有遍历操作（即没有key()、values()和entries()方法），也没有size属性；二是无法清空，即不支持clear方法。这与WeakMap的键不被计入引用、被垃圾回收机制忽略有关。因此，WeakMap只有四个方法可用：get()、set()、has()、delete()。</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2015/10/22/ES6-3/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -1738,77 +984,14 @@ ga('send', 'pageview');
 <ul>
 <li>JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。</li>
 </ul>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="string">"\u&#123;20BB7&#125;"</span>    <span class="regexp">//</span> <span class="string">"𠮷"</span></div></pre></td></tr></table></figure>
-<ul>
-<li>JavaScript内部，字符以UTF-16的格式储存，每个字符固定为2个字节。对于那些需要4个字节储存的字符（Unicode码点大于0xFFFF的字符），JavaScript会认为它们是两个字符。charAt方法无法读取字符，charCodeAt方法只能分别返回前两个字节和后两个字节的值。ES6提供了codePointAt方法，能够正确处理4个字节储存的字符，返回一个字符的码点。它的逆过程通过String.fromCodePoint实现，弥补了String.fromCharCode的溢出问题。</li>
-</ul>
-<figure class="highlight rust"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">charCodeAt -&gt; codePointAt</div><div class="line"><span class="built_in">String</span>.fromCharCode -&gt; <span class="built_in">String</span>.fromCodePoint</div></pre></td></tr></table></figure>
-<ul>
-<li>for..of遍历字符串，可以识别大于0xFFFF的码点，传统的for循环无法识别这样的码点。</li>
-<li>ES7提供了字符串实例的at方法，可以识别Unicode编号大于0xFFFF的字符，返回正确的字符。</li>
-<li>ES6提供String.prototype.normalize()方法，用来将字符的不同表示方法统一为同样的形式，这称为Unicode正规化。</li>
-<li>includes(),startsWith(),endsWith(),repeat()</li>
-<li>模板字符串：模板字符串（template string）是增强版的字符串，用反引号（`）标识。如果使用模板字符串表示多行字符串，所有的空格和缩进都会被保留在输出之中。模板字符串中嵌入变量，需要将变量名写在${}之中。使用&lt;%= … %&gt;输出JavaScript表达式。</li>
-<li>标签模板：模板字符串可以紧跟在一个函数名后面，该函数将被调用来处理这个模板字符串。这被称为“标签模板”功能（tagged template）。</li>
-<li>String.raw方法，往往用来充当模板字符串的处理函数，返回一个斜杠都被转义（即斜杠前面再加一个斜杠）的字符串，对应于替换变量后的模板字符串。</li>
-</ul>
-<p>数值的扩展</p>
-<ul>
-<li>ES6提供了二进制和八进制数值的新的写法，分别用前缀0b和0o表示。</li>
-<li>Number.isFinite(),Number.isNaN() 区别于全局的isFinite()与isNaN()，他们不调用Number()方法进行转换。</li>
-<li>Number.parseInt(),Number.parseFloat()</li>
-<li>Number.isInterger(),Number.EPSILON</li>
-<li>Number.MAX_SAFE_INTERGER,Number.MIN_SAFE_INTERGER,Number.isSafeInteger()</li>
-<li>Math新增的方法：<ul>
-<li>Math.trunc()//去除小数部分，返回整数部分</li>
-<li>Math.sign()//判断一个数到底是正数，负数，还是0</li>
-<li>Math.cbrt()//计算一个数的立方根</li>
-<li>Math.clz32()//Math.clz32方法返回一个数的32位无符号整数形式有多少个前导0</li>
-<li>Math.imul()//Math.imul方法返回两个数以32位带符号整数形式相乘的结果，返回的也是一个32位的带符号整数。主要解决的精度问题。</li>
-<li>Math.fround()//返回一个数的单精度浮点数形式</li>
-<li>Math.hypot()//返回所有参数的平方和的平方根</li>
-<li>Math.expm1(),Math.log1p(),Math.log10(),Math.log2()</li>
-<li>Math.sinh(x),Math.cosh(x),Math.tanh(x),Math.asinh(x),Math.acosh(x),Math.atanh(x)</li>
-<li>ES7新增了一个指数运算符（<strong>）,```2 </strong> 3 = 2<em>2</em>2```。</li>
-</ul>
-</li>
-</ul>
-<p>数组的扩展</p>
-<ul>
-<li>Array.from方法用于将两类对象转为真正的数组：类似数组的对象（array-like object）和可遍历（iterable）的对象（包括ES6新增的数据结构Set和Map）。</li>
-<li>扩展运算符（…）也可以将某些数据结构转为数组,<code>var args = [...arguments];</code>。</li>
-<li>Array.of方法用于将一组值，转换为数组。这个方法的主要目的，是弥补数组构造函数Array()的不足。只有当参数个数不少于2个，Array()才会返回由参数组成的新数组。</li>
-<li>copyWithin方法，在当前数组内部，将指定位置的成员复制到其他位置（会覆盖原有成员），然后返回当前数组。也就是说，使用这个方法，会修改当前数组。</li>
-<li>find()//直接返回数组元素；findIndex()//返回数组元素索引</li>
-<li>fill方法使用给定值，填充一个数组。</li>
-<li>数组实例的entries()，keys()和values()。</li>
-<li>数组实例的includes()。</li>
-<li>注意对数组的空位的处理变化了。</li>
-<li><strong>数组推导</strong>[超级赞的功能]</li>
-<li>Array.observe(),Array.unobserve()这两个方法用于监听（取消监听）数组的变化，指定回调函数。</li>
-</ul>
-<p>函数的扩展</p>
-<ul>
-<li>ES6允许为函数的参数设置默认值，即直接写在参数定义的后面。<strong>指定了默认值以后，函数的length属性，将返回没有指定默认值的参数个数</strong>。参数默认值所处的作用域，不是全局作用域，而是函数作用域。参数变量是默认声明的，所以不能用let或const再次声明。</li>
-<li>ES6引入rest参数（形式为“…变量名”），用于获取<strong>函数</strong>的多余参数，这样就不需要使用arguments对象了。<strong>所有数组特有的方法都可以用于这个变量</strong>。注意，rest参数之后不能再有其他参数（即只能是最后一个参数），否则会报错。函数的length属性，不包括rest参数。</li>
-<li>扩展运算符（spread）是三个点（…）。它好比rest参数的逆运算，将一个数组转为用逗号分隔的参数序列。</li>
-<li>函数的name属性，返回该函数的函数名。bind返回的函数，name属性值会加上“bound ”前缀。</li>
-<li>ES6允许使用“箭头”（=&gt;）定义函数。<ul>
-<li>函数体内的this对象，绑定定义时所在的对象，而不是使用时所在的对象。由于this在箭头函数中被绑定，所以不能用call()、apply()、bind()这些方法去改变this的指向。</li>
-<li>不可以当作构造函数。</li>
-<li>不可以使用arguments对象，该对象在函数体内不存在。如果要用，可以用Rest参数代替。</li>
-</ul>
-</li>
-<li>函数绑定:函数绑定运算符是并排的两个双冒号（::），双冒号左边是一个对象，右边是一个函数。该运算符会自动将左边的对象，作为上下文环境（即this对象），绑定到右边的函数上面。如果双冒号左边为空，右边是一个对象的方法，则等于将该方法绑定在该对象上面。由于双冒号运算符返回的还是原对象，因此可以采用链式写法。</li>
-<li>尾调用:指某个函数的最后一步是调用另一个函数。“尾调用优化”（Tail call optimization），即只保留内层函数的调用帧。如果所有函数都是尾调用，那么完全可以做到每次执行时，调用帧只有一项，这将大大节省内存。这就是“尾调用优化”的意义。<strong>注意，只有不再用到外层函数的内部变量，内层函数的调用帧才会取代外层函数的调用帧，否则就无法进行“尾调用优化”。</strong>递归非常耗费内存，因为需要同时保存成千上百个调用帧，很容易发生“栈溢出”错误（stack overflow）。但对于尾递归来说，由于只存在一个调用帧，所以永远不会发生“栈溢出”错误。尾递归的实现，往往需要改写递归函数，确保最后一步只调用自身。</li>
-<li>ES7有一个提案，允许函数的最后一个参数有尾逗号（trailing comma）。</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2015/10/21/ES6-2/#more">more >></a>
+        
       
 
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -1973,6 +1156,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -1982,14 +1173,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">

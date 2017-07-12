@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
   <title>ES6 learning 二 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="字符串的扩展  JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。  1&quot;\u&amp;#123;20BB7&amp;#125;&quot;    // &quot;𠮷&quot;  JavaScript内部，字符以UTF-16的格式储存，每个字符固定为2个字节。对于那些需要4个字节储存的字符（Unicode码点大于0">
+  <meta name="description" content="字符串的扩展  JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。">
 <meta name="keywords" content="前端,计算机">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES6 learning 二">
 <meta property="og:url" content="http://memory.lulutia.com/2015/10/21/ES6-2/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="字符串的扩展  JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。  1&quot;\u&amp;#123;20BB7&amp;#125;&quot;    // &quot;𠮷&quot;  JavaScript内部，字符以UTF-16的格式储存，每个字符固定为2个字节。对于那些需要4个字节储存的字符（Unicode码点大于0">
-<meta property="og:updated_time" content="2017-06-07T03:15:45.000Z">
+<meta property="og:description" content="字符串的扩展  JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。">
+<meta property="og:updated_time" content="2017-07-12T04:45:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES6 learning 二">
-<meta name="twitter:description" content="字符串的扩展  JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。  1&quot;\u&amp;#123;20BB7&amp;#125;&quot;    // &quot;𠮷&quot;  JavaScript内部，字符以UTF-16的格式储存，每个字符固定为2个字节。对于那些需要4个字节储存的字符（Unicode码点大于0">
+<meta name="twitter:description" content="字符串的扩展  JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -208,6 +208,7 @@ ga('send', 'pageview');
 <ul>
 <li>JavaScript可以用\uxxxx表示一个字符，但局限于\u0000–\uFFFF,超过就得用双字节。ES6对这一点做出了改进，只要将码点放入大括号，就能正确解读该字符。</li>
 </ul>
+<a id="more"></a>
 <figure class="highlight awk"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="string">"\u&#123;20BB7&#125;"</span>    <span class="regexp">//</span> <span class="string">"𠮷"</span></div></pre></td></tr></table></figure>
 <ul>
 <li>JavaScript内部，字符以UTF-16的格式储存，每个字符固定为2个字节。对于那些需要4个字节储存的字符（Unicode码点大于0xFFFF的字符），JavaScript会认为它们是两个字符。charAt方法无法读取字符，charCodeAt方法只能分别返回前两个字节和后两个字节的值。ES6提供了codePointAt方法，能够正确处理4个字节储存的字符，返回一个字符的码点。它的逆过程通过String.fromCodePoint实现，弥补了String.fromCharCode的溢出问题。</li>
@@ -298,8 +299,8 @@ ga('send', 'pageview');
           </a>
         </div>
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -532,6 +533,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -541,14 +550,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">

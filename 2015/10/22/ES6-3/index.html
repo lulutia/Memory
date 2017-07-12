@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
   <title>ES6 learning 三 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="对象的扩展  ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。 ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。注意，属性名表达式与简洁表示法，不能同时使用，会报错。 Object.is用来比较两个值是否严格相等。它与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于">
+  <meta name="description" content="对象的扩展  ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。 ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。注意，属性名表达式与简洁表示法，不能同时使用，会报错。">
 <meta name="keywords" content="前端,计算机">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ES6 learning 三">
 <meta property="og:url" content="http://memory.lulutia.com/2015/10/22/ES6-3/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="对象的扩展  ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。 ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。注意，属性名表达式与简洁表示法，不能同时使用，会报错。 Object.is用来比较两个值是否严格相等。它与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于">
-<meta property="og:updated_time" content="2017-06-07T03:15:45.000Z">
+<meta property="og:description" content="对象的扩展  ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。 ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。注意，属性名表达式与简洁表示法，不能同时使用，会报错。">
+<meta property="og:updated_time" content="2017-07-12T04:45:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ES6 learning 三">
-<meta name="twitter:description" content="对象的扩展  ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。 ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。注意，属性名表达式与简洁表示法，不能同时使用，会报错。 Object.is用来比较两个值是否严格相等。它与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于">
+<meta name="twitter:description" content="对象的扩展  ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。 ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。注意，属性名表达式与简洁表示法，不能同时使用，会报错。">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -208,6 +208,9 @@ ga('send', 'pageview');
 <ul>
 <li>ES6允许在对象之中，只写属性名。这时，属性值等于属性名所代表的变量。除了属性简写，方法也可以简写。</li>
 <li>ES6允许字面量定义对象时，用表达式作为对象的属性名或方法名，即把表达式放在方括号内。<strong>注意，属性名表达式与简洁表示法，不能同时使用，会报错。</strong></li>
+</ul>
+<a id="more"></a>
+<ul>
 <li>Object.is用来比较两个值是否严格相等。它与严格比较运算符（===）的行为基本一致。不同之处只有两个：一是+0不等于-0，二是NaN等于自身。</li>
 <li>Object.assign方法用来将源对象（source）的所有可枚举属性，复制到目标对象（target）。Object.assign只拷贝自身属性，不可枚举的属性（enumerable为false）和继承的属性不会被拷贝。</li>
 <li>对象的每个属性都有一个描述对象（Descriptor），用来控制该属性的行为。Object.getOwnPropertyDescriptor方法可以获取该属性的描述对象。</li>
@@ -268,8 +271,8 @@ ga('send', 'pageview');
           </a>
         </div>
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -502,6 +505,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -511,14 +522,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">

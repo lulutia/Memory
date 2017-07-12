@@ -8,21 +8,20 @@
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
   <title>React Native 学习系列二 | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="状态管理 历史情况  最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程 人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑 数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发">
+  <meta name="description" content="状态管理 历史情况 最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程">
 <meta name="keywords" content="前端,计算机,ReactNative">
 <meta property="og:type" content="article">
 <meta property="og:title" content="React Native 学习系列二">
 <meta property="og:url" content="http://memory.lulutia.com/2017/07/06/reactnative02/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="状态管理 历史情况  最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程 人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑 数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发">
-<meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/virtualdom.png">
+<meta property="og:description" content="状态管理 历史情况 最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/reactlife.png">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/contentSizechange.png">
-<meta property="og:updated_time" content="2017-07-06T09:46:29.000Z">
+<meta property="og:updated_time" content="2017-07-12T04:47:16.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="React Native 学习系列二">
-<meta name="twitter:description" content="状态管理 历史情况  最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程 人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑 数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发">
-<meta name="twitter:image" content="http://okzzg7ifm.bkt.clouddn.com/virtualdom.png">
+<meta name="twitter:description" content="状态管理 历史情况 最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程">
+<meta name="twitter:image" content="http://okzzg7ifm.bkt.clouddn.com/reactlife.png">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -209,19 +208,19 @@ ga('send', 'pageview');
     <div class="article-entry" itemprop="articleBody">
       
         <h3 id="状态管理"><a href="#状态管理" class="headerlink" title="状态管理"></a>状态管理</h3><ul>
-<li><p>历史情况</p>
-<ul>
+<li>历史情况<ul>
 <li>最早的服务器端渲染: 新的请求发送到服务器端，服务器端返回一个新的页面，然后浏览器进行渲染。导致基本上任何与UI相关的数据变化时，都要全部重新走完整个绘制流程</li>
-<li>人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑</li>
-<li>数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发生时，只有那些确实需要变化的进行变化。这种方式对事件变更本身会进行一层处理，导致需要按照特定的API进行处理</li>
-<li>脏检测: 创建了值的观察器，一旦应用中发生变化，就检测这个观察器里的值是否与之前的值相同，如果不同就重新渲染这个值到UI。这种方式因为没有告诉框架是否变了以及什么地方变化了，所以只能通过外部来检查，比如有一种方法就是一旦交互产生，就重新把所有观察器跑一遍。这种方式遇见UI比较复杂或者重绘经常性发生时就很可能产生性能问题</li>
-<li><p>虚拟DOM: 思想上与服务器端渲染类似。只要状态发生变化，就全部重新渲染一次。但是其不同的地方在于他不是在真正DOM上执行这个操作，而是渲染到虚拟DOM，即一个轻量的纯javaScript的对象结构，里面是简单对象和数组来表达真实的DOM对象。之后再通过一个特殊的过程根据这个虚拟DOM来创建真实DOM。因此当一个值发生变化时，会通过对比新生成的虚拟DOM与之前的虚拟DOM而找出涉及DOM的变化，之后将变化反应在真正的DOM上。这种方式不用跟踪变动，减少了昂贵的DOM操作，这部分的详细了解推荐通过<a href="https://github.com/Matt-Esch/virtual-dom#dom-model" target="_blank" rel="external">virtual-dom</a>这个项目来进行分析，总的来说流程如下:</p>
-<p>  <img src="http://okzzg7ifm.bkt.clouddn.com/virtualdom.png" alt="virtualdom"></p>
-</li>
 </ul>
 </li>
 </ul>
-<h3 id="JSX"><a href="#JSX" class="headerlink" title="JSX"></a>JSX</h3><ul>
+<a id="more"></a>
+<pre><code>* 人工重绘界面: 交互产生事件，事件对应预先设定的重绘逻辑。导致代码中充斥着人工的处理渲染的逻辑
+* 数据绑定: 在UI上增加了监听器，当监听器接收到事件变更时自动知道如何处理。这种方式需要在一开始就设置所有的绑定，当事件发生时，只有那些确实需要变化的进行变化。这种方式对事件变更本身会进行一层处理，导致需要按照特定的API进行处理
+* 脏检测: 创建了值的观察器，一旦应用中发生变化，就检测这个观察器里的值是否与之前的值相同，如果不同就重新渲染这个值到UI。这种方式因为没有告诉框架是否变了以及什么地方变化了，所以只能通过外部来检查，比如有一种方法就是一旦交互产生，就重新把所有观察器跑一遍。这种方式遇见UI比较复杂或者重绘经常性发生时就很可能产生性能问题
+* 虚拟DOM: 思想上与服务器端渲染类似。只要状态发生变化，就全部重新渲染一次。但是其不同的地方在于他不是在真正DOM上执行这个操作，而是渲染到虚拟DOM，即一个轻量的纯javaScript的对象结构，里面是简单对象和数组来表达真实的DOM对象。之后再通过一个特殊的过程根据这个虚拟DOM来创建真实DOM。因此当一个值发生变化时，会通过对比新生成的虚拟DOM与之前的虚拟DOM而找出涉及DOM的变化，之后将变化反应在真正的DOM上。这种方式不用跟踪变动，减少了昂贵的DOM操作，这部分的详细了解推荐通过[virtual-dom](https://github.com/Matt-Esch/virtual-dom#dom-model)这个项目来进行分析，总的来说流程如下:
+
+    ![virtualdom](http://okzzg7ifm.bkt.clouddn.com/virtualdom.png)
+</code></pre><h3 id="JSX"><a href="#JSX" class="headerlink" title="JSX"></a>JSX</h3><ul>
 <li><p>什么是JSX</p>
 <blockquote>
 <p>It is called JSX, and it is a syntax extension to JavaScript. We recommend using it with React to describe what the UI should look like. JSX may remind you of a template language, but it comes with the full power of JavaScript.JSX produces React “elements”.</p>
@@ -465,8 +464,8 @@ ga('send', 'pageview');
           </a>
         </div>
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -703,6 +702,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -712,14 +719,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">

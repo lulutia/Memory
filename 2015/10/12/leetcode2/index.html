@@ -15,7 +15,7 @@
 <meta property="og:url" content="http://memory.lulutia.com/2015/10/12/leetcode2/index.html">
 <meta property="og:site_name" content="lulutia">
 <meta property="og:description" content="其他见part1Merge Two Sorted Lists  https://leetcode.com/problems/merge-two-sorted-lists/ Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the no">
-<meta property="og:updated_time" content="2017-06-07T03:15:45.000Z">
+<meta property="og:updated_time" content="2017-07-12T04:46:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="leetcode-JavaScript实现part2">
 <meta name="twitter:description" content="其他见part1Merge Two Sorted Lists  https://leetcode.com/problems/merge-two-sorted-lists/ Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the no">
@@ -209,6 +209,7 @@ ga('send', 'pageview');
 <li><a href="https://leetcode.com/problems/merge-two-sorted-lists/" target="_blank" rel="external">https://leetcode.com/problems/merge-two-sorted-lists/</a></li>
 <li>Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.</li>
 </ul>
+<a id="more"></a>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Definition for singly-linked list.</div><div class="line"> * function ListNode(val) &#123;</div><div class="line"> *     this.val = val;</div><div class="line"> *     this.next = null;</div><div class="line"> * &#125;</div><div class="line"> */</div><div class="line"><span class="comment">/**</span></div><div class="line"> * @param &#123;ListNode&#125; l1</div><div class="line"> * @param &#123;ListNode&#125; l2</div><div class="line"> * @return &#123;ListNode&#125;</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> mergeTwoLists = function(l1, l2) &#123;</div><div class="line">    <span class="keyword">var</span> resultNode = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">    <span class="keyword">var</span> result = resultNode;</div><div class="line">    <span class="keyword">if</span>(l1===<span class="literal">null</span>&amp;&amp;l2===<span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">while</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">        <span class="keyword">if</span>(l1===<span class="literal">null</span>)&#123;</div><div class="line">            result.<span class="keyword">val</span> = l2.<span class="keyword">val</span>;</div><div class="line">            l2 = l2.next;</div><div class="line">            <span class="keyword">if</span>(l2!==<span class="literal">null</span>)&#123;</div><div class="line">            result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">            result = result.next;&#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(l2===<span class="literal">null</span>)&#123;</div><div class="line">            result.<span class="keyword">val</span> = l1.<span class="keyword">val</span>;</div><div class="line">            l1 = l1.next;</div><div class="line">            <span class="keyword">if</span>(l1!==<span class="literal">null</span>)&#123;</div><div class="line">            result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">            result = result.next;&#125;</div><div class="line">            </div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            <span class="keyword">if</span>(l1.<span class="keyword">val</span>&lt;=l2.<span class="keyword">val</span>)&#123;</div><div class="line">                result.<span class="keyword">val</span> = l1.<span class="keyword">val</span>;</div><div class="line">                l1 = l1.next;</div><div class="line">                <span class="keyword">if</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">                result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">                result = result.next;&#125;</div><div class="line">                </div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span>&#123;</div><div class="line">                result.<span class="keyword">val</span> = l2.<span class="keyword">val</span>;</div><div class="line">                l2 = l2.next;</div><div class="line">                <span class="keyword">if</span>(l1!==<span class="literal">null</span>||l2!==<span class="literal">null</span>)&#123;</div><div class="line">                result.next = <span class="keyword">new</span> <span class="type">ListNode</span>(<span class="number">0</span>);</div><div class="line">                result = result.next;&#125;</div><div class="line">                </div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> resultNode;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
 <p>Remove Duplicates from Sorted Array</p>
 <ul>
@@ -319,8 +320,8 @@ ga('send', 'pageview');
           </a>
         </div>
       
+        <div id="comments" class="article-info article-info-index"></div>
     </div>
-    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -557,6 +558,14 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">面试</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -566,14 +575,6 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">optimization</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">
