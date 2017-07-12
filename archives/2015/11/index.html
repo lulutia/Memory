@@ -33,7 +33,7 @@
   <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
   <script type="text/javascript">
     const gitment = new Gitment({
-      id: '', // optional
+      id: 'memory', // optional
       owner: 'lulutia',
       repo: 'https://github.com/lulutia/Memory',
       oauth: {
@@ -42,7 +42,7 @@
       },
     })
 
-    document.body.appendChild(gitment.render())
+    gitment.render('container')
   </script>
   
 <!-- Google Analytics -->
@@ -396,15 +396,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">总结</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">计算机</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">总结</a>
               </li>
              
               <li class="article-tag-list-item">
