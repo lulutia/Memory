@@ -1,0 +1,3 @@
+#comments ul li:before {
+  content: none;
+}
