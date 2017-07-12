@@ -32,6 +32,19 @@
       background: linear-gradient(200deg,#a0cfe4,#e8c37e);
     }
   </style>
+  <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+  <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+  <script type="text/javascript">
+  const gitment = new Gitment({
+    id: 'memory',
+    owner: 'lulutia',
+    repo: 'Memory',
+    oauth: {
+      client_id: 'da7a7d4a2324ed36dbd5',
+      client_secret: '20d8cc4a7fb5d35ec1d994bf31b17988fb89d974',
+    }
+  })
+  </script>
   
 <!-- Google Analytics -->
 <script type="text/javascript">
@@ -307,6 +320,7 @@ ga('send', 'pageview');
         </div>
       
     </div>
+    <div id="comments" class="article-info article-info-index"></div>
     <div class="article-info article-info-index">
       
       
@@ -433,6 +447,10 @@ ga('send', 'pageview');
 
   
 
+<script type="text/javascript">
+  gitment.render('comments')
+</script>
+
 
           </div>
         </div>
@@ -523,15 +541,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">总结</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">前端</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">计算机</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">总结</a>
               </li>
              
               <li class="article-tag-list-item">
