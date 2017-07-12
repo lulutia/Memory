@@ -34,17 +34,6 @@
   </style>
   <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
   <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-  <script type="text/javascript">
-  const gitment = new Gitment({
-    id: 'memory',
-    owner: 'lulutia',
-    repo: 'Memory',
-    oauth: {
-      client_id: 'da7a7d4a2324ed36dbd5',
-      client_secret: '20d8cc4a7fb5d35ec1d994bf31b17988fb89d974',
-    }
-  })
-  </script>
   
 <!-- Google Analytics -->
 <script type="text/javascript">
@@ -266,6 +255,19 @@ ga('send', 'pageview');
         </div>
         <div id="comments" class="article-info article-info-index"></div>
 <script type="text/javascript">
+  console.log(window.location.href);
+  let name = window.location.href;
+  let idArray = name.split('/');
+  let id = idArray[idArray.length - 2];
+  const gitment = new Gitment({
+    id: id,
+    owner: 'lulutia',
+    repo: 'Memory',
+    oauth: {
+      client_id: 'da7a7d4a2324ed36dbd5',
+      client_secret: '20d8cc4a7fb5d35ec1d994bf31b17988fb89d974',
+    }
+  })
   gitment.render('comments')
 </script>
 
