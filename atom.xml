@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://memory.lulutia.com/"/>
-  <updated>2017-10-18T09:27:02.000Z</updated>
+  <updated>2017-10-31T07:09:18.000Z</updated>
   <id>http://memory.lulutia.com/</id>
   
   <author>
@@ -14,6 +14,136 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Vue生命周期总结</title>
+    <link href="http://memory.lulutia.com/2017/10/31/vuetimeline/"/>
+    <id>http://memory.lulutia.com/2017/10/31/vuetimeline/</id>
+    <published>2017-10-31T07:04:00.000Z</published>
+    <updated>2017-10-31T07:09:18.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文主要总结了vue中涉及到的生命周期，并且通过实际尝试得出了其执行顺序。</p>
+<a id="more"></a>
+<p>在进行Vue项目开发的过程中，会不可避免的接触它的生命周期。了解每个生命周期的特性及其使用场景对于快速进行项目开发相当重要。</p>
+<h3 id="全局守卫"><a href="#全局守卫" class="headerlink" title="全局守卫"></a>全局守卫</h3><p>一般基于Vue全家桶进行开发的项目都会采用vue-router来进行路由处理。在这种情况下，全局路由钩子将会是我们接触的生命周期第一站。这块主要涉及到以下两个方法：</p>
+<ul>
+<li><p>使用router.beforeEach注册一个全局前置守卫。直白的说就是当一个导航触发时，会按照顺序执行完毕此方法里的内容后再进行跳转[resolve后]。因此，在这个周期内特别适合做<strong>全局拦截</strong>，比如判断登陆状态。这个方法接受三个参数(from, to, next)，并且以调用next方法来作为resolve的标志。next方法可以传入以下几种参数：</p>
+<ul>
+<li>不传参数如next()：进行管道中的下一个钩子，执行完后成为resolve状态，进行正常跳转</li>
+<li>传入具体的路径如next(‘/‘): 直接跳转到传入的地址，当前导航会被中断，进行新的导航</li>
+<li>传入false如next(false): 中断当前导航，保持在当前的页面</li>
+<li>传入error如next(error): error是一个Error实例，导航会被终止且该错误会被传递给router.onError()注册过的回调</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'router.beforeEach'</span>)</div><div class="line">  next()</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<ul>
+<li>使用router.afterEach注册一个全局后置钩子，接受两个参数(from, to)。不接受next，也不改变导航状态</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">router.afterEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'router.afterEach'</span>)</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<h3 id="根组件"><a href="#根组件" class="headerlink" title="根组件"></a>根组件</h3><p>按照正常思维来思考，当路由确定后就涉及到具体页面的渲染。因此这部分涉及到以下几个实例的生命周期：</p>
+<ul>
+<li>beforeCreate：这个阶段主要执行初始化。可以访问实例本身，但是因为实例的配置还没完成，因此<strong>访问data或者method都是没用的</strong>。</li>
+<li>created：这个阶段已经进行了实例的配置，因此可以访问data、method和computed等了。但是因为挂载还没完成，所以<strong>直接访问this.$el是没用的</strong></li>
+<li>beforeMount：这个阶段是在挂载开始之前执行，之后就会走正常的渲染逻辑</li>
+<li>mounted：在这个阶段挂载已经完成，所以<strong>访问this.$el已经能够拿到元素了</strong></li>
+<li>beforeDestroy：这个阶段在实例销毁之前调用，因为是之前，所以在这个阶段还能够访问实例本身</li>
+<li>destroyed：这个阶段表示实例已经被销毁完成了。因此所以自己本身及其子组件的绑定，监听都会销毁</li>
+</ul>
+<p>上面是一个最基本的流程。加上前面的全局路由。我们可以看见其执行先后顺序如下：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline1.png" alt=""></p>
+<p>通过上面的展示，我们得到注意点1，在从A页面跳转到B页面时，<strong>A页面的beforeDestroy和destroyed方法是比全局路由的beforeEach和afterEach执行的晚的</strong>。</p>
+<p>除了上面一个最基本的流程外，还有一个很重要的环节就是<strong>更新</strong>。关于这个，有下面两个生命周期阶段：</p>
+<ul>
+<li>beforeUpdate：数据更新时调用，发生在virtual dom进行对比和渲染之前。因此在这个阶段继续更改数据不会触发重新的渲染。但是这里有几个需要注意的地方如下：<ul>
+<li>如果只是单纯的数据变化，而这个变化并没有在template里面使用，则这个函数也不会触发。</li>
+<li>在beforeUpdate里面进行的数据更新，如果与之前的一样，则virtual dom对比结果为一样，此时不会重新触发beforeUpdate和updated；如果不一样，则会触发beforeUpdate和updated，但实际updated时更新的数据为后面的，证明在这个阶段继续更改数据不会触发重新的渲染；但是如果这个阶段的数据更新是异步的，比如延迟一秒更新，实际updated会触发两次并且数据不一样，表明触发了新的绘制</li>
+<li>在beforeUpdate里面重复修改同一个数据可能导致beforeUpdate函数的无限循环，应尽量避免</li>
+</ul>
+</li>
+<li>updated：virtual dom重新渲染和打补丁之后调用。所以如果在这个阶段再进行数据的更改会又重新触发beforeUpdate，恰巧如果beforeUpdate里面有同一数据的修改则很容易导致无限循环，所以最好避免这种事情发生。这个环节后，可以使用更新后的dom。</li>
+</ul>
+<p>在添加了上面两个方法后，现在我们可以看其执行顺序如下：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline02.png" alt=""></p>
+<h3 id="子组件"><a href="#子组件" class="headerlink" title="子组件"></a>子组件</h3><p>根组件的基本生命周期探讨到一阶段了，因为现在都是组件化的思维，因此现在很自然的就会想到子组件的生命周期在全局是处于何种位置的。<br>与根组件一样，子组件也拥有beforeCreate、created、beforeMount、mounted、beforeUpdate、updated、beforeDestroy、destroyed这几个生命阶段。现在我们来看在<strong>不执行更新操作</strong>时的执行顺序：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline03.png" alt=""></p>
+<p>由上可知:</p>
+<ul>
+<li>子组件的初始化晚于根组件，但是其挂载早于根组件，即当子组件都mounted后，根组件才会mounted。具体子组件的beforeCreated时间是在根组件的beforeMount之后</li>
+<li>子组件的销毁开始时间也晚于根组件，但是只有当子组件都destroyed后，根组件才destroyed了</li>
+</ul>
+<p>那加上更新操作时会怎样呢？我们构造了一个子组件，将根组件的msg作为props传入进去，然后根据这个prop构造一个计算属性，来作为子组件的template中的一个参数。注意这里一定要使用计算属性，如果直接使用data的话，是不会更新的：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;smallcomponent :msg="msg"/&gt;</div><div class="line">..........HelloWorld.vue.........</div><div class="line"> &lt;template&gt;</div><div class="line">  &lt;div&gt;</div><div class="line">    &lt;h1&gt;&#123;&#123;componentInfo&#125;&#125;&lt;/h1&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">&lt;/template&gt;</div><div class="line">...</div><div class="line"> props: &#123;</div><div class="line">      msg: &#123;</div><div class="line">        type: String</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">    computed: &#123;</div><div class="line">      componentInfo () &#123;</div><div class="line">        return this.msg</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">..........Time.vue........</div></pre></td></tr></table></figure>
+<p>在上面这种情况下，我们可以得出其生命周期如下，很明显，根组件是在子组件更新完毕后才更新完毕的：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/time04.png" alt=""></p>
+<h3 id="指令"><a href="#指令" class="headerlink" title="指令"></a>指令</h3><p>除了上面所说的子组件，根组件里面可能还会有指令存在，总的来说指令也会有其对应的生命周期，如下来自<a href="https://cn.vuejs.org/v2/guide/custom-directive.html#main" target="_blank" rel="external">vue官方文档</a>：</p>
+<ul>
+<li>bind：只调用一次，指令第一次绑定到元素时调用，用这个钩子函数可以定义一个在绑定时执行一次的初始化动作</li>
+<li>inserted：被绑定元素插入父节点时调用 (父节点存在即可调用，不必存在于 document 中)</li>
+<li>update：所在组件的VNode更新时调用，但是可能发生在其孩子的VNode更新之前</li>
+<li>componentUpdated：所在组件的VNode及其孩子的VNode全部更新时调用</li>
+<li>unbind：只调用一次，指令与元素解绑时调用</li>
+</ul>
+<p>我们实现了一个指令，将根组件的msg作为值传入指令中，在最基本的状态下，他们的生命周期流程如下：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline05.png" alt=""></p>
+<p>看来指令和子组件的状态十分类似，也是在根组件beforeMount后进行bind与inserted，然后根组件才执行mounted；在解绑时，也是在根组件beforeDestroy后执行，执行完后根组件才可能执行destroyed</p>
+<p>同样，如果这时，加上更新操作，其生命流程会如下所示，很明显，根组件是在指令更新完毕后才更新完毕的：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline06.png" alt=""></p>
+<p>之前我们单独的讨论了子组件和指令，那么如果它们在一起时生命周期的顺序又是怎样呢？通过实际实验，我们得出其顺序如下，当我们在根组件里先因为子组件再引入指令时其顺序如下左图，当我们先引人指令再引人子组件时其顺序如下有图：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline09.png" alt=""></p>
+<p>很明显，这个顺序是和引人组件或者指令的先后顺序有关～</p>
+<ul>
+<li>销毁阶段谁先引入谁先销毁</li>
+<li>更新阶段，都是指令的更新靠前</li>
+<li>创建阶段，谁先引入谁先进行初始化，但总的来说挂载都在初始化之后[无论谁的初始化]</li>
+</ul>
+<h3 id="组件内的守卫"><a href="#组件内的守卫" class="headerlink" title="组件内的守卫"></a>组件内的守卫</h3><p>在前面我们已经讨论过全局守卫、根组件、子组件和指令了。但实际上对于组件而言，它还存在组件内的守卫，<a href="https://router.vuejs.org/zh-cn/advanced/navigation-guards.html" target="_blank" rel="external">如下</a>：</p>
+<ul>
+<li>beforeRouteEnter：在渲染该组件的对应路由被 confirm 前调用，<strong>不能</strong>获取组件实例 this，因为当守卫执行前，组件实例还没被创建</li>
+<li>beforeRouteUpdate：在当前路由改变，但是该组件被复用时调用，可以访问组件实例this</li>
+<li>beforeRouteLeave：导航离开该组件的对应路由时调用，可以访问组件实例this</li>
+</ul>
+<p>我们在根组件添加了以上几个方法，可以看见整个生命周期如下所示：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline10.png" alt=""></p>
+<p>由上可知，beforeRouteEnter是在全局守卫之后调用，而beforeRouteLeave是在全局守卫之前调用。上面我们说到在beforeRouteEnter阶段是没法访问到this的，为了解决这个问题，可以通过传一个回调给next来访问组件实例。在导航被确认的时候执行回调，并且把组件实例作为回调方法的参数。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">beforeRouteEnter (to, <span class="keyword">from</span>, next) &#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'beforeRouteEnter'</span>)</div><div class="line">    next(<span class="function"><span class="params">vm</span> =&gt;</span> &#123;</div><div class="line">      <span class="built_in">console</span>.log(<span class="string">'beforeRouteEnter的next'</span>)</div><div class="line">    &#125;)</div><div class="line">  &#125;,</div></pre></td></tr></table></figure>
+<p>那么这个的触发又是在生命周期的那一环呢？</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline11.png" alt=""></p>
+<p>很明显它会在完成mounted后马上触发。所以虽然beforeRouteEnter的执行时间很早，但是它的回调执行的时间比较晚，算是最接近dom渲染的一个周期了</p>
+<h3 id="路由独享的守卫"><a href="#路由独享的守卫" class="headerlink" title="路由独享的守卫"></a>路由独享的守卫</h3><p>除了上面我们讨论的全局守卫和组件内的守卫，实际还有一个路由独享的守卫，即可以在路由配置上直接定义beforeEnter守卫。具体使用如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> router = <span class="keyword">new</span> Router(&#123;</div><div class="line">  <span class="attr">routes</span>: [</div><div class="line">    &#123;</div><div class="line">      <span class="attr">path</span>: <span class="string">'/'</span>,</div><div class="line">      <span class="attr">name</span>: <span class="string">'Hello'</span>,</div><div class="line">      <span class="attr">component</span>: HelloWorld,</div><div class="line">      <span class="attr">beforeEnter</span>: <span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'Exclusive beforeEnter'</span>)</div><div class="line">        next()</div><div class="line">      &#125;</div><div class="line">    &#125;,</div><div class="line">    &#123;</div><div class="line">      <span class="attr">path</span>: <span class="string">'/world'</span>,</div><div class="line">      <span class="attr">name</span>: <span class="string">'World'</span>,</div><div class="line">      <span class="attr">component</span>: Page2</div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>通过实际情况我们可以得知，这个方法的调用会在全局守卫的beforeEach之后，而在组件内守卫的beforeRouteEnter之前，如下：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline12.png" alt=""></p>
+<h3 id="Vue-nextTick-amp-vm-nextTick"><a href="#Vue-nextTick-amp-vm-nextTick" class="headerlink" title="Vue.nextTick &amp; vm.$nextTick"></a>Vue.nextTick &amp; vm.$nextTick</h3><p>除了上面讨论的，还有两个和生命周期有关系的方法，如下：</p>
+<ul>
+<li><a href="https://cn.vuejs.org/v2/api/index.html#Vue-nextTick" target="_blank" rel="external">Vue.nextTick</a>：这是个全局API，在下次DOM更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的DOM</li>
+<li><a href="https://cn.vuejs.org/v2/api/index.html#vm-nextTick" target="_blank" rel="external">vm.$nextTick</a>: 将回调延迟到下次DOM更新循环之后执行。在修改数据之后立即使用它，然后等待DOM更新。它跟全局方法Vue.nextTick一样，不同的是回调的this自动绑定到调用它的实例上</li>
+</ul>
+<p>我们将这部分加上去，得到整个这篇文章探讨的生命周期过程如下：</p>
+<p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline13.png" alt=""></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://cn.vuejs.org/" target="_blank" rel="external">Vue.js官方文档</a></li>
+<li><a href="https://router.vuejs.org/zh-cn/index.html" target="_blank" rel="external">vue-router官方文档</a></li>
+<li><a href="https://segmentfault.com/a/1190000008879966" target="_blank" rel="external">vue生命周期探究（一）</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文主要总结了vue中涉及到的生命周期，并且通过实际尝试得出了其执行顺序。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="vue" scheme="http://memory.lulutia.com/tags/vue/"/>
+    
+  </entry>
   
   <entry>
     <title>基于IntersectionObserver的曝光统计测试</title>
