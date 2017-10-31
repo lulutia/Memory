@@ -26,7 +26,7 @@
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/timeline11.png">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/timeline12.png">
 <meta property="og:image" content="http://okzzg7ifm.bkt.clouddn.com/timeline13.png">
-<meta property="og:updated_time" content="2017-10-31T07:09:18.000Z">
+<meta property="og:updated_time" content="2017-10-31T07:34:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Vue生命周期总结">
 <meta name="twitter:description" content="本文主要总结了vue中涉及到的生命周期，并且通过实际尝试得出了其执行顺序。">
@@ -229,11 +229,11 @@ ga('send', 'pageview');
 <li>beforeMount：这个阶段是在挂载开始之前执行，之后就会走正常的渲染逻辑</li>
 <li>mounted：在这个阶段挂载已经完成，所以<strong>访问this.$el已经能够拿到元素了</strong></li>
 <li>beforeDestroy：这个阶段在实例销毁之前调用，因为是之前，所以在这个阶段还能够访问实例本身</li>
-<li>destroyed：这个阶段表示实例已经被销毁完成了。因此所以自己本身及其子组件的绑定，监听都会销毁</li>
+<li>destroyed：这个阶段表示实例已经被销毁完成了。因此所有自己本身及其子组件的绑定，监听都会销毁</li>
 </ul>
 <p>上面是一个最基本的流程。加上前面的全局路由。我们可以看见其执行先后顺序如下：</p>
 <p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline1.png" alt=""></p>
-<p>通过上面的展示，我们得到注意点1，在从A页面跳转到B页面时，<strong>A页面的beforeDestroy和destroyed方法是比全局路由的beforeEach和afterEach执行的晚的</strong>。</p>
+<p>通过上面的展示，我们得到注意点，在从A页面跳转到B页面时，<strong>A页面的beforeDestroy和destroyed方法是比全局路由的beforeEach和afterEach执行的晚的</strong>。</p>
 <p>除了上面一个最基本的流程外，还有一个很重要的环节就是<strong>更新</strong>。关于这个，有下面两个生命周期阶段：</p>
 <ul>
 <li>beforeUpdate：数据更新时调用，发生在virtual dom进行对比和渲染之前。因此在这个阶段继续更改数据不会触发重新的渲染。但是这里有几个需要注意的地方如下：<ul>
@@ -270,7 +270,7 @@ ga('send', 'pageview');
 <p>看来指令和子组件的状态十分类似，也是在根组件beforeMount后进行bind与inserted，然后根组件才执行mounted；在解绑时，也是在根组件beforeDestroy后执行，执行完后根组件才可能执行destroyed</p>
 <p>同样，如果这时，加上更新操作，其生命流程会如下所示，很明显，根组件是在指令更新完毕后才更新完毕的：</p>
 <p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline06.png" alt=""></p>
-<p>之前我们单独的讨论了子组件和指令，那么如果它们在一起时生命周期的顺序又是怎样呢？通过实际实验，我们得出其顺序如下，当我们在根组件里先因为子组件再引入指令时其顺序如下左图，当我们先引人指令再引人子组件时其顺序如下有图：</p>
+<p>之前我们单独的讨论了子组件和指令，那么如果它们在一起时生命周期的顺序又是怎样呢？通过实际实验，我们得出其顺序如下，当我们在根组件里先引入子组件再引入指令时其顺序如下左图，当我们先引人指令再引人子组件时其顺序如下右图：</p>
 <p><img src="http://okzzg7ifm.bkt.clouddn.com/timeline09.png" alt=""></p>
 <p>很明显，这个顺序是和引人组件或者指令的先后顺序有关～</p>
 <ul>
@@ -571,6 +571,10 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">算法</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">React Native</a>
               </li>
              
@@ -583,19 +587,15 @@ return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){v
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">算法</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">面试</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">ReactNative</a>
+                <a href="javascript:void(0)" class="js-tag color4">vue</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">vue</a>
+                <a href="javascript:void(0)" class="js-tag color2">ReactNative</a>
               </li>
             
             <div class="clearfix"></div>
