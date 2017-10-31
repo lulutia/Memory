@@ -15,10 +15,10 @@ tags: [前端,计算机,vue]
 
 * 使用router.beforeEach注册一个全局前置守卫。直白的说就是当一个导航触发时，会按照顺序执行完毕此方法里的内容后再进行跳转[resolve后]。因此，在这个周期内特别适合做**全局拦截**，比如判断登陆状态。这个方法接受三个参数(from, to, next)，并且以调用next方法来作为resolve的标志。next方法可以传入以下几种参数：
 
-	* 不传参数如next()：进行管道中的下一个钩子，执行完后成为resolve状态，进行正常跳转
-	* 传入具体的路径如next('/'): 直接跳转到传入的地址，当前导航会被中断，进行新的导航
-	* 传入false如next(false): 中断当前导航，保持在当前的页面
-	* 传入error如next(error): error是一个Error实例，导航会被终止且该错误会被传递给router.onError()注册过的回调
+  * 不传参数如next()：进行管道中的下一个钩子，执行完后成为resolve状态，进行正常跳转
+  * 传入具体的路径如next('/'): 直接跳转到传入的地址，当前导航会被中断，进行新的导航
+  * 传入false如next(false): 中断当前导航，保持在当前的页面
+  * 传入error如next(error): error是一个Error实例，导航会被终止且该错误会被传递给router.onError()注册过的回调
 
 ```js
 router.beforeEach((to, from, next) => {
@@ -42,20 +42,20 @@ router.afterEach((to, from, next) => {
 * beforeMount：这个阶段是在挂载开始之前执行，之后就会走正常的渲染逻辑
 * mounted：在这个阶段挂载已经完成，所以**访问this.$el已经能够拿到元素了**
 * beforeDestroy：这个阶段在实例销毁之前调用，因为是之前，所以在这个阶段还能够访问实例本身
-* destroyed：这个阶段表示实例已经被销毁完成了。因此所以自己本身及其子组件的绑定，监听都会销毁
+* destroyed：这个阶段表示实例已经被销毁完成了。因此所有自己本身及其子组件的绑定，监听都会销毁
 
 上面是一个最基本的流程。加上前面的全局路由。我们可以看见其执行先后顺序如下：
 
 ![](http://okzzg7ifm.bkt.clouddn.com/timeline1.png)
 
-通过上面的展示，我们得到注意点1，在从A页面跳转到B页面时，**A页面的beforeDestroy和destroyed方法是比全局路由的beforeEach和afterEach执行的晚的**。
+通过上面的展示，我们得到注意点，在从A页面跳转到B页面时，**A页面的beforeDestroy和destroyed方法是比全局路由的beforeEach和afterEach执行的晚的**。
 
 除了上面一个最基本的流程外，还有一个很重要的环节就是**更新**。关于这个，有下面两个生命周期阶段：
 
 * beforeUpdate：数据更新时调用，发生在virtual dom进行对比和渲染之前。因此在这个阶段继续更改数据不会触发重新的渲染。但是这里有几个需要注意的地方如下：
-	* 如果只是单纯的数据变化，而这个变化并没有在template里面使用，则这个函数也不会触发。
-	* 在beforeUpdate里面进行的数据更新，如果与之前的一样，则virtual dom对比结果为一样，此时不会重新触发beforeUpdate和updated；如果不一样，则会触发beforeUpdate和updated，但实际updated时更新的数据为后面的，证明在这个阶段继续更改数据不会触发重新的渲染；但是如果这个阶段的数据更新是异步的，比如延迟一秒更新，实际updated会触发两次并且数据不一样，表明触发了新的绘制
-	* 在beforeUpdate里面重复修改同一个数据可能导致beforeUpdate函数的无限循环，应尽量避免
+  * 如果只是单纯的数据变化，而这个变化并没有在template里面使用，则这个函数也不会触发。
+  * 在beforeUpdate里面进行的数据更新，如果与之前的一样，则virtual dom对比结果为一样，此时不会重新触发beforeUpdate和updated；如果不一样，则会触发beforeUpdate和updated，但实际updated时更新的数据为后面的，证明在这个阶段继续更改数据不会触发重新的渲染；但是如果这个阶段的数据更新是异步的，比如延迟一秒更新，实际updated会触发两次并且数据不一样，表明触发了新的绘制
+  * 在beforeUpdate里面重复修改同一个数据可能导致beforeUpdate函数的无限循环，应尽量避免
 * updated：virtual dom重新渲染和打补丁之后调用。所以如果在这个阶段再进行数据的更改会又重新触发beforeUpdate，恰巧如果beforeUpdate里面有同一数据的修改则很容易导致无限循环，所以最好避免这种事情发生。这个环节后，可以使用更新后的dom。
 
 在添加了上面两个方法后，现在我们可以看其执行顺序如下：
@@ -120,7 +120,7 @@ router.afterEach((to, from, next) => {
 
 ![](http://okzzg7ifm.bkt.clouddn.com/timeline06.png)
 
-之前我们单独的讨论了子组件和指令，那么如果它们在一起时生命周期的顺序又是怎样呢？通过实际实验，我们得出其顺序如下，当我们在根组件里先因为子组件再引入指令时其顺序如下左图，当我们先引人指令再引人子组件时其顺序如下有图：
+之前我们单独的讨论了子组件和指令，那么如果它们在一起时生命周期的顺序又是怎样呢？通过实际实验，我们得出其顺序如下，当我们在根组件里先引入子组件再引入指令时其顺序如下左图，当我们先引人指令再引人子组件时其顺序如下右图：
 
 ![](http://okzzg7ifm.bkt.clouddn.com/timeline09.png)
 
@@ -198,4 +198,3 @@ const router = new Router({
 * [Vue.js官方文档](https://cn.vuejs.org/)
 * [vue-router官方文档](https://router.vuejs.org/zh-cn/index.html)
 * [vue生命周期探究（一）](https://segmentfault.com/a/1190000008879966)
-
