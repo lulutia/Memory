@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://memory.lulutia.com/"/>
-  <updated>2017-10-31T07:34:49.000Z</updated>
+  <updated>2018-01-19T03:26:34.000Z</updated>
   <id>http://memory.lulutia.com/</id>
   
   <author>
@@ -14,6 +14,95 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>移动端基于vue-router的滚动位置记录(keep-alive)</title>
+    <link href="http://memory.lulutia.com/2018/01/19/keep-alive/"/>
+    <id>http://memory.lulutia.com/2018/01/19/keep-alive/</id>
+    <published>2018-01-19T02:57:00.000Z</published>
+    <updated>2018-01-19T03:26:34.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文主要对于如何在基于vue的移动端实现滚动位置记录进行了探讨。</p>
+<a id="more"></a>
+<p>在日常开发中，我们经常的会遇见与滚动位置记录相关的需求。多见于从列表页进入详情页，然后进行回退。对这种情况提炼出一套解决方案是相当有必要的。</p>
+<h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>在日常开发中，我们经常的会遇见与滚动位置记录相关的需求。多见于从列表页进入详情页，然后进行回退。原因如下：</p>
+<ul>
+<li>在移动开发中，列表多是由无限滚动进行加载的，因此如果回退后又从头进行加载实际上用户体验是相当不好的</li>
+<li>如果列表页的展现对实时性要求不高甚至长期不变，则回退后又进行的重新加载实际上是性能的浪费</li>
+</ul>
+<p>针对上面，在实际操作时更理想的情况是，对于实时性不高的列表，从列表页进入详情页又回退后，列表页会保存之前的位置。<br>在基于vue-router的项目中，为了实现上述效果可以使用其提供的keep-alive功能与scrollBehavior进行配合。</p>
+<h4 id="keep-alive与scrollBehavior"><a href="#keep-alive与scrollBehavior" class="headerlink" title="keep-alive与scrollBehavior"></a>keep-alive与scrollBehavior</h4><ul>
+<li>keep-alive: keep-alive是Vue内置的一个抽象组件，它自身不会渲染DOM元素也不会出现在父组件链中，它只是在包裹动态组件时会缓存不活动的组件实例，而不是销毁它们。<a href="https://cn.vuejs.org/v2/api/#keep-alive" target="_blank" rel="external">更多使用方法详见Vue官方文档</a>。</li>
+<li><p>scrollBehavior: scrollBehavior是由vue-router中Router实例提供的方法，它接受三个参数，分别为(to, from, savedPosition)，其中to和from是路由对象，而savedPosition是当 popstate导航(通过浏览器的 前进/后退 按钮触发)时记录的位置信息。</p>
+<ul>
+<li><p>scrollBehavior返回滚动位置的对象信息，如{ x: number, y: number}，如果返回的是<a href="https://developer.mozilla.org/zh-CN/docs/Glossary/Falsy" target="_blank" rel="external">falsy</a>或者空对象则不会发生滚动。</p>
+</li>
+<li><p>注意scrollBehavior只在HTML5 history模式下可用。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="实际使用"><a href="#实际使用" class="headerlink" title="实际使用"></a>实际使用</h4><ul>
+<li>使用router-view配合keep-alive: 在入口文件通过v-if进行对特定页面的缓存。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"page-group"</span>&gt;</div><div class="line">  &lt;keep-alive&gt;</div><div class="line">    &lt;router-view class="view" v-if="$route.meta.keep_alive"&gt;&lt;/router-view&gt;</div><div class="line">  &lt;/keep-alive&gt;</div><div class="line">  &lt;router-view class="view" v-if="!$route.meta.keep_alive"&gt;&lt;/router-view&gt;</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>对路由进行配置，开启HTML5 history模式并配置scrollBehavior：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> router = <span class="keyword">new</span> VueRouter(&#123;</div><div class="line"> 		<span class="attr">mode</span>: <span class="string">'history'</span>,</div><div class="line"> 		<span class="attr">scrollBehavior</span>: scrollBehavior,</div><div class="line"> 		routes</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>对路由进行配置，定制scrollBehavior方法，在这里会遇见以下几个问题：</p>
+<ul>
+<li><p>如何判断页面是否需要保留位置信息: </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">  <span class="attr">name</span>: constants.NAME,</div><div class="line">  <span class="attr">path</span>: constants.PATH,</div><div class="line">  <span class="attr">component</span>: <span class="built_in">module</span>,</div><div class="line">  <span class="attr">meta</span>: &#123;</div><div class="line">    <span class="attr">title</span>: constants.TITLE,</div><div class="line">    <span class="attr">val_cid</span>: constants.VAL_CID,</div><div class="line">    <span class="attr">requireAuth</span>: constants.REQUIRE_AUTH,</div><div class="line">    <span class="attr">keep_alive</span>: <span class="literal">true</span></div><div class="line">  &#125;,</div><div class="line">  constants</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>我们通过在路由上添加了一个参数keep_alive来声明当前路由是否要启动keep_alive的功能。</p>
+</li>
+<li><p>如何根据需要刷新页面，重新获取数据: 假如我们有三个页面，通过A进入B，通过B进入C。那么其中通过A进入B是需要进行数据刷新的；而从B进入C，再从C返回B则不需要进行数据刷新。因此针对同一个页面我们需要使用一种机制来判断多久需要数据刷新。<br>基本我们可以提炼出：通过<strong>跳转</strong>的是需要进行数据刷新的；而通过默认浏览器行为的是不需要进行浏览器刷新的。<br>看vue-router的源码中我们会发现下面的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'popstate'</span>, e =&gt; &#123;</div><div class="line">	.......</div><div class="line">    	this.transitionTo(location, route =&gt; &#123;</div><div class="line">      <span class="keyword">if</span> (supportsScroll) &#123;</div><div class="line">        handleScroll(router, route, current, <span class="literal">true</span>)</div><div class="line">      &#125;</div><div class="line">    &#125;)</div><div class="line">  &#125;)</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">push (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</div><div class="line">  ...</div><div class="line">  this.transitionTo(location, route =&gt; &#123;</div><div class="line">    ...</div><div class="line">    handleScroll(<span class="keyword">this</span>.router, route, fromRoute, <span class="literal">false</span>)</div><div class="line">    ...</div><div class="line">  &#125;, onAbort)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面代码在处理popstate时调用的handleScroll方法传入的最后一个参数是true，但是自己重写的push、replace等函数调用handleScroll时传入的最后一个参数都是false。<br>而在scroll.js中，我们可以看到handleScroll函数的最后一个参数就是用来区分浏览器默认行为，和router-link的行为的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">......</div><div class="line">const behavior = router.options.scrollBehavior</div><div class="line">......</div><div class="line">router.app.$nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</div><div class="line">   <span class="keyword">const</span> position = getScrollPosition()</div><div class="line">   <span class="keyword">const</span> shouldScroll = behavior.call(router, to, <span class="keyword">from</span>, isPop ? position : <span class="literal">null</span>)</div><div class="line">......</div><div class="line">  &#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在上面一段代码中，我们可以看到，对于浏览器默认行为，调用自定义的scrollBehavior函数后传参的savedPosition为保存的position，对于跳转这种则传参的savedPosition为null。<br><strong>通过上面，我们已经能区分什么时候需要进行数据刷新了</strong>。之后，我们需要修改两部分的代码，一部分是scrollBehavior，修改它来根据不同的情况返回不同的滚动值；另外一部分是实际keep-alive的页面的渲染逻辑，它需要根据不同的情况来选择是否进行数据获取。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> scrollBehavior = <span class="function">(<span class="params">to, <span class="keyword">from</span>, savedPosition</span>) =&gt;</span> &#123;</div><div class="line">  <span class="keyword">if</span> (to.matched.some(<span class="function"><span class="params">t</span> =&gt;</span> t.meta.keep_alive)) &#123;</div><div class="line">  	to.meta.saved_position = savedPosition; <span class="comment">// 传递这个值到具体页面来判断是否进行数据刷新</span></div><div class="line">    <span class="keyword">let</span> back = savedPosition ? savedPosition : &#123;<span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">0</span>&#125;;</div><div class="line">    <span class="keyword">return</span> back;</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">beforeRouteEnter: <span class="function"><span class="keyword">function</span>(<span class="params">to ,from, next</span>)</span>&#123;</div><div class="line">     next(<span class="function"><span class="params">vm</span> =&gt;</span> &#123;</div><div class="line">     	<span class="comment">// 通过对null的判断决定是否进行数据刷新</span></div><div class="line">       <span class="keyword">if</span> (to.meta.saved_position === <span class="literal">null</span>) &#123;</div><div class="line">         vm.initAll();</div><div class="line">       &#125;</div><div class="line">     &#125;)</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>这里需要注意必须要在beforeRouteEnter的next里面进行调用，因为一般的生命周期钩子比如mounted等都会被keep-alive给吃掉。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="需要注意的点"><a href="#需要注意的点" class="headerlink" title="需要注意的点"></a>需要注意的点</h3><p>在实际使用中，其实上面这种做法会有问题。我们会发现，在A页面进行刷新，然后第一次从A进入B，又从B返回A的时候，并没有滚动到特定的位置。它滚动到了顶部。通过代码调试，我们可以看到，这一次返回的savedPosition为undefined，因此在判断back的时候会赋值{x: 0, y: 0}。</p>
+<p>为了解决这个问题，我们需要手动记录一下滚动的位置。</p>
+<p>在路由跳转的时候，如果from的是keep-alive的页面，则记录它的位置，并保存在路由上。之后通过浏览器行为进入这个页面的时候对位置进行判定，如果有就取这个值。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> scrollBehavior = <span class="function">(<span class="params">to, <span class="keyword">from</span>, savedPosition</span>) =&gt;</span> &#123;</div><div class="line">  <span class="keyword">if</span> (to.matched.some(<span class="function"><span class="params">t</span> =&gt;</span> t.meta.keep_alive)) &#123;</div><div class="line">    <span class="keyword">if</span> (savedPosition === <span class="literal">null</span>) &#123;</div><div class="line">      to.meta.saved_position = <span class="literal">null</span>;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      savedPosition = to.meta.saved_position;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">let</span> back = savedPosition ? savedPosition : &#123;<span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">0</span>&#125;;</div><div class="line">    <span class="keyword">return</span> back;</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</div><div class="line">	...</div><div class="line">	if (<span class="keyword">from</span>.meta.keep_alive) &#123;</div><div class="line">    <span class="keyword">from</span>.meta.saved_position = &#123;<span class="attr">x</span>: <span class="built_in">window</span>.pageXOffset, <span class="attr">y</span>: <span class="built_in">window</span>.pageXOffset&#125;;</div><div class="line">  &#125;</div><div class="line">  ...</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>自此，可以解决这个问题。<br>那么我们接下来看下，为啥会出现undefined。在vue-router的代码中，有下面几段：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"> router.app.$nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</div><div class="line">   <span class="keyword">const</span> position = getScrollPosition()</div><div class="line">   <span class="keyword">const</span> shouldScroll = behavior.call(router, to, <span class="keyword">from</span>, isPop ? position : <span class="literal">null</span>)</div><div class="line">......</div><div class="line"> &#125;)</div><div class="line"> </div><div class="line"> <span class="function"><span class="keyword">function</span> <span class="title">getScrollPosition</span> (<span class="params"></span>): ?<span class="title">Object</span> </span>&#123;</div><div class="line">  <span class="keyword">const</span> key = getStateKey()</div><div class="line">  <span class="keyword">if</span> (key) &#123;</div><div class="line">    <span class="keyword">return</span> positionStore[key]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以看到，如果在调用getScrollPosition方法时，如果在positionStore里面没有找到对应当前key的数据，则会返回undefined。</p>
+<p>那么为什么会没找到当前的key呢，因为刷新后，也就是当router进行初始化时，当前的路由状态并没有在history上进行注册，即window.history.state为null。此时，当在当前页面A进行滑动后跳转到其他页面B时，会将位置信息存储到positionStore上面，key为初始化的window.performance.now().toFixed(3)。此时，点击回退按钮，会触发popstate来获取A的信息。但是因为A的history state并没有注册。所以无法找到匹配的位置信息。</p>
+<p>不过好的是现在这个问题已经被修复了，在<a href="https://github.com/vuejs/vue-router/releases/tag/v2.8.0" target="_blank" rel="external">2.8.0及其以上版本</a>中可以看到。修复思路就是在路由进行初始化的时候调用window.history.replaceState({ key: getStateKey() }, ‘’)来进行一个注册。具体见<a href="https://github.com/vuejs/vue-router/issues/1585" target="_blank" rel="external">链接</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://www.jianshu.com/p/fe238d8e7c6d" target="_blank" rel="external">vue-router 中使用 keep-alive 控制 ajax 请求的缓存策略(二)</a></li>
+<li><a href="https://github.com/vuejs/vue-router/blob/dev/src/util/scroll.js" target="_blank" rel="external">vue-router dev分支源码</a></li>
+<li><a href="https://github.com/vuejs/vue-router/issues/772" target="_blank" rel="external">scrollBehavior doesn’t store a scrolling position on the first page #772</a></li>
+<li><a href="https://github.com/vuejs/vue-router/issues/1585" target="_blank" rel="external">scrollBehavior doesn’t work for initial route in Firefox #1585</a></li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文主要对于如何在基于vue的移动端实现滚动位置记录进行了探讨。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
+    
+    
+      <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="vue" scheme="http://memory.lulutia.com/tags/vue/"/>
+    
+  </entry>
   
   <entry>
     <title>Vue生命周期总结</title>
@@ -2171,95 +2260,6 @@
       <category term="前端" scheme="http://memory.lulutia.com/tags/%E5%89%8D%E7%AB%AF/"/>
     
       <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>留档：GitHub＋hexo＋godaddy</title>
-    <link href="http://memory.lulutia.com/2015/09/11/hello-world/"/>
-    <id>http://memory.lulutia.com/2015/09/11/hello-world/</id>
-    <published>2015-09-11T11:22:00.000Z</published>
-    <updated>2017-07-12T04:45:50.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>环境准备部分</p>
-<ul>
-<li>安装Node，去<a href="https://nodejs.org/" target="_blank" rel="external">node官网</a>根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成在里面了。</li>
-<li>安装git，我用的是git的客户端<a href="https://www.sourcetreeapp.com/" target="_blank" rel="external">SourceTree</a>，选择很多，怎样顺手怎样来。</li>
-</ul>
-<a id="more"></a>
-<p>github部分<br><a href="https://github.com/" target="_blank" rel="external"><strong>github</strong></a>是一个开源代码库以及版本控制系统。</p>
-<ul>
-<li>申请一个GitHub的账号，路径点击上面链接。</li>
-<li>建立项目的仓库，这里根据你希望搭建的博客形式分为了两种方式：<ol>
-<li>个人或者组织的，这种情况下，你建立的仓库必须与你的用户名保持一致。比如：atmos/atmos.github.io。而且在这个仓库下的master分支将作为内容被建立并且发布到GitHub Pages site。</li>
-<li>项目的主页。在这种情况下，可以针对每个具体的项目仓库创建其相对的主页，分支gh-pages作为内容来建立和发布内容。它的访问url一般为username(orgname).github.io/projectname。</li>
-<li>总结：如果是希望建立全局性(内容上)的网页建议用第一种方式，否则用第二种方式。详细对比可见<a href="https://help.github.com/articles/user-organization-and-project-pages/" target="_blank" rel="external">GitHub Help</a>。</li>
-</ol>
-</li>
-<li>添加SSH公匙到Account settings －》SSH Keys －》Add SSH Key(其实如果不用SSH连接是可以省略这一步的)，具体过程<a href="https://help.github.com/articles/generating-ssh-keys/" target="_blank" rel="external">点击我</a>。将的很详细，跟着走就可以了。</li>
-<li>将此仓库克隆到本地(此处需要建立没有历史纪录和操作记录的新分支，所以最好新克隆)，然后创建gh-pages的分支并且将里面的内容都删除，此处不要提交修改。具体过程<a href="https://help.github.com/articles/creating-project-pages-manually/" target="_blank" rel="external">点击我</a>。</li>
-</ul>
-<p>hexo部分<br><a href="https://hexo.io/zh-cn/" target="_blank" rel="external"><strong>hexo</strong></a>是一个快速，简洁高效的博客框架。</p>
-<ul>
-<li><p>在命令行里输入<code>npm install hexo-cli -g</code>进行安装。这里可能会出现几个问题。</p>
-<ul>
-<li>需要权限，此时输入变为<code>sudo npm install hexo-cli -g</code>即可。</li>
-<li><p>卡node-gyp rebuild的问题，比如以下错误:</p>
-  <figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">node-gyp rebuild</div><div class="line">gyp WARN install got an error, rolling back install</div><div class="line">gyp ERR! configure error </div><div class="line">gyp ERR! stack Error: EPERM, utime <span class="string">'/Users/dirk/.node-gyp/0.12.4'</span></div><div class="line">gyp ERR! stack     at Error (native)</div><div class="line">gyp ERR! System Darwin 14.3.0</div><div class="line">gyp ERR! <span class="built_in">command</span> <span class="string">"node"</span> <span class="string">"/usr/local/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js"</span> <span class="string">"rebuild"</span></div><div class="line">gyp ERR! cwd /usr/<span class="built_in">local</span>/lib/node_modules/hexo-cli/node_modules/hexo-fs/node_modules/chokidar/node_modules/fsevents</div><div class="line">gyp ERR! node -v v0.12.4</div><div class="line">gyp ERR! node-gyp -v v1.0.3</div><div class="line">gyp ERR! not ok </div><div class="line">npm WARN optional dep failed, continuing fsevents@0.3.6</div></pre></td></tr></table></figure>
-<p>  原因就是GFW啦，所以要使用下国内镜像然后安装，如下：</p>
-  <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> npm install -g cnpm --registry=https://registry.npm.taobao.org <span class="comment">#可能需要sudo</span></span></div><div class="line"><span class="meta">$</span><span class="bash"> cnpm install hexo-cli -g</span></div></pre></td></tr></table></figure>
-</li>
-</ul>
-</li>
-<li><p>接着执行以下代码，主要就是初始化blog，如果没有指定文件夹则默认就在当下文件夹，然后切换到初始化后的文件夹安装依赖，最后开启本地服务器，此时访问本地<a href="http://localhost:4000/就可以了，命令如下：" target="_blank" rel="external">http://localhost:4000/就可以了，命令如下：</a></p>
-  <figure class="highlight armasm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="symbol">hexo</span> init <span class="keyword">blog</span></div><div class="line"><span class="symbol">cd</span> <span class="keyword">blog</span></div><div class="line"><span class="symbol">npm</span> install</div></pre></td></tr></table></figure>
-<p>  但是在实际执行中可能会遇见一些问题，比如：</p>
-  <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[Error: Module did <span class="keyword">not</span> self-<span class="keyword">register</span>.]</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/default/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/Debug/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">ERROR Plugin load failed: hexo-generator-feed</div><div class="line">ReferenceError: hexo is <span class="keyword">not</span> defined</div></pre></td></tr></table></figure>
-<p>  解决方案：</p>
-  <figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm <span class="keyword">install</span> hexo-generator-feed <span class="comment">--save</span></div><div class="line">npm <span class="keyword">install</span> hexo <span class="comment">--save</span></div></pre></td></tr></table></figure>
-</li>
-<li><p>以上只是部署到了本地，实际上我们需要部署到github上，所以需要去修改hexo的配置，主要修改deploy部分，修改如下,注意type不能写github：</p>
-  <figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">deploy</span>:</div><div class="line">  <span class="attribute">type</span>: git</div><div class="line">  <span class="attribute">repository</span>: <span class="attribute">https</span>:<span class="comment">//github.com/&lt;username&gt;/&lt;username&gt;.github.io.git</span></div><div class="line">  <span class="attribute">branch</span>: gh-pages</div></pre></td></tr></table></figure>
-<p>  然后执行以下命令：</p>
-  <figure class="highlight ebnf"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="attribute">hexo g</span></div><div class="line">hexo deploy</div></pre></td></tr></table></figure>
-<p>  实际中可能遇见的问题，比如：</p>
-  <figure class="highlight arduino"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/Release/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/default/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div><div class="line">&#123; [Error: Cannot <span class="built_in">find</span> <span class="keyword">module</span> <span class="string">'./build/Debug/DTraceProviderBindings'</span>] code: <span class="string">'MODULE_NOT_FOUND'</span> &#125;</div></pre></td></tr></table></figure>
-<p>  解决方案：</p>
-  <figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm <span class="keyword">install</span> hexo-deployer-git <span class="comment">--save</span></div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>主题安装<br><a href="https://github.com/hexojs/hexo/wiki/Themes" target="_blank" rel="external"><strong>主题寻找地址</strong></a><br>安装方法也很简单，具体的每个主题下有，大概就是将他们克隆到本地的themes文件夹下，然后修改hexo的配置里的theme为希望的主题。</p>
-<p>域名部署</p>
-<ul>
-<li>我是之前在godaddy上买过一个域名。</li>
-<li><a href="https://support.dnspod.cn/Kb/showarticle/tsid/42" target="_blank" rel="external">Godaddy注册商域名修改DNS地址</a>。</li>
-<li>在DNSPod添加域名后进入控制台添加纪录，这边已经有两条记录了，此时再添加两条，一条是A纪录的host为@指向github的ip，这里是固定的192.30.252.153。另外一条CNAME纪录的host为www指向你的主页<username>.github.io(当然这里也可以通过dig命令获取具体的ip值)，同理，如果是项目主页可以添加二级目录指向<username>.github.io。</username></username></li>
-<li>在具体的项目下添加一个文件CNAME。里面写上你希望对应的域名，然后提交。接着生成部署hexo就行。</li>
-<li><a href="https://help.github.com/articles/about-custom-domains-for-github-pages-sites/" target="_blank" rel="external">更加详细内容参照</a>。</li>
-</ul>
-<p>另外一些参考资料</p>
-<ul>
-<li><a href="http://ibruce.info/2013/11/22/hexo-your-blog/" target="_blank" rel="external">资料一</a></li>
-<li><a href="https://medium.com/@LovettLovett/github-pages-godaddy-f0318c2f25a" target="_blank" rel="external">资料二</a></li>
-</ul>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;环境准备部分&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;安装Node，去&lt;a href=&quot;https://nodejs.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;node官网&lt;/a&gt;根据自己的机子选择合适的一路傻瓜安装就行了，node安装好了一般npm也集成在里面了。&lt;/li&gt;
-&lt;li&gt;安装git，我用的是git的客户端&lt;a href=&quot;https://www.sourcetreeapp.com/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;SourceTree&lt;/a&gt;，选择很多，怎样顺手怎样来。&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="technology" scheme="http://memory.lulutia.com/categories/technology/"/>
-    
-    
-      <category term="计算机" scheme="http://memory.lulutia.com/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
-    
-      <category term="环境搭建" scheme="http://memory.lulutia.com/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
     
   </entry>
   

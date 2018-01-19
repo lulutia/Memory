@@ -6,17 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://memory.lulutia.com">
-  <title>Tag: 计算机 | lulutia</title>
+  <title>移动端基于vue-router的滚动位置记录(keep-alive) | lulutia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Keep going">
-<meta property="og:type" content="website">
-<meta property="og:title" content="lulutia">
-<meta property="og:url" content="http://memory.lulutia.com/tags/计算机/page/2/index.html">
+  <meta name="description" content="本文主要对于如何在基于vue的移动端实现滚动位置记录进行了探讨。">
+<meta name="keywords" content="前端,计算机,vue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="移动端基于vue-router的滚动位置记录(keep-alive)">
+<meta property="og:url" content="http://memory.lulutia.com/2018/01/19/keep-alive/index.html">
 <meta property="og:site_name" content="lulutia">
-<meta property="og:description" content="Keep going">
+<meta property="og:description" content="本文主要对于如何在基于vue的移动端实现滚动位置记录进行了探讨。">
+<meta property="og:updated_time" content="2018-01-19T03:26:34.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="lulutia">
-<meta name="twitter:description" content="Keep going">
+<meta name="twitter:title" content="移动端基于vue-router的滚动位置记录(keep-alive)">
+<meta name="twitter:description" content="本文主要对于如何在基于vue的移动端实现滚动位置记录进行了探讨。">
   
     <link rel="alternative" href="/atom.xml" title="lulutia" type="application/atom+xml">
   
@@ -169,36 +171,135 @@ ga('send', 'pageview');
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-keep-alive" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      移动端基于vue-router的滚动位置记录(keep-alive)
+    </h1>
+  
+
+        
+        <a href="/2018/01/19/keep-alive/" class="archive-article-date">
+  	<time datetime="2018-01-19T02:57:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-19</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文主要对于如何在基于vue的移动端实现滚动位置记录进行了探讨。</p>
+<a id="more"></a>
+<p>在日常开发中，我们经常的会遇见与滚动位置记录相关的需求。多见于从列表页进入详情页，然后进行回退。对这种情况提炼出一套解决方案是相当有必要的。</p>
+<h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>在日常开发中，我们经常的会遇见与滚动位置记录相关的需求。多见于从列表页进入详情页，然后进行回退。原因如下：</p>
+<ul>
+<li>在移动开发中，列表多是由无限滚动进行加载的，因此如果回退后又从头进行加载实际上用户体验是相当不好的</li>
+<li>如果列表页的展现对实时性要求不高甚至长期不变，则回退后又进行的重新加载实际上是性能的浪费</li>
+</ul>
+<p>针对上面，在实际操作时更理想的情况是，对于实时性不高的列表，从列表页进入详情页又回退后，列表页会保存之前的位置。<br>在基于vue-router的项目中，为了实现上述效果可以使用其提供的keep-alive功能与scrollBehavior进行配合。</p>
+<h4 id="keep-alive与scrollBehavior"><a href="#keep-alive与scrollBehavior" class="headerlink" title="keep-alive与scrollBehavior"></a>keep-alive与scrollBehavior</h4><ul>
+<li>keep-alive: keep-alive是Vue内置的一个抽象组件，它自身不会渲染DOM元素也不会出现在父组件链中，它只是在包裹动态组件时会缓存不活动的组件实例，而不是销毁它们。<a href="https://cn.vuejs.org/v2/api/#keep-alive" target="_blank" rel="external">更多使用方法详见Vue官方文档</a>。</li>
+<li><p>scrollBehavior: scrollBehavior是由vue-router中Router实例提供的方法，它接受三个参数，分别为(to, from, savedPosition)，其中to和from是路由对象，而savedPosition是当 popstate导航(通过浏览器的 前进/后退 按钮触发)时记录的位置信息。</p>
+<ul>
+<li><p>scrollBehavior返回滚动位置的对象信息，如{ x: number, y: number}，如果返回的是<a href="https://developer.mozilla.org/zh-CN/docs/Glossary/Falsy" target="_blank" rel="external">falsy</a>或者空对象则不会发生滚动。</p>
+</li>
+<li><p>注意scrollBehavior只在HTML5 history模式下可用。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="实际使用"><a href="#实际使用" class="headerlink" title="实际使用"></a>实际使用</h4><ul>
+<li>使用router-view配合keep-alive: 在入口文件通过v-if进行对特定页面的缓存。</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;div <span class="class"><span class="keyword">class</span></span>=<span class="string">"page-group"</span>&gt;</div><div class="line">  &lt;keep-alive&gt;</div><div class="line">    &lt;router-view class="view" v-if="$route.meta.keep_alive"&gt;&lt;/router-view&gt;</div><div class="line">  &lt;/keep-alive&gt;</div><div class="line">  &lt;router-view class="view" v-if="!$route.meta.keep_alive"&gt;&lt;/router-view&gt;</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure>
+<ul>
+<li><p>对路由进行配置，开启HTML5 history模式并配置scrollBehavior：</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> router = <span class="keyword">new</span> VueRouter(&#123;</div><div class="line"> 		<span class="attr">mode</span>: <span class="string">'history'</span>,</div><div class="line"> 		<span class="attr">scrollBehavior</span>: scrollBehavior,</div><div class="line"> 		routes</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+</li>
+<li><p>对路由进行配置，定制scrollBehavior方法，在这里会遇见以下几个问题：</p>
+<ul>
+<li><p>如何判断页面是否需要保留位置信息: </p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</div><div class="line">  <span class="attr">name</span>: constants.NAME,</div><div class="line">  <span class="attr">path</span>: constants.PATH,</div><div class="line">  <span class="attr">component</span>: <span class="built_in">module</span>,</div><div class="line">  <span class="attr">meta</span>: &#123;</div><div class="line">    <span class="attr">title</span>: constants.TITLE,</div><div class="line">    <span class="attr">val_cid</span>: constants.VAL_CID,</div><div class="line">    <span class="attr">requireAuth</span>: constants.REQUIRE_AUTH,</div><div class="line">    <span class="attr">keep_alive</span>: <span class="literal">true</span></div><div class="line">  &#125;,</div><div class="line">  constants</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>我们通过在路由上添加了一个参数keep_alive来声明当前路由是否要启动keep_alive的功能。</p>
+</li>
+<li><p>如何根据需要刷新页面，重新获取数据: 假如我们有三个页面，通过A进入B，通过B进入C。那么其中通过A进入B是需要进行数据刷新的；而从B进入C，再从C返回B则不需要进行数据刷新。因此针对同一个页面我们需要使用一种机制来判断多久需要数据刷新。<br>基本我们可以提炼出：通过<strong>跳转</strong>的是需要进行数据刷新的；而通过默认浏览器行为的是不需要进行浏览器刷新的。<br>看vue-router的源码中我们会发现下面的代码：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'popstate'</span>, e =&gt; &#123;</div><div class="line">	.......</div><div class="line">    	this.transitionTo(location, route =&gt; &#123;</div><div class="line">      <span class="keyword">if</span> (supportsScroll) &#123;</div><div class="line">        handleScroll(router, route, current, <span class="literal">true</span>)</div><div class="line">      &#125;</div><div class="line">    &#125;)</div><div class="line">  &#125;)</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">push (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</div><div class="line">  ...</div><div class="line">  this.transitionTo(location, route =&gt; &#123;</div><div class="line">    ...</div><div class="line">    handleScroll(<span class="keyword">this</span>.router, route, fromRoute, <span class="literal">false</span>)</div><div class="line">    ...</div><div class="line">  &#125;, onAbort)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上面代码在处理popstate时调用的handleScroll方法传入的最后一个参数是true，但是自己重写的push、replace等函数调用handleScroll时传入的最后一个参数都是false。<br>而在scroll.js中，我们可以看到handleScroll函数的最后一个参数就是用来区分浏览器默认行为，和router-link的行为的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">......</div><div class="line">const behavior = router.options.scrollBehavior</div><div class="line">......</div><div class="line">router.app.$nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</div><div class="line">   <span class="keyword">const</span> position = getScrollPosition()</div><div class="line">   <span class="keyword">const</span> shouldScroll = behavior.call(router, to, <span class="keyword">from</span>, isPop ? position : <span class="literal">null</span>)</div><div class="line">......</div><div class="line">  &#125;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在上面一段代码中，我们可以看到，对于浏览器默认行为，调用自定义的scrollBehavior函数后传参的savedPosition为保存的position，对于跳转这种则传参的savedPosition为null。<br><strong>通过上面，我们已经能区分什么时候需要进行数据刷新了</strong>。之后，我们需要修改两部分的代码，一部分是scrollBehavior，修改它来根据不同的情况返回不同的滚动值；另外一部分是实际keep-alive的页面的渲染逻辑，它需要根据不同的情况来选择是否进行数据获取。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> scrollBehavior = <span class="function">(<span class="params">to, <span class="keyword">from</span>, savedPosition</span>) =&gt;</span> &#123;</div><div class="line">  <span class="keyword">if</span> (to.matched.some(<span class="function"><span class="params">t</span> =&gt;</span> t.meta.keep_alive)) &#123;</div><div class="line">  	to.meta.saved_position = savedPosition; <span class="comment">// 传递这个值到具体页面来判断是否进行数据刷新</span></div><div class="line">    <span class="keyword">let</span> back = savedPosition ? savedPosition : &#123;<span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">0</span>&#125;;</div><div class="line">    <span class="keyword">return</span> back;</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">beforeRouteEnter: <span class="function"><span class="keyword">function</span>(<span class="params">to ,from, next</span>)</span>&#123;</div><div class="line">     next(<span class="function"><span class="params">vm</span> =&gt;</span> &#123;</div><div class="line">     	<span class="comment">// 通过对null的判断决定是否进行数据刷新</span></div><div class="line">       <span class="keyword">if</span> (to.meta.saved_position === <span class="literal">null</span>) &#123;</div><div class="line">         vm.initAll();</div><div class="line">       &#125;</div><div class="line">     &#125;)</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>这里需要注意必须要在beforeRouteEnter的next里面进行调用，因为一般的生命周期钩子比如mounted等都会被keep-alive给吃掉。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="需要注意的点"><a href="#需要注意的点" class="headerlink" title="需要注意的点"></a>需要注意的点</h3><p>在实际使用中，其实上面这种做法会有问题。我们会发现，在A页面进行刷新，然后第一次从A进入B，又从B返回A的时候，并没有滚动到特定的位置。它滚动到了顶部。通过代码调试，我们可以看到，这一次返回的savedPosition为undefined，因此在判断back的时候会赋值{x: 0, y: 0}。</p>
+<p>为了解决这个问题，我们需要手动记录一下滚动的位置。</p>
+<p>在路由跳转的时候，如果from的是keep-alive的页面，则记录它的位置，并保存在路由上。之后通过浏览器行为进入这个页面的时候对位置进行判定，如果有就取这个值。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> scrollBehavior = <span class="function">(<span class="params">to, <span class="keyword">from</span>, savedPosition</span>) =&gt;</span> &#123;</div><div class="line">  <span class="keyword">if</span> (to.matched.some(<span class="function"><span class="params">t</span> =&gt;</span> t.meta.keep_alive)) &#123;</div><div class="line">    <span class="keyword">if</span> (savedPosition === <span class="literal">null</span>) &#123;</div><div class="line">      to.meta.saved_position = <span class="literal">null</span>;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      savedPosition = to.meta.saved_position;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">let</span> back = savedPosition ? savedPosition : &#123;<span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">0</span>&#125;;</div><div class="line">    <span class="keyword">return</span> back;</div><div class="line">  &#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</div><div class="line">	...</div><div class="line">	if (<span class="keyword">from</span>.meta.keep_alive) &#123;</div><div class="line">    <span class="keyword">from</span>.meta.saved_position = &#123;<span class="attr">x</span>: <span class="built_in">window</span>.pageXOffset, <span class="attr">y</span>: <span class="built_in">window</span>.pageXOffset&#125;;</div><div class="line">  &#125;</div><div class="line">  ...</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>自此，可以解决这个问题。<br>那么我们接下来看下，为啥会出现undefined。在vue-router的代码中，有下面几段：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"> router.app.$nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</div><div class="line">   <span class="keyword">const</span> position = getScrollPosition()</div><div class="line">   <span class="keyword">const</span> shouldScroll = behavior.call(router, to, <span class="keyword">from</span>, isPop ? position : <span class="literal">null</span>)</div><div class="line">......</div><div class="line"> &#125;)</div><div class="line"> </div><div class="line"> <span class="function"><span class="keyword">function</span> <span class="title">getScrollPosition</span> (<span class="params"></span>): ?<span class="title">Object</span> </span>&#123;</div><div class="line">  <span class="keyword">const</span> key = getStateKey()</div><div class="line">  <span class="keyword">if</span> (key) &#123;</div><div class="line">    <span class="keyword">return</span> positionStore[key]</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以看到，如果在调用getScrollPosition方法时，如果在positionStore里面没有找到对应当前key的数据，则会返回undefined。</p>
+<p>那么为什么会没找到当前的key呢，因为刷新后，也就是当router进行初始化时，当前的路由状态并没有在history上进行注册，即window.history.state为null。此时，当在当前页面A进行滑动后跳转到其他页面B时，会将位置信息存储到positionStore上面，key为初始化的window.performance.now().toFixed(3)。此时，点击回退按钮，会触发popstate来获取A的信息。但是因为A的history state并没有注册。所以无法找到匹配的位置信息。</p>
+<p>不过好的是现在这个问题已经被修复了，在<a href="https://github.com/vuejs/vue-router/releases/tag/v2.8.0" target="_blank" rel="external">2.8.0及其以上版本</a>中可以看到。修复思路就是在路由进行初始化的时候调用window.history.replaceState({ key: getStateKey() }, ‘’)来进行一个注册。具体见<a href="https://github.com/vuejs/vue-router/issues/1585" target="_blank" rel="external">链接</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a href="https://www.jianshu.com/p/fe238d8e7c6d" target="_blank" rel="external">vue-router 中使用 keep-alive 控制 ajax 请求的缓存策略(二)</a></li>
+<li><a href="https://github.com/vuejs/vue-router/blob/dev/src/util/scroll.js" target="_blank" rel="external">vue-router dev分支源码</a></li>
+<li><a href="https://github.com/vuejs/vue-router/issues/772" target="_blank" rel="external">scrollBehavior doesn’t store a scrolling position on the first page #772</a></li>
+<li><a href="https://github.com/vuejs/vue-router/issues/1585" target="_blank" rel="external">scrollBehavior doesn’t work for initial route in Firefox #1585</a></li>
+</ul>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+        <div id="comments" class="article-info article-info-index"></div>
+<script type="text/javascript">
+  let name = window.location.href;
+  let idArray = name.split('/');
+  let id = idArray[idArray.length - 2];
+  const gitment = new Gitment({
+    id: id,
+    owner: 'lulutia',
+    repo: 'Memory',
+    oauth: {
+      client_id: 'da7a7d4a2324ed36dbd5',
+      client_secret: '20d8cc4a7fb5d35ec1d994bf31b17988fb89d974',
+    }
+  })
+  gitment.render('comments')
+</script>
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2015" class="archive-year">2015</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/10/20/JavaScript-delete/" class="archive-article-date">
-  	<time datetime="2015-10-20T04:36:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/10/20/JavaScript-delete/">JavaScript中的delete一探</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -210,11 +311,15 @@ ga('send', 'pageview');
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
         		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">vue</a>
+        		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -227,408 +332,89 @@ ga('send', 'pageview');
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://memory.lulutia.com/2018/01/19/keep-alive/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/10/15/memory1/" class="archive-article-date">
-  	<time datetime="2015-10-15T12:38:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-15</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/10/15/memory1/">面试回忆360</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">面试</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/technology/" class="article-tag-list-link color1">technology</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/10/13/note-structure01/" class="archive-article-date">
-  	<time datetime="2015-10-13T08:06:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-13</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/10/13/note-structure01/">(数据结构与算法JavaScript描述)读书笔记</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/technology/" class="article-tag-list-link color1">technology</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/10/12/leetcode2/" class="archive-article-date">
-  	<time datetime="2015-10-12T10:09:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-12</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/10/12/leetcode2/">leetcode-JavaScript实现part2</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Algorithm/" class="article-tag-list-link color5">Algorithm</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/10/11/ES6/" class="archive-article-date">
-  	<time datetime="2015-10-11T14:38:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-11</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/10/11/ES6/">ES6 learning</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/technology/" class="article-tag-list-link color1">technology</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/10/11/leetcode/" class="archive-article-date">
-  	<time datetime="2015-10-11T10:22:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-11</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/10/11/leetcode/">leetcode-JavaScript实现</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Algorithm/" class="article-tag-list-link color5">Algorithm</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/10/11/Node1/" class="archive-article-date">
-  	<time datetime="2015-10-11T10:21:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-10-11</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/10/11/Node1/">留档：Node学习脚印一</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">前端</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/technology/" class="article-tag-list-link color1">technology</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2015/09/11/hello-world/" class="archive-article-date">
-  	<time datetime="2015-09-11T11:22:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2015-09-11</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2015/09/11/hello-world/">留档：GitHub＋hexo＋godaddy</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">计算机</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">环境搭建</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/technology/" class="article-tag-list-link color1">technology</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2017/10/31/vuetimeline/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Vue生命周期总结</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
   
 
-    
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/tags/计算机/">&laquo; Prev</a><a class="page-number" href="/tags/计算机/">1</a><span class="page-number current">2</span>
-    </nav>
   
+
+  
+
+  
+
+
 
 
           </div>
@@ -651,9 +437,9 @@ ga('send', 'pageview');
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		root: "/",
