@@ -131,7 +131,7 @@ tags: [前端,计算机,vue]
 	```
 	这里需要注意必须要在beforeRouteEnter的next里面进行调用，因为一般的生命周期钩子比如mounted等都会被keep-alive给吃掉。
 
-### 需要注意的点	
+#### 需要注意的点	
 
 在实际使用中，其实上面这种做法会有问题。我们会发现，在A页面进行刷新，然后第一次从A进入B，又从B返回A的时候，并没有滚动到特定的位置。它滚动到了顶部。通过代码调试，我们可以看到，这一次返回的savedPosition为undefined，因此在判断back的时候会赋值{x: 0, y: 0}。
 		
@@ -186,7 +186,7 @@ router.beforeEach((to, from, next) => {
 	
 不过好的是现在这个问题已经被修复了，在[2.8.0及其以上版本](https://github.com/vuejs/vue-router/releases/tag/v2.8.0)中可以看到。修复思路就是在路由进行初始化的时候调用window.history.replaceState({ key: getStateKey() }, '')来进行一个注册。具体见[链接](https://github.com/vuejs/vue-router/issues/1585)
 		
-### 参考
+#### 参考
 * [vue-router 中使用 keep-alive 控制 ajax 请求的缓存策略(二)](https://www.jianshu.com/p/fe238d8e7c6d)
 * [vue-router dev分支源码](https://github.com/vuejs/vue-router/blob/dev/src/util/scroll.js)
 * [scrollBehavior doesn't store a scrolling position on the first page #772](https://github.com/vuejs/vue-router/issues/772)
